@@ -1,0 +1,14 @@
+[project]
+name = "bio-pipelines"
+version = "0.1.0"
+description = "Declarative In-Database Bioprocess Compiler, 4th-Order Runge-Kutta (RK4) Cascade Digital Twin, and Pareto Swarm Explorer powered by pg_bio (PostgreSQL 18 + Rust)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1.0",
+    "matplotlib>=3.9.0",
+    "numpy>=2.0.0",
+    "psycopg[binary]>=3.2.0",
+    "pyyaml>=6.0.2",
+    "rich>=13.9.0",
+]

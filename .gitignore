@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+structures/AF-*.pdb
+output/*.pdb
