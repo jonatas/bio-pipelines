@@ -68,6 +68,20 @@ PIPELINES = [
         "boost": 7.8,
         "color": "#457b9d",
     },
+    {
+        "id": "habanero-spicy-fuel",
+        "title": "5. Habanero Capsicum GGPPS -> Bio-Jet Fuel (32°C, pH 6.8)",
+        "sub_label": "Prenyl Precursors IPP/DMAPP (µM)",
+        "int_label": "Transient GGPP / FPP Pool (µM)",
+        "prod_label": "Drop-In C15/C20 Bio-Jet Terpene (µM)",
+        "kcat1": 26.0,
+        "km1": 360.0,
+        "kcat2": 44.0,
+        "km2": 28.0,
+        "ki": 16.0,
+        "boost": 8.8,
+        "color": "#f97316",
+    },
 ]
 
 
@@ -158,11 +172,11 @@ def run_rk4_multi_pipeline_benchmark():
 
     console.print(summary_table)
 
-    # Render 2x2 Multi-Feedstock RK4 Cascade Figure
+    # Render 2x2 Multi-Feedstock RK4 Cascade Figure (first 4 industrial/agro + Habanero summary)
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     axes = axes.flatten()
 
-    for idx, p in enumerate(PIPELINES):
+    for idx, p in enumerate(PIPELINES[:4]):
         ax = axes[idx]
         r = results[p["id"]]
         t = r["with_sink"][:, 0]

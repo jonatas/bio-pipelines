@@ -9,7 +9,7 @@
 
 ![pg_bio Layer 14 — Multi-Feedstock Swarm & RK4 Cascade Explorer](./output/swarm_web_dashboard.jpg)
 
-It implements the **Universal 4-Module Chimera & Consortium Grammar** across four recalcitrant solid-phase feedstocks:
+It implements the **Universal 4-Module Chimera & Consortium Grammar** across five industrial, agricultural, and biofuel feedstocks:
 
 | Pipeline Directory | Feedstock & Target Bond | Module 1: Interfacial Anchor | Module 2: Primary Scissor | Module 3: Equilibrium Sink | Module 4: Optical Beacon |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -17,6 +17,7 @@ It implements the **Universal 4-Module Chimera & Consortium Grammar** across fou
 | [`plastics-upcycling/`](./plastics-upcycling) | **PET & Polyurethane** (`C(=O)-O`, 360 kJ/mol, 68°C, pH 8.0) | CBM / Cutinase Anchor (`A0A067N4P7`) | Thermostable LCC / PETase / Cutinase (`G9BY57` / `Q47RJ6`) | Protocatechuate Dioxygenase $\rightarrow$ Vanillin / 2,5-FDCA | `PcaU` Terephthalate Biosensor |
 | [`agro-waste-lignocellulose/`](./agro-waste-lignocellulose) | **Sugarcane Bagasse** (42% Cellulose, 25% Xylan, 20% Lignin, 55°C, pH 5.0) | Fungal CBM1 / Bacterial CBM3 Dockerin (`A0AAX3E7H2`) | 3-Enzyme Swarm (DyP Peroxidase + GH10 Xylanase + AA9 LPMO/Cel7A) | Cellobiose Phosphorylase + HMF Oxidase $\rightarrow$ 2,5-FDCA | `XylR` / `FerC` Biosensor $\rightarrow$ Lycopene |
 | [`agro-waste-lignocellulose/`](./agro-waste-lignocellulose) | **Corn Stover & Bran** (Arabinoxylan–Diferulate Bridges, 50°C, pH 5.5) | CBM13 / CBM42 Arabinoxylan Anchor (`A0AAX3E7H2`) | CE1 Feruloyl Esterase + GH51 Arabinofuranosidase (`Q0CVS2`) | Ferulic Acid Decarboxylase (`FDC1`) + `VpVAN` $\rightarrow$ Bio-Vanillin | `FerC` Ferulate-Inducible Beacon |
+| [`habanero-spicy-fuel/`](./habanero-spicy-fuel) | **Habanero / *Capsicum* Prenyl Diphosphates** (`C-OPP`, 295 kJ/mol, 32°C, pH 6.8) | Lipid-Droplet / Oleosin / Phasin Anchor | *Capsicum* `GGPPS` (`P80042`) & Extremophile Prenyl Synthases | Terpene Synthase Cyclase + Dodecane Overlay $\rightarrow$ Drop-In $\text{C}_{15}/\text{C}_{20}$ Bio-Jet Fuel | `ERG9`/`idi` Sensor $\rightarrow$ *Capsicum* `PSY` (`P37272`) + `PDS` (`P80093`) |
 
 ---
 

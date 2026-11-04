@@ -12,6 +12,7 @@ PIPELINES = [
     "plastics-upcycling",
     "sugarcane-bagasse",
     "corn-stover-bran",
+    "habanero-spicy-fuel",
 ]
 
 
@@ -118,7 +119,7 @@ def run_validation_suite():
 
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
     console.print(table)
-    console.print(f"[bold green]✅ All 4 Pipelines Passed 100% of Mathematical, Kinetic & 3D Validation Checks in {elapsed_ms:.1f} ms![/]")
+    console.print(f"[bold green]✅ All 5 Pipelines Passed 100% of Mathematical, Kinetic & 3D Validation Checks in {elapsed_ms:.1f} ms![/]")
 
 
 if __name__ == "__main__":

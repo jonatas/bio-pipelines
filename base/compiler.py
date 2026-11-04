@@ -24,11 +24,14 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
             cur.execute("SELECT to_regclass('public.bio_domain_atlas');")
             has_table = cur.fetchone()[0] is not None
             atlas_count = 0
+            substrate_count = 0
             if has_table:
                 cur.execute("SELECT COUNT(*) FROM bio_domain_atlas;")
                 atlas_count = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM bio_substrates;")
+                substrate_count = cur.fetchone()[0]
 
-            if rebuild_atlas or atlas_count == 0:
+            if rebuild_atlas or atlas_count == 0 or substrate_count < 5:
                 schema_sql = open(os.path.join(BASE_DIR, "schema.sql")).read()
                 pareto_sql = open(os.path.join(BASE_DIR, "swarm_pareto.sql")).read()
                 cur.execute(schema_sql)
@@ -213,6 +216,7 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
             for label, f1, f2, f3, k1, k2, k3 in [
                 ("Sugarcane Bagasse (Cellulose:Xylan:Lignin)", 0.42, 0.25, 0.20, 14.0, 18.0, 9.5),
                 ("Corn Stover & Bran (Cellulose:Arabinoxylan:Ferulate)", 0.36, 0.28, 0.18, 13.5, 16.5, 12.0),
+                ("Habanero Spicy-Fuel (DMAPP:IPP:FPP/GGPP Terpene Flux)", 0.48, 0.32, 0.20, 16.0, 19.5, 14.0),
             ]:
                 cur.execute(
                     "SELECT * FROM optimize_consortium_stoichiometry(%s, %s, %s, %s, %s, %s, 48.0);",
@@ -232,7 +236,7 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
             console.print(stoich_table)
 
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
-    console.print(f"[bold green]⚡ Executed 4-Feedstock Declarative Compiler & Layer 14 Rust Engine in {elapsed_ms:.2f} ms![/]")
+    console.print(f"[bold green]⚡ Executed 5-Feedstock Declarative Compiler & Layer 14 Rust Engine in {elapsed_ms:.2f} ms![/]")
 
 
 if __name__ == "__main__":

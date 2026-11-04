@@ -6,6 +6,7 @@
 --   2. plastics-upcycling        (PET/PU -> Monomers / Vanillin / FDCA)
 --   3. sugarcane-bagasse         (Cellulose/Xylan/Lignin -> C5/C6 & 2,5-FDCA)
 --   4. corn-stover-bran          (Arabinoxylan Diferulate Bridges -> Bio-Vanillin)
+--   5. habanero-spicy-fuel       (Capsicum GGPPS P80042 Isoprenoids -> Drop-In Bio-Jet Fuel)
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS bio_substrates (
@@ -70,6 +71,17 @@ INSERT INTO bio_substrates (
     5.5,
     'FDC1 + VpVAN Cascade -> Bio-Vanillin',
     'FerC Ferulate-Inducible Chromoprotein Beacon'
+),
+(
+    'habanero-spicy-fuel',
+    'Capsicum GGPPS (P80042) Prenyl Diphosphates (DMAPP / IPP / FPP / GGPP)',
+    'Allylic Pyrophosphate Ester (C-OPP)',
+    295.0,
+    'CC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCOP(=O)(O)OP(=O)(O)O',
+    32.0,
+    6.8,
+    'Terpene Synthase Cyclization + Dodecane Overlay -> Drop-In C15/C20 Bio-Jet Fuel',
+    'ERG9/idi FPP-GGPP Sensor -> Capsicum PSY (P37272) + PDS (P80093) Carotenoid Beacon'
 );
 
 -- Universal 4-Module Domain Atlas populated across the 2.34M protein space

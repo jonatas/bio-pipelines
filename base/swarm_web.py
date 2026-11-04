@@ -88,6 +88,25 @@ PIPELINE_PRESETS = {
         "f2": 0.28,
         "f3": 0.18,
     },
+    "habanero-spicy-fuel": {
+        "title": "Habanero Capsicum GGPPS (P80042) -> Drop-In Bio-Aviation Jet Fuel (32°C, pH 6.8)",
+        "temp_c": 32.0,
+        "ph": 6.8,
+        "smiles": "CC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCOP(=O)(O)OP(=O)(O)O",
+        "ref_smiles": "CC(C)=CCCC(C)=CCCC(C)=CC=C",
+        "sub_label": "Prenyl Precursors IPP/DMAPP (µM)",
+        "int_label": "Transient GGPP / FPP Pool (µM)",
+        "prod_label": "Drop-In C15/C20 Bio-Jet Terpene (µM)",
+        "kcat1": 26.0,
+        "km1": 360.0,
+        "kcat2": 44.0,
+        "km2": 28.0,
+        "ki": 16.0,
+        "boost": 8.8,
+        "f1": 0.48,
+        "f2": 0.32,
+        "f3": 0.20,
+    },
 }
 
 
@@ -497,6 +516,7 @@ HTML_TEMPLATE = """
                 <option value="plastics-upcycling">2. PET Polyester -> PCA/Vanillin (68°C, pH 8.0)</option>
                 <option value="sugarcane-bagasse">3. Sugarcane Bagasse -> 2,5-FDCA (55°C, pH 5.0)</option>
                 <option value="corn-stover-bran">4. Corn Stover Diferulate -> Bio-Vanillin (50°C, pH 5.5)</option>
+                <option value="habanero-spicy-fuel">5. Habanero Capsicum GGPPS -> Bio-Jet Fuel (32°C, pH 6.8)</option>
             </select>
             <button onclick="resetSlidersToPreset()">Reset Preset</button>
         </div>
@@ -1050,14 +1070,14 @@ def api_swarm():
                            ROUND(mw_kda::numeric, 1) AS mw,
                            ROUND(isoelectric_pi::numeric, 2) AS pi,
                            ROUND(shannon_entropy::numeric, 3) AS entropy,
-                           NTILE(16) OVER (ORDER BY ABS(isoelectric_pi - %s) ASC, shannon_entropy DESC) AS bucket
+                           NTILE(16) OVER (ORDER BY (uniprot_id = 'P80042') DESC, ABS(isoelectric_pi - %s) ASC, shannon_entropy DESC) AS bucket
                     FROM bio_domain_atlas
                     WHERE pipeline_family = %s AND module_role = 'M2_Scissor'
                       AND mw_kda BETWEEN 16.0 AND 75.0
                 )
                 SELECT DISTINCT ON (bucket) uniprot_id, organism_name, mw, pi, entropy
                 FROM ranked_s
-                ORDER BY bucket ASC, entropy DESC;
+                ORDER BY bucket ASC, (uniprot_id = 'P80042') DESC, entropy DESC;
                 """,
                 (preset["ph"], pid),
             )

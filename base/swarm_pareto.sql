@@ -38,6 +38,12 @@ WITH candidate_domains AS (
     WHERE (name ILIKE '%carbohydrate-binding%' OR name ILIKE '%xylan-binding%' OR name ILIKE '%cellulose-binding%')
       AND sequence IS NOT NULL AND length(sequence) BETWEEN 35 AND 600
 
+    UNION ALL
+    SELECT 'habanero-spicy-fuel', 'M1_Anchor', 'Lipid_Droplet_Oleosin_Anchor', uniprot_id, name, sequence
+    FROM proteins
+    WHERE (name ILIKE '%lipid droplet%' OR name ILIKE '%oleosin%' OR name ILIKE '%phasin%' OR name ILIKE '%apolipoprotein%' OR name ILIKE '%lipid-binding%')
+      AND sequence IS NOT NULL AND length(sequence) BETWEEN 40 AND 550
+
     -- 2. Primary Bond Scissors (Module 2)
     UNION ALL
     SELECT 'ptfe-to-bioceramic', 'M2_Scissor', 'Dehalogenase', uniprot_id, name, sequence
@@ -61,6 +67,12 @@ WITH candidate_domains AS (
     FROM proteins
     WHERE (name ILIKE '%feruloyl esterase%' OR name ILIKE '%arabinofuranosidase%')
       AND sequence IS NOT NULL AND length(sequence) BETWEEN 120 AND 850
+
+    UNION ALL
+    SELECT 'habanero-spicy-fuel', 'M2_Scissor', 'GGPPS_Prenyl_Synthase', uniprot_id, name, sequence
+    FROM proteins
+    WHERE (uniprot_id = 'P80042' OR name ILIKE '%geranylgeranyl pyrophosphate%' OR name ILIKE '%farnesyl pyrophosphate%' OR name ILIKE '%polyprenyl synthetase%')
+      AND sequence IS NOT NULL AND length(sequence) BETWEEN 150 AND 650
 
     -- 3. Equilibrium Sinks (Module 3)
     UNION ALL
@@ -86,6 +98,12 @@ WITH candidate_domains AS (
     FROM proteins
     WHERE (name ILIKE '%ferulic acid decarboxylase%' OR name ILIKE '%phenolic acid decarboxylase%' OR name ILIKE '%vanillin%')
       AND sequence IS NOT NULL AND length(sequence) BETWEEN 100 AND 650
+
+    UNION ALL
+    SELECT 'habanero-spicy-fuel', 'M3_Sink', 'Terpene_Cyclase_Biofuel_Sink', uniprot_id, name, sequence
+    FROM proteins
+    WHERE (name ILIKE '%terpene synthase%' OR name ILIKE '%diterpene%' OR name ILIKE '%sesquiterpene%' OR name ILIKE '%squalene%')
+      AND sequence IS NOT NULL AND length(sequence) BETWEEN 150 AND 800
 
     -- 4. Optical Beacons (Module 4)
     UNION ALL

@@ -1,0 +1,44 @@
+pipeline_id: habanero-spicy-fuel
+name: "Habanero Spicy-Fuel: Capsicum GGPPS (P80042) Isoprenoid -> Drop-In Bio-Aviation Jet Fuel"
+feedstock:
+  type: isoprenoid_pyrophosphate
+  target_bond: "Allylic Prenyl Pyrophosphate Ester (C-OPP, 295 kJ/mol)"
+  smiles: "CC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCOP(=O)(O)OP(=O)(O)O"
+  reference_analog_smiles: "CC(C)=CCCC(C)=CCCC(C)=CC=C"
+reactor:
+  temperature_c: 32.0
+  ph: 6.8
+  magnesium_mm: 10.0
+modules:
+  module_1_anchor:
+    role: "Interfacial Anchor"
+    subtype: "Lipid_Droplet_Oleosin_Anchor"
+    reference_uniprot: "P80042"
+    min_gravy: 0.10
+  module_2_scissor:
+    role: "Primary Bond Scissor"
+    subtype: "GGPPS_Prenyl_Synthase"
+    reference_uniprot: "P80042"
+    extremophile_uniprot: "A0AAQ4CWP8"
+    theozyme_template: "p80042_ggpps_ddxxd_mg_cluster"
+  module_3_sink:
+    role: "Equilibrium Sink"
+    subtype: "Terpene_Cyclase_Biofuel_Sink"
+    reference_uniprot: "A0ABU2D2L0"
+    sink_product: "Drop-In C15/C20 Bio-Jet Terpene (Phase-Separated)"
+  module_4_beacon:
+    role: "Optical Beacon"
+    subtype: "Carotenoid_Reporter"
+    sensor: "FPP/GGPP-Inducible ERG9/idi Promoter"
+    reporter_uniprot: "P37272"
+    desaturase_uniprot: "P80093"
+    readout: "Capsicum Chromoplastic Lycopene/Capsanthin Readout (472/503 nm)"
+linkers:
+  - "GGGGSGGGGSGGGGS"
+  - "EAAAK"
+  - "GGGGSEAAAKGGGGS"
+hosts:
+  - s_cerevisiae
+  - y_lipolytica
+  - p_putida
+  - e_coli
