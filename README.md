@@ -2,11 +2,13 @@
 
 `bio-pipelines` is a standalone, multi-feedstock synthetic biology and industrial bioprocess compiler built on top of **`pg_bio`** (PostgreSQL 18 + Rust Layer 1–14 primitives).
 
+![pg_bio Layer 14 — Multi-Feedstock Swarm & RK4 Cascade Explorer](./output/swarm_web_dashboard.jpg)
+
 It implements the **Universal 4-Module Chimera & Consortium Grammar** across four recalcitrant solid-phase feedstocks:
 
 | Pipeline Directory | Feedstock & Target Bond | Module 1: Interfacial Anchor | Module 2: Primary Scissor | Module 3: Equilibrium Sink | Module 4: Optical Beacon |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [`ptfe-to-bioceramic/`](./ptfe-to-bioceramic) | **PTFE / PFAS** (`C-F`, 540 kJ/mol, 37°C, pH 7.4) | Class II Hydrophobin (`P79073` / `A0A2T3ZQB7`) | Fluoroacetate Dehalogenase (`Q1JU72` / `P81594`) | AMELX Tag $\rightarrow$ Fluorapatite $\text{Ca}_5(\text{PO}_4)_3\text{F}$ | `crcB` Fluoride Riboswitch $\rightarrow$ Phytoene Desaturase |
+| [`ptfe-to-bioceramic/`](./ptfe-to-bioceramic) | **PTFE / PFAS** (`C-F`, 540 kJ/mol, 37°C, pH 7.4) | Class II Hydrophobin (`P79073` / `A0A2T3ZKC8`) | Fluoroacetate Dehalogenase (`Q1JU72` / `P81594`) | AMELX Tag $\rightarrow$ Fluorapatite $\text{Ca}_5(\text{PO}_4)_3\text{F}$ | `crcB` Fluoride Riboswitch $\rightarrow$ Phytoene Desaturase |
 | [`plastics-upcycling/`](./plastics-upcycling) | **PET & Polyurethane** (`C(=O)-O`, 360 kJ/mol, 68°C, pH 8.0) | CBM / Cutinase Anchor (`A0A067N4P7`) | Thermostable LCC / PETase / Cutinase (`G9BY57` / `Q47RJ6`) | Protocatechuate Dioxygenase $\rightarrow$ Vanillin / 2,5-FDCA | `PcaU` Terephthalate Biosensor |
 | [`agro-waste-lignocellulose/`](./agro-waste-lignocellulose) | **Sugarcane Bagasse** (42% Cellulose, 25% Xylan, 20% Lignin, 55°C, pH 5.0) | Fungal CBM1 / Bacterial CBM3 Dockerin (`A0AAX3E7H2`) | 3-Enzyme Swarm (DyP Peroxidase + GH10 Xylanase + AA9 LPMO/Cel7A) | Cellobiose Phosphorylase + HMF Oxidase $\rightarrow$ 2,5-FDCA | `XylR` / `FerC` Biosensor $\rightarrow$ Lycopene |
 | [`agro-waste-lignocellulose/`](./agro-waste-lignocellulose) | **Corn Stover & Bran** (Arabinoxylan–Diferulate Bridges, 50°C, pH 5.5) | CBM13 / CBM42 Arabinoxylan Anchor (`A0AAX3E7H2`) | CE1 Feruloyl Esterase + GH51 Arabinofuranosidase (`Q0CVS2`) | Ferulic Acid Decarboxylase (`FDC1`) + `VpVAN` $\rightarrow$ Bio-Vanillin | `FerC` Ferulate-Inducible Beacon |
@@ -25,6 +27,8 @@ All heavy numerical, cheminformatics, and 3D structural computations execute dir
    - 3-component simplex optimizer ($w_1 + w_2 + w_3 = 1.00$) balancing enzyme dosing across mixed lignocellulosic feedstocks.
 4. **`translate_and_merge_pdb_chains(domain_a_pdb, domain_b_pdb, clearance_angstroms)`**
    - Pure 3D rigid-body bounding-box translator enforcing $\ge 28.0\,\text{\AA}$ inter-domain clearance alongside `evaluate_globular_compactness()`.
+
+![In-Database 4th-Order Runge-Kutta (RK4) Enzymatic Cascade Digital Twin](./output/rk4_four_feedstock_cascades.png)
 
 ---
 
