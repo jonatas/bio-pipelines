@@ -1,6 +1,11 @@
 # 🧬 `bio-pipelines` — Declarative In-Database Bioprocess Compiler & RK4 Cascade Explorer
 
-`bio-pipelines` is a standalone, multi-feedstock synthetic biology and industrial bioprocess compiler built on top of **`pg_bio`** (PostgreSQL 18 + Rust Layer 1–14 primitives).
+`bio-pipelines` is a standalone, multi-feedstock synthetic biology and industrial bioprocess compiler built on top of [**`pg_bio`**](https://github.com/jonatas/pg_bio) (PostgreSQL 18 + Rust Layer 1–14 primitives), generalizing the 4-module architecture first demonstrated in [**`teaflon`**](https://github.com/jonatas/teaflon).
+
+> 🔗 **Ecosystem Links:**
+> - **Core Database Engine (Rust + PostgreSQL 18):** [`jonatas/pg_bio`](https://github.com/jonatas/pg_bio) ([`src/lib.rs`](https://github.com/jonatas/pg_bio/blob/main/src/lib.rs))
+> - **Original PTFE $\rightarrow$ Fluorapatite Case Study:** [`jonatas/teaflon`](https://github.com/jonatas/teaflon) ([`ideia.me/teaflon-intro`](https://ideia.me/teaflon-intro))
+> - **Declarative Multi-Feedstock Pipelines & RK4 Swarm UI:** [`jonatas/bio-pipelines`](https://github.com/jonatas/bio-pipelines) *(this repository)*
 
 ![pg_bio Layer 14 — Multi-Feedstock Swarm & RK4 Cascade Explorer](./output/swarm_web_dashboard.jpg)
 
