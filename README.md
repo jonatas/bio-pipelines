@@ -118,28 +118,52 @@ All heavy numerical, cheminformatics, vector homology, and 3D structural computa
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (One-Command Docker or Local `uv`)
+
+### Option A: One-Command Docker / Docker Compose (Zero Local Setup)
+
+The included [`Dockerfile`](./Dockerfile) and [`docker-compose.yml`](./docker-compose.yml) bundle **PostgreSQL 18**, the compiled **`pg_bio` Rust extension**, **Python 3 / `uv`**, and a curated 1.6 MB seed dataset ([`base/docker_seed.sql`](./base/docker_seed.sql)) containing 1,412 candidate proteins, 400 3D-scored discovery edges, 300 RangeFinder 10 Å pockets, and 160 CETSA/TPP microprotein knockout cascades so anyone can test all 8 pipelines and the full 3D Web UI locally in a single command:
+
+```bash
+# 1. Build and launch PostgreSQL 18 + pg_bio + bio-pipelines Web UI on http://localhost:8090
+docker compose up --build
+
+# -> Automatically initializes Postgres 18, installs pg_bio, loads base/docker_seed.sql,
+#    compiles all 8 YAML pipelines (base/compiler.py), runs the Hypothesis Agent
+#    (base/hypothesis_agent.py), and starts the Unified Web UI on http://localhost:8090
+```
+
+You can also run the automated end-to-end mathematical, kinetic (RK4 mass conservation), simplex stoichiometry, and 3D clearance validation suite inside the container:
+
+```bash
+docker compose run --rm bio-pipelines test
+```
+
+### Option B: Local Development with `uv` (Against Local `pg_bio` PostgreSQL 18)
 
 ```bash
 # 1. Install dependencies with uv
 uv sync
 
-# 2. Run the declarative multi-feedstock compiler (~80 ms after initial atlas bootstrap)
+# 2. (Optional, if starting on an empty database) Seed the curated 8-pipeline dataset
+psql "${PG_BIO_URL:-postgresql://localhost:28818/bio_demo}" -f base/docker_seed.sql
+
+# 3. Run the declarative multi-feedstock compiler (~80 ms after initial atlas bootstrap)
 uv run python base/compiler.py
 
-# 3. Generate the 2x2 48-hour RK4 cascade benchmark chart (~24 ms in PostgreSQL)
+# 4. Generate the 2x2 48-hour RK4 cascade benchmark chart (~24 ms in PostgreSQL)
 uv run python base/plot_rk4_cascades.py
 
-# 4. Launch the Autonomous Protein Correlation Swarm worker (with in-process hypothesis evolution every 25 waves)
+# 5. Launch the Autonomous Protein Correlation Swarm worker (with in-process hypothesis evolution every 25 waves)
 uv run python base/swarm_discovery.py
 
-# 5. Or run a standalone Autonomous Hypothesis & Dark-Proteome (DUF) Evolution cycle
+# 6. Or run a standalone Autonomous Hypothesis & Dark-Proteome (DUF) Evolution cycle
 uv run python base/hypothesis_agent.py
 
-# 6. Launch the interactive Unified Pipeline System, Swarm Heatmap, 3D Compare, Card Arena, TPP Lab & Telemetry Web UI
+# 7. Launch the interactive Unified Pipeline System, Swarm Heatmap, 3D Compare, Card Arena, TPP Lab & Telemetry Web UI
 uv run python base/swarm_web.py
 # -> Open http://127.0.0.1:8090 (routes: /pipelines, /discovery, /telemetry, /cards, /compare, /galaxy, /tpp)
 
-# 7. Run the end-to-end mathematical, kinetic & 3D validation suite
+# 8. Run the end-to-end mathematical, kinetic & 3D validation suite across all 8 pipelines
 uv run python base/validate_swarm_web.py
 ```

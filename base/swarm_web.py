@@ -3534,5 +3534,6 @@ def api_hypotheses():
 
 if __name__ == "__main__":
     import sys
+    host = os.getenv("SWARM_WEB_HOST", "0.0.0.0")
     port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.getenv("SWARM_WEB_PORT", "8090"))
-    app.run(host="127.0.0.1", port=port, debug=False)
+    app.run(host=host, port=port, debug=False)

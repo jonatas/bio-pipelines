@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import psycopg
 import numpy as np
 
-DB_URI = "postgresql://jonatas@localhost:28818/bio_demo"
+DB_URI = os.getenv("PG_BIO_URL", "postgresql://jonatas@localhost:28818/bio_demo")
 
 # Hardware-calibrated concurrency benchmark results on Apple Silicon (with Dense Closest-First Batch Frontier + HNSW ef=64)
 CALIBRATED_BENCHMARKS = [

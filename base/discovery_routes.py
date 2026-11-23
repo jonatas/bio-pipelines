@@ -13,7 +13,7 @@ except ImportError:
     from inspector_assets import INSPECTOR_CSS, INSPECTOR_JS
 
 app = Flask(__name__)
-DB_URI = "postgresql://jonatas@localhost:28818/bio_demo"
+DB_URI = os.getenv("PG_BIO_URL", "postgresql://jonatas@localhost:28818/bio_demo")
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -9232,4 +9232,6 @@ def api_compound_3d(hub_id):
 
 
 if __name__ == '__main__':
-    app.run(port=8080, threaded=True)
+    host = os.getenv("SWARM_WEB_HOST", "0.0.0.0")
+    port = int(os.getenv("SWARM_WEB_PORT", "8080"))
+    app.run(host=host, port=port, threaded=True)

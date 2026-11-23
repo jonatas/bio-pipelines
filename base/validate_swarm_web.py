@@ -1,3 +1,4 @@
+import os
 import json
 import time
 import urllib.request
@@ -6,7 +7,7 @@ from rich.table import Table
 from rich import box
 
 console = Console()
-BASE_URL = "http://127.0.0.1:8090"
+BASE_URL = os.getenv("SWARM_WEB_URL", "http://127.0.0.1:8090")
 PIPELINES = [
     "ptfe-to-bioceramic",
     "plastics-upcycling",
@@ -14,6 +15,8 @@ PIPELINES = [
     "corn-stover-bran",
     "habanero-spicy-fuel",
     "biochar-water-remediation",
+    "cyanide-mine-tailings",
+    "desalination-brine-upcycling",
 ]
 
 
