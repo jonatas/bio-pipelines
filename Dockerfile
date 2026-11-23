@@ -1,10 +1,11 @@
 # =============================================================================
-# Stage 1: Compile the pg_bio Rust (pgrx 0.17.0) extension against PostgreSQL 18
+# Stage 1: Compile pg_vectorsearch (PRISM/RaBitQ) + pg_bio (Rust pgrx 0.17.0) on PostgreSQL 18
 # =============================================================================
 FROM postgres:18-bookworm AS pg_bio_builder
 
 ARG PG_BIO_GIT_URL="https://github.com/jonatas/pg_bio.git"
 ARG PG_BIO_GIT_REF="main"
+ARG PG_VECTORSEARCH_GIT_URL="https://github.com/timescale/pg_vectorsearch.git"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -15,11 +16,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang \
     pkg-config \
     libssl-dev \
+    libopenblas-dev \
+    meson \
+    ninja-build \
     postgresql-server-dev-18 \
     postgresql-18-pgvector \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Rust toolchain & cargo-pgrx 0.17.0
+# 1. Build and install Tiger Data's pg_vectorsearch (PRISM + 1-bit RaBitQ) for PostgreSQL 18
+RUN git clone --depth 1 "${PG_VECTORSEARCH_GIT_URL}" /usr/src/pg_vectorsearch \
+    && make -C /usr/src/pg_vectorsearch install PG_CONFIG=/usr/lib/postgresql/18/bin/pg_config
+
+# 2. Install Rust toolchain & cargo-pgrx 0.17.0 and compile pg_bio
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
@@ -31,7 +39,7 @@ RUN git clone --depth 1 --branch "${PG_BIO_GIT_REF}" "${PG_BIO_GIT_URL}" .
 RUN cargo pgrx install --pg18 --release --no-default-features --features pg18
 
 # =============================================================================
-# Stage 2: Unified Runtime (PostgreSQL 18 + pg_bio + Python 3 / uv + bio-pipelines)
+# Stage 2: Unified Runtime (PostgreSQL 18 + pgvector + pg_vectorsearch + pg_bio + uv + bio-pipelines)
 # =============================================================================
 FROM postgres:18-bookworm
 
@@ -41,10 +49,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-venv \
     python3-dev \
+    libopenblas0 \
     postgresql-18-pgvector \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy compiled pg_bio extension artifacts from builder stage
+# Copy compiled pg_vectorsearch & pg_bio extension artifacts from builder stage
+COPY --from=pg_bio_builder /usr/lib/postgresql/18/lib/pg_vectorsearch* /usr/lib/postgresql/18/lib/
+COPY --from=pg_bio_builder /usr/share/postgresql/18/extension/pg_vectorsearch* /usr/share/postgresql/18/extension/
 COPY --from=pg_bio_builder /usr/lib/postgresql/18/lib/pg_bio.so /usr/lib/postgresql/18/lib/
 COPY --from=pg_bio_builder /usr/share/postgresql/18/extension/pg_bio* /usr/share/postgresql/18/extension/
 
