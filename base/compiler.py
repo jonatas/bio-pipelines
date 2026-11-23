@@ -31,7 +31,7 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                 cur.execute("SELECT COUNT(*) FROM bio_substrates;")
                 substrate_count = cur.fetchone()[0]
 
-            if rebuild_atlas or atlas_count == 0 or substrate_count < 5:
+            if rebuild_atlas or atlas_count == 0 or substrate_count < 8:
                 schema_sql = open(os.path.join(BASE_DIR, "schema.sql")).read()
                 pareto_sql = open(os.path.join(BASE_DIR, "swarm_pareto.sql")).read()
                 cur.execute(schema_sql)
@@ -216,7 +216,10 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
             for label, f1, f2, f3, k1, k2, k3 in [
                 ("Sugarcane Bagasse (Cellulose:Xylan:Lignin)", 0.42, 0.25, 0.20, 14.0, 18.0, 9.5),
                 ("Corn Stover & Bran (Cellulose:Arabinoxylan:Ferulate)", 0.36, 0.28, 0.18, 13.5, 16.5, 12.0),
-                ("Habanero Spicy-Fuel (DMAPP:IPP:FPP/GGPP Terpene Flux)", 0.48, 0.32, 0.20, 16.0, 19.5, 14.0),
+                ("Habanero Spicy-Fuel (DMAPP:IPP:FPP/GGPP + GGR Hydrogenation)", 0.48, 0.32, 0.20, 16.0, 19.5, 14.0),
+                ("Biochar Water Remediation (NSAIDs:Dyes:Halide Herbicides)", 0.45, 0.35, 0.20, 18.5, 21.0, 12.5),
+                ("Cyanide Mine Tailings (Free CN-:Persulfide GSSH:Thiosulfate)", 0.44, 0.36, 0.20, 19.0, 22.5, 15.0),
+                ("Desalination Brine + Whey (Lactose:UDP-Glc:UDP-Gal)", 0.50, 0.30, 0.20, 17.5, 20.5, 14.5),
             ]:
                 cur.execute(
                     "SELECT * FROM optimize_consortium_stoichiometry(%s, %s, %s, %s, %s, %s, 48.0);",

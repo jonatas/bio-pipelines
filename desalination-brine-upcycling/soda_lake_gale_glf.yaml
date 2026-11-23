@@ -1,0 +1,41 @@
+pipeline_id: desalination-brine-upcycling
+name: "Desalination Brine & Cheese-Whey Permeate -> Soda-Lake GalE/Glf Rare Nucleotide Sugar Upcycling (pH 9.5, 3.5 M NaCl)"
+feedstock:
+  type: hypersaline-whey-lactose-brine
+  target_bond: "Pyranose C4-OH Epimerization & Pyranose-Furanose Ring Contraction (305 kJ/mol)"
+  smiles: "OCC1OC(O)C(O)C(O)C1O"
+  reference_analog_smiles: "OCC1OC(O)C(O)C1O"
+reactor:
+  temperature_c: 45.0
+  ph: 9.5
+  salinity_nacl_m: 3.5
+modules:
+  module_1_anchor:
+    role: "Halophilic S-Layer / Immobilized Resin Anchor"
+    subtype: "Halophilic_CBM_SLayer_Anchor"
+    reference_uniprot: "M0GR98"
+    min_gravy: 0.05
+  module_2_scissor:
+    role: "Soda-Lake NAD+-Dependent GalE 4-Epimerase"
+    subtype: "SodaLake_GalE_Epimerase"
+    reference_uniprot: "D3SWG7"
+    extremophile_uniprot: "A0ABD5UZ94"
+    theozyme_template: "rossmann_yx3k_nad_epimerase"
+  module_3_sink:
+    role: "FAD-Dependent Pyranose-Furanose Mutase Sink"
+    subtype: "FAD_Glf_Galactofuranose_Sink"
+    reference_uniprot: "A0A1I1DB55"
+    sink_product: "High-Value UDP-Galactofuranose & Prebiotic Galacto-Oligosaccharides (GOS)"
+  module_4_beacon:
+    role: "Optical Conversion Beacon"
+    subtype: "Halophilic_Carotenoid_Reporter"
+    sensor: "GalR / LacI Halophilic Galactose-Inducible Promoter"
+    reporter_uniprot: "A0A0W1R8L8"
+    readout: "Halophilic Phytoene Dehydrogenase CrtI Ruby Bacterioruberin Readout"
+linkers:
+  - "GGGGSEAAAKGGGGS"
+  - "GGGGSGGGGSGGGGS"
+hosts:
+  - h_volcanii
+  - n_magadii
+  - b_subtilis

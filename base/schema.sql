@@ -82,6 +82,39 @@ INSERT INTO bio_substrates (
     6.8,
     'Terpene Synthase Cyclization + Dodecane Overlay -> Drop-In C15/C20 Bio-Jet Fuel',
     'ERG9/idi FPP-GGPP Sensor -> Capsicum PSY (P37272) + PDS (P80093) Carotenoid Beacon'
+),
+(
+    'biochar-water-remediation',
+    'Agro-Waste Biochar (Bagasse / Ouricuri / Mg-Al LDH) + Emerging Micropollutants (Diclofenac, Dyes, Atrazine)',
+    'Diaryl Amine / Thiazine Chromophore / Aryl C-Cl',
+    385.0,
+    'OC(=O)Cc1ccccc1Nc2c(Cl)cccc2Cl',
+    30.0,
+    6.5,
+    'Catechol 1,2-Dioxygenase + Mg/Al-LDH Chloride Sink (Biochar Pore Regeneration)',
+    'DmpR / MphR Phenolic & Macrolide Sensor -> Lycopene Breakthrough Alert'
+),
+(
+    'cyanide-mine-tailings',
+    'Alkaline Gold-Mine Heap Leachate (Cyanide CN- + Persulfide GSSH / Sulfide HS-, pH 9.8, 3.0 M NaCl)',
+    'Nitrile C#N + Hydrodisulfide R-S-SH',
+    415.0,
+    'N#CSCCc1ccc(O)c(O)c1',
+    38.0,
+    9.8,
+    'Bifunctional MBL-Rhodanese Persulfide Dioxygenase-Sulfurtransferase (A0ABD6AX71 x M0AE48) -> Thiocyanate SCN- & Sulfate SO4(2-)',
+    'ArsR / BigR Persulfide-Cyanide Sensor (A0A2S2KQG4) -> Halophilic Phytoene Desaturase CrtI (A0A0W1R8L8)'
+),
+(
+    'desalination-brine-upcycling',
+    'Hypersaline Desalination Reject Brine + Cheese-Whey Permeate (3.5 M NaCl, pH 9.5, Lactose / UDP-Glucose)',
+    'Pyranose C4-OH & Pyranose-Furanose Ring',
+    305.0,
+    'OCC1OC(Oc2ccccc2)C(O)C(O)C1O',
+    45.0,
+    9.5,
+    'Soda-Lake GalE 4-Epimerase (D3SWG7 x A0ABD5UZ94) + Glf Mutase (A0A1I1DB55) -> Rare UDP-Galactofuranose & Prebiotic Galacto-Oligosaccharides',
+    'GalR / LacI Halophilic Sugar Sensor -> Bacterioruberin Carotenoid Beacon (A0A0W1R8L8)'
 );
 
 -- Universal 4-Module Domain Atlas populated across the 2.34M protein space
@@ -122,3 +155,74 @@ CREATE TABLE IF NOT EXISTS bio_chimeric_runs (
     predicted_48h_conversion FLOAT8,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- =============================================================================
+-- Autonomous Multi-Agent Annotation Evolution & Hypothesis Ledger
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS bio_annotation_evolution (
+    uniprot_id VARCHAR(20) PRIMARY KEY,
+    organism_name TEXT NOT NULL,
+    original_annotation TEXT NOT NULL,
+    evolved_annotation TEXT NOT NULL,
+    inferred_ec_or_family TEXT NOT NULL,
+    best_partner_uniprot VARCHAR(20) NOT NULL,
+    best_partner_organism TEXT NOT NULL,
+    best_edge_id BIGINT NOT NULL,
+    evidence_edges_count INT NOT NULL DEFAULT 1,
+    distinct_genera_count INT NOT NULL DEFAULT 1,
+    vector_distance FLOAT8 NOT NULL,
+    seq_identity_pct FLOAT8 NOT NULL,
+    twilight_score FLOAT8 NOT NULL,
+    tm_score FLOAT8,
+    core_rmsd FLOAT8,
+    rf_range_iou FLOAT8,
+    rf_score FLOAT8,
+    len_ratio FLOAT8 NOT NULL,
+    gated_synergy_score FLOAT8 NOT NULL,
+    evolution_version INT NOT NULL DEFAULT 1,
+    status VARCHAR(30) NOT NULL DEFAULT 'Evolving', -- 'Evolving', '3D_Verified', 'Promoted_To_Atlas'
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bio_hypothesis_ledger (
+    hypothesis_id SERIAL PRIMARY KEY,
+    hypothesis_code VARCHAR(40) UNIQUE NOT NULL,
+    target_pipeline VARCHAR(50) NOT NULL,
+    is_new_scenario BOOLEAN NOT NULL DEFAULT FALSE,
+    module_role VARCHAR(40) NOT NULL,               -- 'M1_Anchor', 'M2_Scissor', 'M3_Sink', 'M4_Beacon'
+    subtype VARCHAR(50) NOT NULL,
+    candidate_uniprot VARCHAR(20) NOT NULL,
+    candidate_organism TEXT NOT NULL,
+    reference_homolog VARCHAR(20) NOT NULL,
+    hypothesis_title TEXT NOT NULL,
+    biological_rationale TEXT NOT NULL,
+    fold_gate_tm FLOAT8,
+    core_rmsd_a FLOAT8,
+    rf_pocket_iou FLOAT8,
+    gist_props_matched INT,
+    gated_synergy_score FLOAT8 NOT NULL,
+    chimera_partner_uniprot VARCHAR(20),
+    chimera_flory_ratio FLOAT8,
+    pareto_score FLOAT8,
+    baseline_48h_yield_pct FLOAT8,
+    predicted_48h_yield_pct FLOAT8,
+    yield_delta_pct FLOAT8,
+    status VARCHAR(30) NOT NULL DEFAULT 'Proposed', -- 'Proposed', '3D_Verified', 'RK4_Validated', 'Promoted_To_Atlas', 'New_Scenario_Ready', 'Rejected'
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bio_agent_checkpoint (
+    id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+    last_scanned_edge_id BIGINT NOT NULL DEFAULT 0,
+    total_cycles_run INT NOT NULL DEFAULT 0,
+    total_annotations_evolved INT NOT NULL DEFAULT 0,
+    total_hypotheses_promoted INT NOT NULL DEFAULT 0,
+    last_run_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO bio_agent_checkpoint (id, last_scanned_edge_id, total_cycles_run, total_annotations_evolved, total_hypotheses_promoted)
+VALUES (1, 0, 0, 0, 0)
+ON CONFLICT (id) DO NOTHING;
+

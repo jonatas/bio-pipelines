@@ -82,6 +82,20 @@ PIPELINES = [
         "boost": 8.8,
         "color": "#f97316",
     },
+    {
+        "id": "biochar-water-remediation",
+        "title": "6. Agro-Waste Biochar -> Micropollutant Sink (30°C, pH 6.5)",
+        "sub_label": "Adsorbed Micropollutant (µM)",
+        "int_label": "Quinone/Halide Intermediate (µM)",
+        "prod_label": "Mineralized + LDH-Cl⁻ Sink (µM)",
+        "kcat1": 25.0,
+        "km1": 370.0,
+        "kcat2": 43.0,
+        "km2": 30.0,
+        "ki": 19.0,
+        "boost": 8.4,
+        "color": "#10b981",
+    },
 ]
 
 

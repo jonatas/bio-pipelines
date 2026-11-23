@@ -1,0 +1,51 @@
+pipeline_id: biochar-water-remediation
+name: "Self-Regenerating Agro-Waste Biochar (Bagasse / Ouricuri / LDH) -> Coupled Adsorption & Enzymatic Micropollutant Cleavage"
+feedstock:
+  type: emerging-water-contaminants-on-biochar
+  matrix_adsorbents:
+    sugarcane_bagasse_biochar_pct: 45.0
+    ouricuri_syagrus_coronata_biochar_pct: 35.0
+    mg_al_ldh_composite_pct: 20.0
+  contaminant_fractions:
+    nsaids_and_phenolics_diclofenac_paracetamol_pct: 45.0
+    synthetic_dyes_methylene_blue_rhodamine_pct: 35.0
+    chlorinated_triazines_and_quinolones_atrazine_ciprofloxacin_pct: 20.0
+  target_bond: "Diaryl Amine / Thiazine Chromophore / Aryl C-Cl (Diclofenac, Methylene Blue, Atrazine)"
+  smiles: "OC(=O)Cc1ccccc1Nc2c(Cl)cccc2Cl"
+  reference_analog_smiles: "CC(=O)Nc1ccc(O)cc1"
+reactor:
+  temperature_c: 30.0
+  ph: 6.5
+modules:
+  module_1_anchor:
+    role: "Interfacial Biochar Pore Anchor"
+    subtype: "Biochar_Graphitic_CBM_Anchor"
+    description: "Amphiphilic Class II Hydrophobin / Aromatic CBM anchoring enzymes onto graphitic sp2 biochar pores without leaching"
+  module_2_scissor:
+    role: "Primary Micropollutant Scissor (3-Enzyme Bio-Regeneration Swarm)"
+    consortium_members:
+      - name: "Phenolic_NSAID_Oxidizer"
+        subtype: "MultiCopper_Laccase"
+        target_fraction: "Diclofenac, Paracetamol & 17beta-Estradiol (45%)"
+      - name: "Chromophore_Dye_Decolorizer"
+        subtype: "DyP_Peroxidase_Ligninase"
+        target_fraction: "Methylene Blue & Rhodamine B Dyes (35%)"
+      - name: "Halogenated_Herbicide_Antibiotic_Cleaver"
+        subtype: "Chlorohydrolase_Dehalogenase"
+        target_fraction: "Atrazine & Ciprofloxacin (20%)"
+  module_3_sink:
+    role: "Equilibrium Sink & Pore Regenerator"
+    subtype: "Catechol_Dioxygenase_LDH_Sink"
+    sink_product: "Catechol 1,2-Dioxygenase Ring Cleavage + Mg/Al-LDH Chloride Intercalation (Restores Free Biochar Sites q_e)"
+  module_4_beacon:
+    role: "Optical Column-Breakthrough Beacon"
+    subtype: "Carotenoid_Reporter"
+    sensor: "DmpR / MphR Phenolic & Macrolide Transcriptional Biosensor"
+    readout: "Lycopene / Phytoene Desaturase Column Breakthrough Optical Alert"
+linkers:
+  - "GGGGSGGGGSGGGGS"
+  - "PTPTPTPTPTPT"
+hosts:
+  - p_pastoris
+  - b_subtilis
+  - s_cerevisiae

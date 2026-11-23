@@ -13,6 +13,7 @@ PIPELINES = [
     "sugarcane-bagasse",
     "corn-stover-bran",
     "habanero-spicy-fuel",
+    "biochar-water-remediation",
 ]
 
 

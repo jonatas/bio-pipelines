@@ -1,0 +1,41 @@
+pipeline_id: cyanide-mine-tailings
+name: "Alkaline Gold-Mine Cyanide & Sulfide Tailings -> Coupled MBL-Rhodanese Detoxification (pH 9.8, 3.0 M NaCl)"
+feedstock:
+  type: alkaline-cyanide-sulfide-leachate
+  target_bond: "Cyanide / Nitrile (C#N) + Persulfide Hydrodisulfide (R-S-SH, 415 kJ/mol)"
+  smiles: "N#CCc1ccccc1"
+  reference_analog_smiles: "N#CS"
+reactor:
+  temperature_c: 38.0
+  ph: 9.8
+  salinity_nacl_m: 3.0
+modules:
+  module_1_anchor:
+    role: "Interfacial Tailings / Mineral-Slurry Anchor"
+    subtype: "Halophilic_Biofilm_Hydrophobin_Anchor"
+    reference_uniprot: "M0GR98"
+    min_gravy: 0.05
+  module_2_scissor:
+    role: "Bifunctional MBL-Rhodanese Persulfide Dioxygenase-Sulfurtransferase"
+    subtype: "MBL_Rhodanese_Chameleon_Swarm"
+    reference_uniprot: "A0ABD6AX71"
+    extremophile_uniprot: "M0AE48"
+    theozyme_template: "mbl_zn2_rhodanese_cys_persulfide"
+  module_3_sink:
+    role: "Equilibrium Sink"
+    subtype: "Thiocyanate_Sulfate_Mineral_Sink"
+    reference_uniprot: "M0AE48"
+    sink_product: "Non-Toxic Thiocyanate SCN- + Sulfate SO4(2-) (Gypsum Precipitation)"
+  module_4_beacon:
+    role: "Optical Breakthrough Beacon"
+    subtype: "ArsR_Persulfide_Carotenoid_Beacon"
+    sensor: "ArsR/BigR Metalloregulator & Sulfane Sensor (A0A2S2KQG4 -> S2EBX9)"
+    reporter_uniprot: "A0A0W1R8L8"
+    readout: "Halophilic Phytoene Dehydrogenase CrtI Bacterioruberin Readout (505 nm)"
+linkers:
+  - "GGGGSGGGGSGGGGS"
+  - "EAAAK"
+hosts:
+  - n_magadii
+  - h_volcanii
+  - p_putida
