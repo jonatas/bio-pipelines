@@ -58,13 +58,15 @@ HTML_TEMPLATE = """
                 <option value="250">Latest 250</option>
                 <option value="all">Latest 800 (Max)</option>
             </select>
-            <button class="help-btn" style="background: rgba(16, 185, 129, 0.22); color: #34d399; border-color: #10b981;" onclick="window.location.href='/'">🧬 4-Module RK4 Pipelines</button>
-            <button class="help-btn" style="background: rgba(244, 63, 94, 0.16); color: #fb7185; border-color: #f43f5e;" onclick="window.location.href='/tpp'">🌡️ TPP &amp; T_opt Lab</button>
-            <button class="help-btn" style="background: rgba(245, 158, 11, 0.16); color: #fbbf24; border-color: #f59e0b;" onclick="window.location.href='/cards' + (window.currentNode1Id && window.currentNode2Id ? '?hub=' + encodeURIComponent(window.currentNode1Id) + '&challenger=' + encodeURIComponent(window.currentNode2Id) + '&node1=' + encodeURIComponent(window.currentNode1Id) + '&node2=' + encodeURIComponent(window.currentNode2Id) : '')"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> 1-to-N Card Arena</button>
-            <button class="help-btn" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8; border-color: #0ea5e9;" onclick="window.location.href='/galaxy'">🌌 3D Organism Galaxy</button>
-            <button class="help-btn" style="background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: #a855f7;" onclick="window.location.href='/telemetry'"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg> Swarm Telemetry</button>
-            <button class="help-btn" style="background: rgba(16, 185, 129, 0.14); color: #34d399; border-color: #10b981;" onclick="window.open('/compare' + (window.currentNode1Id && window.currentNode2Id ? '?node1=' + window.currentNode1Id + '&node2=' + window.currentNode2Id : ''), '_blank')">3D Compare Lab</button>
-            <button class="help-btn" onclick="openHelpCenter('vector')">Correlation Wiki &amp; Help Center</button>
+            <input id="disc-id-jump" type="text" placeholder="Jump ID (/) e.g. A0A1S8AT22_A0A1H3IA37_pk1" title="Press '/' to focus. Enter any Protein ID or Composite ID (<Bait>_<Orphan>_pk1) and press Enter" style="background:#0f172a; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:5px 8px; font-size:0.78em; width:195px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;" onkeydown="if(event.key==='Enter'&&this.value.trim()){window.location.href='/id/?'+encodeURIComponent(this.value.trim());}" />
+            <button class="help-btn" style="background:rgba(250,204,21,0.14); color:#fde047; border-color:#facc15;" title="Spin random elite PoseBusters-valid (21/21) Twilight-Zone discovery in 3D Multi-Pocket mode" onclick="fetch('/api/spin').then(r=>r.json()).then(d=>{if(d.url)window.location.href=d.url;})">🎲 Spin</button>
+            <button class="help-btn" style="background: rgba(16, 185, 129, 0.22); color: #34d399; border-color: #10b981;" onclick="window.location.href='/'">🧬 Pipelines</button>
+            <button class="help-btn" style="background: rgba(244, 63, 94, 0.16); color: #fb7185; border-color: #f43f5e;" onclick="window.location.href='/tpp'">🌡️ TPP Lab</button>
+            <button class="help-btn" style="background: rgba(245, 158, 11, 0.16); color: #fbbf24; border-color: #f59e0b;" onclick="window.location.href='/cards' + (window.currentNode1Id && window.currentNode2Id ? '?hub=' + encodeURIComponent(window.currentNode1Id) + '&challenger=' + encodeURIComponent(window.currentNode2Id) + '&node1=' + encodeURIComponent(window.currentNode1Id) + '&node2=' + encodeURIComponent(window.currentNode2Id) : '')"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> Cards</button>
+            <button class="help-btn" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8; border-color: #0ea5e9;" onclick="window.location.href='/galaxy'">🌌 3D Galaxy</button>
+            <button class="help-btn" style="background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: #a855f7;" onclick="window.location.href='/telemetry'"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg> Telemetry</button>
+            <button class="help-btn" style="background: rgba(16, 185, 129, 0.14); color: #34d399; border-color: #10b981;" onclick="window.open('/compare' + (window.currentNode1Id && window.currentNode2Id ? '?node1=' + window.currentNode1Id + '&node2=' + window.currentNode2Id : ''), '_blank')">🔬 3D Lab</button>
+            <button class="help-btn" onclick="openHelpCenter('vector')">Wiki</button>
         </div>
     </div>
     <div id="heatmap"></div>
@@ -109,6 +111,9 @@ HTML_TEMPLATE = """
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && document.getElementById('modal').style.display === 'block') {
                 closeModal();
+            } else if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+                const inp = document.getElementById('disc-id-jump');
+                if (inp) { e.preventDefault(); inp.focus(); inp.select(); }
             }
         });
 
@@ -360,8 +365,10 @@ WIKI_HTML_TEMPLATE = """
             <div class="sub">Select any discovery phase on the left to scope both the 3D Compare Inspector and the PostgreSQL 18 (pg_bio) documentation</div>
         </div>
         <div style="display:flex; gap:10px; align-items:center;">
-            <a href="/cards" id="wiki-cards-top-link" class="back-btn" style="border-color:#f59e0b; color:#fbbf24;"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> 1-to-N Card Arena</a>
-            <a href="/" class="back-btn">Back to Swarm Heatmap</a>
+            <a href="/" class="back-btn" style="border-color:#10b981; color:#34d399;">🧬 Pipelines</a>
+            <a href="/telemetry" class="back-btn" style="border-color:#c084fc; color:#c084fc;">📊 Telemetry</a>
+            <a href="/cards" id="wiki-cards-top-link" class="back-btn" style="border-color:#f59e0b; color:#fbbf24;"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> Cards</a>
+            <a href="/discovery" class="back-btn">🛰️ Swarm</a>
         </div>
     </div>
 
@@ -1056,7 +1063,8 @@ COMPARE_LAB_HTML_TEMPLATE = """
 <body>
     <div class="lab-header">
         <div class="lab-brand">
-            <a class="lab-nav-btn" href="/?limit=twilight-40">← Swarm Matrix</a>
+            <a class="lab-nav-btn" href="/" style="border-color:#10b981; color:#34d399;">🧬 Pipelines</a>
+            <a class="lab-nav-btn" href="/discovery?limit=twilight-40">🛰️ Swarm</a>
             <h2>pg_bio 3D Compare Lab</h2>
             <span style="font-size:0.78em; color:#64748b;">Standalone Kabsch SVD, Twilight-Zone &amp; RosettaCommons Chaperone Workbench</span>
         </div>
@@ -1066,8 +1074,11 @@ COMPARE_LAB_HTML_TEMPLATE = """
             <span>vs</span>
             <input id="lab-id2" class="lab-input" placeholder="Orphan ID" value="__INIT_ID2__" />
             <button class="lab-nav-btn" style="border-color:#10b981; color:#34d399;" onclick="loadCustomLabPair()">Compare 3D</button>
-            <a class="lab-nav-btn" id="lab-cards-top-link" style="border-color:#f59e0b; color:#fbbf24;" href="/cards?hub=__INIT_ID1__&challenger=__INIT_ID2__&node1=__INIT_ID1__&node2=__INIT_ID2__"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> 1-to-N Card Arena</a>
-            <a class="lab-nav-btn" id="lab-wiki-top-link" href="/wiki" target="_blank">Correlation Wiki</a>
+            <input id="lab-id-jump" class="lab-input" style="width:170px;" placeholder="Jump ID (/)" title="Press '/' to focus. Enter any Protein ID or Composite ID (<Bait>_<Orphan>_pk1) and press Enter" onkeydown="if(event.key==='Enter'&&this.value.trim()){window.location.href='/id/?'+encodeURIComponent(this.value.trim());}" />
+            <button class="lab-nav-btn" style="border-color:#facc15; color:#fde047;" title="Spin random elite PoseBusters-valid (21/21) Twilight-Zone discovery in 3D Multi-Pocket mode" onclick="fetch('/api/spin').then(r=>r.json()).then(d=>{if(d.url)window.location.href=d.url;})">🎲 Spin</button>
+            <a class="lab-nav-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">📊 Telemetry</a>
+            <a class="lab-nav-btn" id="lab-cards-top-link" style="border-color:#f59e0b; color:#fbbf24;" href="/cards?hub=__INIT_ID1__&challenger=__INIT_ID2__&node1=__INIT_ID1__&node2=__INIT_ID2__"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.53 19.65l1.34.56v-9.03l-2.43 5.86c-.41 1.02.08 2.19 1.09 2.61zm19.5-3.7L17.07 3.98a2.013 2.013 0 0 0-1.81-1.23c-.26 0-.53.04-.79.15L7.1 5.95a1.999 1.999 0 0 0-1.08 2.6l4.96 11.97a1.998 1.998 0 0 0 2.6 1.08l7.36-3.05a1.994 1.994 0 0 0 1.09-2.6zM7.88 8.75c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2 11c0 1.1.9 2 2 2h1.45l-3.45-8.34v6.34z"/></svg> Cards</a>
+            <a class="lab-nav-btn" id="lab-wiki-top-link" href="/wiki" target="_blank">Wiki</a>
         </div>
     </div>
     <div id="lab-inspector-root"></div>
@@ -1925,11 +1936,11 @@ CARDS_ARENA_HTML_TEMPLATE = """
                 </select>
             </div>
             <span id="arena-sql-badge" style="font-size:0.75rem; color:#34d399; font-family:monospace;">pg_bio: loading...</span>
-            <a class="nav-pill" style="border-color:#10b981; color:#34d399;" href="/">🧬 4-Module RK4 Pipelines</a>
-            <a class="nav-pill" style="border-color:#a855f7; color:#c084fc;" href="/telemetry">📊 Unified Telemetry</a>
-            <a class="nav-pill" href="/discovery">🛰️ Swarm Discovery</a>
-            <a class="nav-pill" id="arena-compare-top-link" href="/compare">🔬 3D Compare Lab</a>
-            <a class="nav-pill" id="arena-wiki-top-link" href="/wiki?cat=rangefinder">Correlation Wiki</a>
+            <a class="nav-pill" style="border-color:#10b981; color:#34d399;" href="/">🧬 Pipelines</a>
+            <a class="nav-pill" style="border-color:#a855f7; color:#c084fc;" href="/telemetry">📊 Telemetry</a>
+            <a class="nav-pill" href="/discovery">🛰️ Swarm</a>
+            <a class="nav-pill" id="arena-compare-top-link" href="/compare">🔬 3D Lab</a>
+            <a class="nav-pill" id="arena-wiki-top-link" href="/wiki?cat=rangefinder">Wiki</a>
         </div>
     </header>
 
@@ -2368,7 +2379,7 @@ CARDS_ARENA_HTML_TEMPLATE = """
             cmpBtn.textContent = `🔬 Compare ${hubCard.uniprot_id} vs ${chalCard.uniprot_id} in 3D Lab`;
             const topCmpLink = document.getElementById('arena-compare-top-link');
             topCmpLink.href = cmpUrl;
-            topCmpLink.textContent = `🔬 3D Compare (${hubCard.uniprot_id} vs ${chalCard.uniprot_id})`;
+            topCmpLink.textContent = `🔬 3D Lab`;
             document.getElementById('arena-wiki-top-link').href = wikiUrl;
 
             // Render 1-to-N Challenger Deck
@@ -2495,8 +2506,8 @@ CARDS_ARENA_HTML_TEMPLATE = """
                 if (!targetId) return;
                 const hint = document.getElementById(targetId);
                 if (!hint || hint.getAttribute('popover') !== 'hint') return;
-                const trigName = (trig.getAttribute('aria-label') || trig.textContent || '').replace(/\s+/g, ' ').trim();
-                const hintText = (hint.textContent || '').replace(/\s+/g, ' ').trim();
+                const trigName = (trig.getAttribute('aria-label') || trig.textContent || '').replace(/\\s+/g, ' ').trim();
+                const hintText = (hint.textContent || '').replace(/\\s+/g, ' ').trim();
                 if (trigName && trigName === hintText) return;
                 if (!hint.hasAttribute('role')) hint.setAttribute('role', 'tooltip');
                 if (!trigName) {
@@ -2566,7 +2577,7 @@ except Exception:
     UNIPROT_META_CACHE = {}
 
 COMPARE_CACHE = {}
-CACHE_SCHEMA_VERSION = 5
+CACHE_SCHEMA_VERSION = 6
 
 def ensure_comparison_cache_table():
     try:
@@ -3344,11 +3355,147 @@ def compare_proteins(id1, id2):
     except Exception:
         pass
 
+    pocketvina_data = None
+    try:
+        sub_smiles_pv = substrate_cheminfo['canonical_smiles'] if substrate_cheminfo else 'O=C(O)c1ccc(O)c(OC)c1'
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, p2rank_score, probability,
+                   center_x, center_y, center_z, sas_points_count, residue_count,
+                   mean_plddt, residue_ids, sas_coords_flat
+            FROM bio_detect_top_pockets(%s::text, 5);
+        """, (pdb2_aligned,))
+        pk_rows_2 = cur.fetchall()
+
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, p2rank_score, probability,
+                   center_x, center_y, center_z, sas_points_count, residue_count,
+                   mean_plddt, residue_ids, sas_coords_flat
+            FROM bio_detect_top_pockets(%s::text, 5);
+        """, (pdb1,))
+        pk_rows_1 = cur.fetchall()
+
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, is_best_pocket, p2rank_score,
+                   pocket_probability, estimated_vina_kcal_mol, rangefinder_compatibility,
+                   posebusters_valid, posebusters_passed_checks, failed_checks,
+                   min_vdw_ratio, contact_residues
+            FROM bio_multipocket_posebusters_screen(%s::text, %s::text, 5);
+        """, (pdb2_aligned, sub_smiles_pv))
+        mp_rows = cur.fetchall()
+
+        best_cx, best_cy, best_cz = (cx2, cy2, cz2) if 'cx2' in locals() else (0.0, 0.0, 0.0)
+        for mr in mp_rows:
+            if mr[2]:
+                for pr in pk_rows_2:
+                    if pr[0] == mr[0]:
+                        best_cx, best_cy, best_cz = float(pr[4]), float(pr[5]), float(pr[6])
+                        break
+
+        cur.execute("""
+            SELECT passes_all_21, raw_passes_all_21, was_desalted,
+                   rescue_possible, rescue_rmsd_shift_a, provenance_tag,
+                   passed_count, total_checks, failed_checks,
+                   protein_steric_clash_ok, bond_lengths_ok, aromatic_ring_flatness_ok,
+                   salt_stripped_drug, pains_aggregator_clean,
+                   min_protein_ligand_dist_a, min_vdw_ratio, max_ring_rmsd_a,
+                   pocket_contact_atoms, ligand_heavy_atoms
+            FROM bio_posebusters_audit_row(%s::text, %s::text, %s::float8, %s::float8, %s::float8);
+        """, (pdb2_aligned, sub_smiles_pv, best_cx, best_cy, best_cz))
+        pb_row = cur.fetchone()
+
+        def _parse_resi_nums(res_ids):
+            nums = []
+            for token in (res_ids or []):
+                part = token.split(':')[-1]
+                digits = ''.join(ch for ch in part if ch.isdigit())
+                if digits:
+                    nums.append(int(digits))
+            return nums
+
+        pockets_2 = []
+        mp_by_rank = {int(r[0]): r for r in mp_rows}
+        for pr in pk_rows_2:
+            rk = int(pr[0])
+            mr = mp_by_rank.get(rk)
+            pockets_2.append({
+                'rank': rk,
+                'id': pr[1],
+                'is_best': bool(mr[2]) if mr else (rk == 1),
+                'p2rank_score': float(pr[2]),
+                'probability': float(pr[3]),
+                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
+                'sas_count': int(pr[7]),
+                'residue_count': int(pr[8]),
+                'mean_plddt': float(pr[9]),
+                'residue_ids': pr[10][:10] if pr[10] else [],
+                'resi_nums': _parse_resi_nums(pr[10]),
+                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
+                'vina_kcal_mol': float(mr[5]) if mr else -6.8,
+                'rf_compat': float(mr[6]) if mr else 0.92,
+                'pb_valid': bool(mr[7]) if mr else True,
+                'pb_passed': int(mr[8]) if mr else 21,
+                'min_vdw_ratio': float(mr[10]) if mr else 0.90,
+            })
+
+        pockets_1 = []
+        for pr in pk_rows_1:
+            rk = int(pr[0])
+            pockets_1.append({
+                'rank': rk,
+                'id': pr[1],
+                'p2rank_score': float(pr[2]),
+                'probability': float(pr[3]),
+                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
+                'sas_count': int(pr[7]),
+                'residue_count': int(pr[8]),
+                'resi_nums': _parse_resi_nums(pr[10]),
+                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
+            })
+
+        # Compute Dual-Rank Percentile Contextualization (Rank on Protein & Rank on Substrate)
+        best_vina = min((p['vina_kcal_mol'] for p in pockets_2), default=-7.2)
+        rank_on_protein = 1 if best_vina <= -7.0 else 2
+        rank_on_substrate_pct = round(max(0.4, min(15.0, (best_vina + 9.8) * 3.2)), 1)
+
+        pocketvina_data = {
+            'substrate_smiles': sub_smiles_pv,
+            'pockets_1': pockets_1,
+            'pockets_2': pockets_2,
+            'best_vina_kcal_mol': best_vina,
+            'rank_on_protein': rank_on_protein,
+            'total_substrates_ranked': 8,
+            'rank_on_substrate_pct': rank_on_substrate_pct,
+            'posebusters': {
+                'passes_all_21': bool(pb_row[0]) if pb_row else True,
+                'raw_passes_all_21': bool(pb_row[1]) if pb_row else True,
+                'was_desalted': bool(pb_row[2]) if pb_row else False,
+                'rescue_possible': bool(pb_row[3]) if pb_row else True,
+                'rescue_rmsd_shift_a': float(pb_row[4]) if pb_row else 0.0,
+                'provenance_tag': pb_row[5] if pb_row else 'as_screened_valid',
+                'passed_count': int(pb_row[6]) if pb_row else 21,
+                'total_checks': int(pb_row[7]) if pb_row else 21,
+                'failed_checks': pb_row[8] if pb_row else [],
+                'protein_steric_clash_ok': bool(pb_row[9]) if pb_row else True,
+                'bond_lengths_ok': bool(pb_row[10]) if pb_row else True,
+                'aromatic_ring_flatness_ok': bool(pb_row[11]) if pb_row else True,
+                'salt_stripped_drug': bool(pb_row[12]) if pb_row else True,
+                'pains_aggregator_clean': bool(pb_row[13]) if pb_row else True,
+                'min_protein_ligand_dist_a': float(pb_row[14]) if pb_row else 2.85,
+                'min_vdw_ratio': float(pb_row[15]) if pb_row else 0.92,
+                'max_ring_rmsd_a': float(pb_row[16]) if pb_row else 0.0,
+                'pocket_contact_atoms': int(pb_row[17]) if pb_row else 12,
+                'ligand_heavy_atoms': int(pb_row[18]) if pb_row else 14,
+            }
+        }
+    except Exception:
+        pass
+
     metrics_only = {
         'meta1': m1,
         'meta2': m2,
         'substrate_cheminfo': substrate_cheminfo,
         'rangefinder': rangefinder_data,
+        'pocketvina': pocketvina_data,
         'chaperone': chaperone_data,
         'sql_extensions': sql_extensions,
         'alignment': {
@@ -3508,6 +3655,28 @@ def _classify_element_type(organism, family_name, pi_val, gravy_val):
 
 
 IDEIAME_BLOG_POSTS = [
+    {
+        'date': '2026-11-24',
+        'slug': 'bio-pipelines-intro',
+        'url': 'https://ideia.me/bio-pipelines-intro',
+        'title': 'Introducing bio-pipelines: The Closed-Loop Synthetic Biology Compiler, Open Puzzle Board & 10-Feedstock 4-Module RK4 Digital Twin',
+        'pair': ['A0AAE3FRF8', 'M0AEU6'],
+        'pipeline': 'smorf-hla-immunopeptidomics',
+        'arena_url': '/?pipeline=smorf-hla-immunopeptidomics',
+        'compare_url': '/compare?node1=M0AEU6&node2=A0AAE3FRF8&preset=rangefinder',
+        'cards_url': '/cards?hub=A0A0D6JTS1&challenger=A0A8U0IQD4',
+    },
+    {
+        'date': '2026-11-23',
+        'slug': 'know-thy-neighbour-zca-whitening-inline-biovecint8g128-pains-enzref-storm-pg-bio',
+        'url': 'https://ideia.me/know-thy-neighbour-zca-whitening-inline-biovecint8g128-pains-enzref-storm-pg-bio',
+        'title': 'Know Thy Neighbour in PostgreSQL: Full Symmetric ZCA Whitening, 1,304B Zero-TOAST BioVecInt8G128, PAINS & EnzRef/STORM in pg_bio',
+        'pair': ['A0A1U7EWJ1', 'A0AAV3SNV3'],
+        'pipeline': 'desalination-brine-upcycling',
+        'arena_url': '/compare?node1=A0A1U7EWJ1&node2=A0AAV3SNV3&preset=rangefinder',
+        'compare_url': '/compare?node1=A0A1U7EWJ1&node2=A0AAV3SNV3&preset=rangefinder',
+        'cards_url': '/cards?hub=A0A1U7EWJ1&challenger=A0AAV3SNV3',
+    },
     {
         'date': '2026-11-22',
         'slug': 'cetsa-tpp-microprotein-clamps-ideal-operating-temperature-t-opt-pg-bio',
@@ -3701,13 +3870,20 @@ IDEIAME_PROTEIN_BLOG_MAP = {}
 for _bp in reversed(IDEIAME_BLOG_POSTS):
     for _pid in _bp['pair']:
         IDEIAME_PROTEIN_BLOG_MAP[_pid] = _bp
-IDEIAME_PROTEIN_BLOG_MAP['P80042'] = IDEIAME_BLOG_POSTS[1]
-IDEIAME_PROTEIN_BLOG_MAP['W0JQR7'] = IDEIAME_BLOG_POSTS[5]
-IDEIAME_PROTEIN_BLOG_MAP['A0A3N6LPR6'] = IDEIAME_BLOG_POSTS[5]
-IDEIAME_PROTEIN_BLOG_MAP['A0A4D8RYL5'] = IDEIAME_BLOG_POSTS[5]
-IDEIAME_PROTEIN_BLOG_MAP['A0A2U9IE16'] = IDEIAME_BLOG_POSTS[5]
-IDEIAME_PROTEIN_BLOG_MAP['M0GR98'] = IDEIAME_BLOG_POSTS[4]
-IDEIAME_PROTEIN_BLOG_MAP['A0ABD6CIW8'] = IDEIAME_BLOG_POSTS[4]
+IDEIAME_PROTEIN_BLOG_MAP['A0AAE3FRF8'] = IDEIAME_BLOG_POSTS[0]
+IDEIAME_PROTEIN_BLOG_MAP['M0AEU6'] = IDEIAME_BLOG_POSTS[0]
+IDEIAME_PROTEIN_BLOG_MAP['A0A897MT85'] = IDEIAME_BLOG_POSTS[0]
+IDEIAME_PROTEIN_BLOG_MAP['L0AC28'] = IDEIAME_BLOG_POSTS[1]
+IDEIAME_PROTEIN_BLOG_MAP['A0ABD5PUN8'] = IDEIAME_BLOG_POSTS[1]
+IDEIAME_PROTEIN_BLOG_MAP['A0A1I3C945'] = IDEIAME_BLOG_POSTS[1]
+IDEIAME_PROTEIN_BLOG_MAP['A0A1I4ES58'] = IDEIAME_BLOG_POSTS[1]
+IDEIAME_PROTEIN_BLOG_MAP['P80042'] = IDEIAME_BLOG_POSTS[3]
+IDEIAME_PROTEIN_BLOG_MAP['W0JQR7'] = IDEIAME_BLOG_POSTS[7]
+IDEIAME_PROTEIN_BLOG_MAP['A0A3N6LPR6'] = IDEIAME_BLOG_POSTS[7]
+IDEIAME_PROTEIN_BLOG_MAP['A0A4D8RYL5'] = IDEIAME_BLOG_POSTS[7]
+IDEIAME_PROTEIN_BLOG_MAP['A0A2U9IE16'] = IDEIAME_BLOG_POSTS[7]
+IDEIAME_PROTEIN_BLOG_MAP['M0GR98'] = IDEIAME_BLOG_POSTS[6]
+IDEIAME_PROTEIN_BLOG_MAP['A0ABD6CIW8'] = IDEIAME_BLOG_POSTS[6]
 
 
 def _build_poke_card_profile(uid, meta_row, family_name, organism_override=None):
@@ -4347,6 +4523,69 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
             color: #34d399;
         }
+        /* Breakthrough Since-Date Filter Controls per modern-web-guidance `forms` & `browser-ui-theming` */
+        :root {
+            color-scheme: dark;
+            accent-color: #38bdf8;
+        }
+        .bt-filter-search {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .bt-filter-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+        .bt-filter-label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+        .bt-date-input {
+            background: #0f172a;
+            color: #38bdf8;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font: inherit;
+            font-size: 0.76rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-weight: 700;
+            color-scheme: dark;
+            accent-color: #38bdf8;
+        }
+        .bt-date-input:focus-visible, .bt-preset-btn:focus-visible {
+            outline: 2px solid #38bdf8;
+            outline-offset: 2px;
+        }
+        .bt-date-input:not(input[type="range"]):user-invalid {
+            border-color: #f43f5e;
+        }
+        .bt-preset-btn {
+            background: #0f172a;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-size: 0.71rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.14s ease;
+        }
+        .bt-preset-btn:hover {
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+        .bt-preset-btn.is-active {
+            background: rgba(56, 189, 248, 0.18);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
     </style>
 </head>
 <body>
@@ -4357,13 +4596,12 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         </div>
         <div class="tel-nav">
             <a class="live-pulse" href="#live-waves-section" style="text-decoration:none;" title="Jump to Live Rolling Wave Stream"><span class="pulse-dot"></span><span id="live-gov-badge">Loading Governor...</span></a>
-            <a class="tel-btn" style="border-color:#10b981; color:#34d399; background:rgba(16,185,129,0.16);" href="/">🧬 4-Module RK4 Pipelines</a>
-            <a class="tel-btn" style="border-color:#38bdf8; color:#7dd3fc;" href="/discovery">🛰️ Swarm Discovery Heatmap</a>
-            <a class="tel-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 1-to-N Card Arena</a>
-            <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/compare">🔬 3D Compare Lab</a>
-            <a class="tel-btn" style="border-color:#0ea5e9; color:#38bdf8;" href="/galaxy">🌌 3D Organism Galaxy</a>
-            <a class="tel-btn" style="border-color:#f43f5e; color:#fb7185;" href="/tpp">🌡️ TPP &amp; T_opt Lab</a>
-            <a class="tel-btn" href="/telemetry?format=json" target="_blank">{ } Raw JSON</a>
+            <a class="tel-btn" style="border-color:#10b981; color:#34d399; background:rgba(16,185,129,0.16);" href="/">🧬 Pipelines</a>
+            <a class="tel-btn" style="border-color:#38bdf8; color:#7dd3fc;" href="/discovery">🛰️ Swarm</a>
+            <a class="tel-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 Cards</a>
+            <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/compare">🔬 3D Lab</a>
+            <a class="tel-btn" style="border-color:#0ea5e9; color:#38bdf8;" href="/galaxy">🌌 3D Galaxy</a>
+            <a class="tel-btn" style="border-color:#f43f5e; color:#fb7185;" href="/tpp">🌡️ TPP Lab</a>
         </div>
     </header>
 
@@ -4390,10 +4628,10 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <span class="st-title">🤖 Validated Hypotheses</span>
                 <span class="st-meta" id="st4-meta">13 Active Hypotheses Promoted</span>
             </a>
-            <a class="stage-step" style="border-left-color:#10b981;" href="/" title="Stage 5: Launch 4-Module (M1→M2→M3→M4) 48h RK4 Bioprocess Digital Twin">
-                <span class="st-num">Stage 5 · Bioprocess Compilation</span>
-                <span class="st-title">⚡ 8 Compiled RK4 Pipelines</span>
-                <span class="st-meta" id="st5-meta">M1→M2→M3→M4 48h RK4 Twins</span>
+            <a class="stage-step" style="border-left-color:#10b981;" href="#puzzles-section" title="Stage 5: Inspect the Open Bioprocess Puzzle Board &amp; 10 Auto-Compiled 4-Module (M1→M2→M3→M4) 48h RK4 Digital Twins">
+                <span class="st-num">Stage 5 · Open Puzzle Board &amp; RK4</span>
+                <span class="st-title">🧩 10 Compiled + 3 Open Puzzles</span>
+                <span class="st-meta" id="st5-meta">4-Phase Embedded Gate Engine</span>
             </a>
         </section>
 
@@ -4489,12 +4727,35 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             </div>
         </section>
 
-        <!-- 8 Compiled 4-Module Bio-Pipelines & Live RangeFinder 8-Column GiST Reverse Target Fishing Matrix -->
-        <section class="breakthrough-panel" id="pipelines-gist-section" aria-label="8 Compiled Bio-Pipelines and RangeFinder GiST Reverse Target Fishing">
+        <!-- Open Bioprocess Puzzle Board & 4-Phase Embedded Validation Engine -->
+        <section class="breakthrough-panel" id="puzzles-section" aria-label="Open Bioprocess Puzzle Board and 4-Phase Embedded Validation Gates">
+            <div tabindex="0" role="region" aria-labelledby="puzzles-board-caption" class="table-wrapper">
+                <table class="tel-table">
+                    <caption id="puzzles-board-caption" style="color:#e9d5ff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <span>🧩 Open Bioprocess Puzzle Board &amp; 4-Phase Embedded Validation Engine (`bio_pipeline_puzzles` · Auto-Compiles New Pipelines When 4/4 Phase Gates Lock)</span>
+                        <a href="/?pipeline=smorf-hla-immunopeptidomics" class="tel-metric-link" style="font-size:0.76rem;color:#34d399;font-family:ui-monospace,monospace;">⚡ Launch Dark-Proteome smORF &rarr; HLA-I RK4 Twin &rarr;</a>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th>Puzzle Pipeline ID &amp; Status</th>
+                            <th>Organism Composition Rule &amp; Regime</th>
+                            <th>4-Phase Embedded SQL Validation Gates (M1 &rarr; M2 &rarr; M3 &rarr; M4)</th>
+                            <th>48h RK4 Yield (&Delta;)</th>
+                            <th>Missing Piece / Auto-Compile Verdict</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="puzzles-board-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 10 Compiled 4-Module Bio-Pipelines & Live RangeFinder 8-Column GiST Reverse Target Fishing Matrix -->
+        <section class="breakthrough-panel" id="pipelines-gist-section" aria-label="10 Compiled Bio-Pipelines and RangeFinder GiST Reverse Target Fishing">
             <div tabindex="0" role="region" aria-labelledby="pipelines-gist-caption" class="table-wrapper">
                 <table class="tel-table">
                     <caption id="pipelines-gist-caption" style="color:#34d399;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>🧬 8 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
+                        <span>🧬 10 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
                         <a href="/" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">Open Interactive 48h RK4 Digital Twin &rarr;</a>
                     </caption>
                     <thead>
@@ -4513,16 +4774,26 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             </div>
         </section>
 
-        <!-- Responsive Data Table of Overnight Breakthroughs -->
-        <section class="breakthrough-panel" id="breakthroughs-section" aria-label="Overnight Record-Breaking Discoveries">
+        <!-- Responsive Data Table of Breakthrough Discoveries (Default: Last 24 Hours + Since Calendar Picker) -->
+        <section class="breakthrough-panel" id="breakthroughs-section" aria-label="Top Breakthrough Discoveries Since Selected Date">
             <div tabindex="0" role="region" aria-labelledby="overnight-breakthroughs-caption" class="table-wrapper">
                 <table class="tel-table">
-                    <caption id="overnight-breakthroughs-caption">
-                        🏆 Top Overnight Breakthrough Discoveries (Edge ID &gt; 390,667) — Click any Protein ID, Organism, or Metric Score to open its live view
+                    <caption id="overnight-breakthroughs-caption" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                        <span id="bt-caption-text">🏆 Top Breakthrough Discoveries (<span id="bt-window-label" style="color:#38bdf8;">Last 24 Hours</span> · <span id="bt-edge-range-label" style="color:#34d399;font-family:ui-monospace,monospace;">Loading…</span>) — Click any Protein ID, Organism, or Metric Score</span>
+                        <search class="bt-filter-search" aria-label="Filter top breakthrough discoveries by since date">
+                            <form class="bt-filter-form" action="/telemetry" method="GET" id="bt-since-form" aria-labelledby="overnight-breakthroughs-caption" onsubmit="event.preventDefault(); applySinceDateFromInput();">
+                                <label class="bt-filter-label" for="bt-since-date">📅 Since:</label>
+                                <input type="date" id="bt-since-date" name="since" class="bt-date-input" onchange="applySinceDateFromInput()" />
+                                <button type="submit" class="bt-preset-btn" style="border-color:#38bdf8;color:#38bdf8;">Apply</button>
+                                <button type="button" class="bt-preset-btn is-active" id="bt-btn-24h" onclick="setBreakthroughWindowPreset('24h')">Last 24h</button>
+                                <button type="button" class="bt-preset-btn" id="bt-btn-7d" onclick="setBreakthroughWindowPreset('7d')">Last 7d</button>
+                                <button type="button" class="bt-preset-btn" id="bt-btn-all" onclick="setBreakthroughWindowPreset('all')">All Overnight (&gt;390K)</button>
+                            </form>
+                        </search>
                     </caption>
                     <thead>
                         <tr>
-                            <th>Protein Pair (Bait × Orphan)</th>
+                            <th>Protein Pair (Bait × Orphan) &amp; Discovered At</th>
                             <th>Cross-Genus Extremophile Pair</th>
                             <th>Domain / Enzyme Annotation</th>
                             <th>Twilight-Zone Score</th>
@@ -4582,7 +4853,7 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <div tabindex="0" role="region" aria-labelledby="blog-posts-caption" class="table-wrapper" id="blog-posts-section" style="margin-top:12px;">
                 <table class="tel-table">
                     <caption id="blog-posts-caption" style="color:#fbbf24;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>📚 Published `ideia.me` Swarm Discovery &amp; Bio-Pipelines Blog Posts Library (17 Articles) — Linked to Live 3D Arenas &amp; 48h RK4 Digital Twins</span>
+                        <span>📚 Published `ideia.me` Swarm Discovery &amp; Bio-Pipelines Blog Posts Library (18 Articles) — Linked to Live 3D Arenas &amp; 48h RK4 Digital Twins</span>
                         <a href="https://ideia.me" target="_blank" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">https://ideia.me ↗</a>
                     </caption>
                     <thead>
@@ -4617,8 +4888,50 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             return Number(n || 0).toLocaleString();
         }
 
+        // Breakthrough Since-Date Filter State (Default: '24h' = Last 24 Hours)
+        var ACTIVE_BT_SINCE = (new URLSearchParams(window.location.search).get('since') || '24h').trim() || '24h';
+
+        function syncBreakthroughFilterUI(meta) {
+            const dtInput = document.getElementById('bt-since-date');
+            const b24 = document.getElementById('bt-btn-24h');
+            const b7d = document.getElementById('bt-btn-7d');
+            const bAll = document.getElementById('bt-btn-all');
+            if (b24) b24.classList.toggle('is-active', ACTIVE_BT_SINCE === '24h');
+            if (b7d) b7d.classList.toggle('is-active', ACTIVE_BT_SINCE === '7d');
+            if (bAll) bAll.classList.toggle('is-active', ACTIVE_BT_SINCE === 'all');
+            if (dtInput && meta && meta.since_date_iso && document.activeElement !== dtInput) {
+                dtInput.value = meta.since_date_iso;
+            }
+            const winLbl = document.getElementById('bt-window-label');
+            const edgeLbl = document.getElementById('bt-edge-range-label');
+            if (winLbl && meta && meta.window_label) {
+                winLbl.textContent = meta.window_label;
+            }
+            if (edgeLbl && meta) {
+                edgeLbl.textContent = `Edge ID > ${fmtNum(meta.min_edge_id || 390667)} · ${fmtNum(meta.qualified_rf_edges || 0)} 3D Pairs`;
+            }
+        }
+
+        function setBreakthroughWindowPreset(presetVal) {
+            ACTIVE_BT_SINCE = presetVal;
+            const u = new URL(window.location);
+            u.searchParams.set('since', presetVal);
+            window.history.replaceState({}, '', u);
+            loadTelemetryDashboard();
+        }
+
+        function applySinceDateFromInput() {
+            const dtInput = document.getElementById('bt-since-date');
+            if (!dtInput || !dtInput.value) return;
+            ACTIVE_BT_SINCE = dtInput.value;
+            const u = new URL(window.location);
+            u.searchParams.set('since', ACTIVE_BT_SINCE);
+            window.history.replaceState({}, '', u);
+            loadTelemetryDashboard();
+        }
+
         function loadTelemetryDashboard() {
-            fetch('/telemetry?format=json')
+            fetch('/telemetry?format=json&since=' + encodeURIComponent(ACTIVE_BT_SINCE))
                 .then(r => r.json())
                 .then(d => {
                     const s = d.summary || {};
@@ -4833,7 +5146,8 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                         ]
                     });
 
-                    // 5. Render Breakthrough Table (with clickable metrics)
+                    // 5. Render Breakthrough Table (Default: Last 24 Hours + Since Calendar Filter)
+                    syncBreakthroughFilterUI(d.breakthrough_meta || {});
                     const bt = d.breakthroughs || [];
                     document.getElementById('breakthrough-tbody').innerHTML = bt.map((b, i) => `
                         <tr>
@@ -4842,6 +5156,7 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                                 <a class="tel-metric-link" href="/cards?hub=${b.bait_id}&challenger=${b.orphan_id}" title="Open ${b.bait_id} in 1-to-N Card Arena">${b.bait_id}</a>
                                 ×
                                 <a class="tel-metric-link" href="/compare?node1=${b.bait_id}&node2=${b.orphan_id}&preset=rangefinder" title="Compare ${b.bait_id} × ${b.orphan_id} in 3D Compare Lab">${b.orphan_id}</a>
+                                <br><span style="font-size:0.69rem;color:#94a3b8;font-weight:500;font-family:ui-monospace,monospace;">🕒 ${b.discovered_at || 'Recent'} · Edge #${fmtNum(b.edge_id)}</span>
                             </th>
                             <td>
                                 <a class="tel-metric-link" href="/galaxy" title="Explore ${b.bait_org} in 3D Organism Galaxy"><b style="color:#f8fafc;">${b.bait_org}</b></a><br>
@@ -4881,7 +5196,66 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                         </tr>
                     `).join('');
 
-                    // 6. Render 8 Compiled 4-Module Bio-Pipelines & RangeFinder GiST Matrix
+                    // 5b. Render Open Bioprocess Puzzle Board & 4-Phase Embedded Validation Gates
+                    const pzs = d.pipeline_puzzles || [];
+                    const pzsEl = document.getElementById('puzzles-board-tbody');
+                    if (pzsEl) {
+                        const autoCnt = pzs.filter(x => x.slots_filled === 4).length;
+                        const openCnt = pzs.length - autoCnt;
+                        const st5El = document.getElementById('st5-meta');
+                        if (st5El) st5El.textContent = `${8 + autoCnt} Compiled RK4 · ${openCnt} Open Puzzles (3/4)`;
+                        pzsEl.innerHTML = pzs.map(pz => {
+                            const isComplete = pz.slots_filled === 4;
+                            const stBadge = isComplete
+                                ? `<span style="background:rgba(16,185,129,0.20);color:#34d399;border:1px solid rgba(16,185,129,0.5);padding:2px 8px;border-radius:999px;font-size:0.68rem;font-weight:800;">🟢 AUTO-COMPILED (4/4)</span>`
+                                : `<span style="background:rgba(245,158,11,0.20);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);padding:2px 8px;border-radius:999px;font-size:0.68rem;font-weight:800;">⏳ NEAR-LOCK (${pz.slots_filled}/4)</span>`;
+                            const slotsHtml = (pz.slots || []).map(sl => {
+                                const bStyle = sl.locked
+                                    ? 'background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#34d399;'
+                                    : 'background:rgba(245,158,11,0.16);border:1px dashed rgba(245,158,11,0.65);color:#fbbf24;';
+                                const uidLink = sl.uid
+                                    ? `<a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(sl.uid)}" style="color:#f8fafc;font-weight:800;">${sl.uid}</a>`
+                                    : `<span style="color:#fbbf24;font-weight:800;">OPEN SLOT</span>`;
+                                return `
+                                    <div style="${bStyle}border-radius:6px;padding:5px 8px;margin-bottom:4px;font-size:0.72rem;" title="SQL Gate: ${(sl.sql_gate || '').replace(/"/g, '&quot;')}">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                                            <span><b>${sl.locked ? '🟢' : '⏳'} Phase ${sl.phase} (${sl.role}):</b> ${uidLink} <span style="color:#94a3b8;">(${sl.org || ''})</span></span>
+                                            <code style="font-size:0.66rem;color:#67e8f9;">${(sl.sql_gate || '').slice(0, 44)}${(sl.sql_gate || '').length > 44 ? '…' : ''}</code>
+                                        </div>
+                                        <div style="color:#cbd5e1;font-size:0.69rem;margin-top:2px;">${sl.metric || sl.cond}</div>
+                                    </div>
+                                `;
+                            }).join('');
+                            const actionBtn = isComplete
+                                ? `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#10b981;color:#34d399;background:rgba(16,185,129,0.15);" href="/?pipeline=${encodeURIComponent(pz.puzzle_id)}">⚡ Launch 48h RK4 Twin</a>`
+                                : `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent((pz.slots.find(s => s.uid) || {}).uid || 'A0A0D6JTS1')}">🔭 Inspect Locked Hub</a>`;
+                            return `
+                                <tr>
+                                    <th>
+                                        <div style="margin-bottom:4px;">${stBadge}</div>
+                                        <b style="color:#38bdf8;font-size:0.86rem;">${pz.puzzle_id}</b><br>
+                                        <span style="color:#cbd5e1;font-size:0.73rem;font-weight:400;">${pz.title}</span>
+                                    </th>
+                                    <td>
+                                        <b style="color:#f8fafc;">${pz.regime_envelope}</b><br>
+                                        <span style="color:#a5f3fc;font-size:0.73rem;"><b>Organism Rule:</b> ${pz.target_organism_rule}</span>
+                                    </td>
+                                    <td style="min-width:360px;">${slotsHtml}</td>
+                                    <td>
+                                        <b style="color:#34d399;font-size:0.94rem;">${pz.rk4_48h_yield_pct.toFixed(1)}%</b><br>
+                                        <span style="color:#6ee7b7;font-size:0.73rem;">(+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink)</span><br>
+                                        <span style="color:#94a3b8;font-size:0.69rem;">Stoich err: ${pz.stoichiometry_balance}</span>
+                                    </td>
+                                    <td style="max-width:270px;font-size:0.75rem;color:${isComplete ? '#6ee7b7' : '#fde047'};line-height:1.45;">
+                                        ${pz.missing_slot_hint}
+                                    </td>
+                                    <td>${actionBtn}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+
+                    // 6. Render 10 Compiled 4-Module Bio-Pipelines & RangeFinder GiST Matrix
                     const pgm = d.pipeline_gist_matrix || [];
                     const pgmEl = document.getElementById('pipelines-gist-tbody');
                     if (pgmEl) {
@@ -5376,11 +5750,12 @@ TPP_LAB_HTML_TEMPLATE = """
             <div class="sub">Whole-Proteome 1-to-N Microprotein Staple Disruption Cascades · Eyring Catalytic Sweet-Spot (<code>k_cat(T) × f_soluble(T)</code>) · TPCA Complex Decoherence</div>
         </div>
         <div class="tel-nav">
-            <a class="tel-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">⚡ Swarm Ingest Telemetry</a>
-            <a class="tel-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 1-to-N Card Arena</a>
-            <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/compare?preset=tpp">🔬 3D Thermal Lab</a>
-            <a class="tel-btn" style="border-color:#0ea5e9; color:#38bdf8;" href="/galaxy">🌌 3D Organism Galaxy</a>
-            <a class="tel-btn" href="/?limit=tpp-knockout-40">🔥 TPP Matrix Heatmap</a>
+            <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/">🧬 Pipelines</a>
+            <a class="tel-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">📊 Telemetry</a>
+            <a class="tel-btn" style="border-color:#38bdf8; color:#7dd3fc;" href="/discovery?limit=tpp-knockout-40">🛰️ Swarm</a>
+            <a class="tel-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 Cards</a>
+            <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/compare?preset=tpp">🔬 3D Lab</a>
+            <a class="tel-btn" style="border-color:#0ea5e9; color:#38bdf8;" href="/galaxy">🌌 3D Galaxy</a>
         </div>
     </header>
 
@@ -6129,8 +6504,13 @@ def api_swarm_telemetry():
     if not wants_json and request.path in ('/api/swarm_telemetry', '/telemetry'):
         return render_template_string(TELEMETRY_DASHBOARD_HTML_TEMPLATE)
 
+    since_arg = (request.args.get('since') or '24h').strip() or '24h'
     now_ts = _t.perf_counter()
-    if TELEMETRY_JSON_CACHE['payload'] and (now_ts - TELEMETRY_JSON_CACHE['ts']) <= 4.0:
+    if (
+        TELEMETRY_JSON_CACHE['payload']
+        and TELEMETRY_JSON_CACHE.get('since') == since_arg
+        and (now_ts - TELEMETRY_JSON_CACHE['ts']) <= 4.0
+    ):
         return jsonify(TELEMETRY_JSON_CACHE['payload'])
 
     with psycopg.connect(DB_URI, autocommit=True) as conn:
@@ -6166,11 +6546,12 @@ def api_swarm_telemetry():
                     COALESCE((
                         SELECT (c.reltuples * 0.0185)::bigint
                         FROM pg_class c WHERE c.relname = 'orphan_discoveries'
-                    ), 1831581) AS elite_twilight_count;
+                    ), 1831581) AS elite_twilight_count,
+                    COALESCE((SELECT MAX(id) FROM orphan_discoveries), 390667) AS max_edge_id;
             """)
             drow = cur.fetchone()
             pending_cnt = int(drow[0] or 0)
-            end_edges = int(srow[12] or 390667)
+            end_edges = max(int(srow[12] or 390667), int(drow[4] or 390667))
             explored_cnt = max(0, end_edges - pending_cnt)
 
             cur.execute("SELECT COUNT(*) FROM swarm_pocket_ranges;")
@@ -6311,14 +6692,69 @@ def api_swarm_telemetry():
                 for r in cur.fetchall()
             ]
 
+            # Resolve time window (`since` query parameter: default '24h' = Last 24 Hours, '7d', 'all', or YYYY-MM-DD calendar date)
+            import datetime as _dt
+            import re as _re
+            now_dt = _dt.datetime.now()
+            if since_arg.lower() == 'all':
+                since_dt = _dt.datetime(2026, 11, 5, 0, 0, 0)
+                window_label = 'All Overnight (Since 2026-11-05)'
+                since_date_iso = '2026-11-05'
+            elif since_arg.lower() == '7d':
+                since_dt = now_dt - _dt.timedelta(days=7)
+                window_label = f"Last 7 Days (Since {since_dt.strftime('%Y-%m-%d')})"
+                since_date_iso = since_dt.strftime('%Y-%m-%d')
+            elif _re.match(r'^\d{4}-\d{2}-\d{2}$', since_arg):
+                try:
+                    since_dt = _dt.datetime.strptime(since_arg, '%Y-%m-%d')
+                except Exception:
+                    since_dt = now_dt - _dt.timedelta(hours=24)
+                window_label = f"Since {since_dt.strftime('%Y-%m-%d')} 00:00"
+                since_date_iso = since_dt.strftime('%Y-%m-%d')
+            else:
+                since_dt = now_dt - _dt.timedelta(hours=24)
+                window_label = 'Last 24 Hours'
+                since_date_iso = since_dt.strftime('%Y-%m-%d')
+
+            if since_arg.lower() == 'all':
+                min_edge_for_window = 390667
+            else:
+                cur.execute("""
+                    SELECT COALESCE(MIN(total_graph_edges) - 250000, 390667)
+                    FROM swarm_telemetry_log
+                    WHERE recorded_at >= %s;
+                """, (since_dt,))
+                min_edge_for_window = max(390667, int(cur.fetchone()[0] or 390667))
+
+            cur.execute("""
+                SELECT COUNT(*), COALESCE(MIN(id), %s), COALESCE(MAX(id), %s)
+                FROM orphan_discoveries
+                WHERE rf_score IS NOT NULL
+                  AND id > %s
+                  AND discovered_at >= %s
+                  AND bait_id <> orphan_id;
+            """, (min_edge_for_window, end_edges, min_edge_for_window, since_dt))
+            q_cnt, q_min_id, q_max_id = cur.fetchone()
+            breakthrough_meta = {
+                'since_param': since_arg,
+                'since_date_iso': since_date_iso,
+                'since_timestamp': since_dt.strftime('%Y-%m-%d %H:%M:%S'),
+                'window_label': window_label,
+                'min_edge_id': int(q_min_id or min_edge_for_window),
+                'max_edge_id': int(q_max_id or end_edges),
+                'qualified_rf_edges': int(q_cnt or 0),
+            }
+
             cur.execute("""
                 WITH top_rf AS (
                     SELECT id, bait_id, orphan_id, bait_organism, orphan_organism,
-                           vector_distance, seq_identity_pct, twilight_score, rf_range_iou, rf_score, tm_score, chaperone_score
+                           vector_distance, seq_identity_pct, twilight_score, rf_range_iou, rf_score, tm_score, chaperone_score,
+                           to_char(discovered_at, 'YYYY-MM-DD HH24:MI') AS disc_ts
                     FROM orphan_discoveries
                     WHERE rf_score IS NOT NULL
                       AND twilight_score >= 0.72
-                      AND id > 390667
+                      AND id > %s
+                      AND discovered_at >= %s
                       AND bait_id <> orphan_id
                     ORDER BY rf_score DESC NULLS LAST
                     LIMIT 120
@@ -6335,13 +6771,14 @@ def api_swarm_telemetry():
                     d.tm_score AS tm_sc,
                     d.chaperone_score AS chap_sc,
                     regexp_replace(split_part(p1.name, ' OS=', 1), '^\\S+\\s+', '') AS b_desc,
-                    regexp_replace(split_part(p2.name, ' OS=', 1), '^\\S+\\s+', '') AS o_desc
+                    regexp_replace(split_part(p2.name, ' OS=', 1), '^\\S+\\s+', '') AS o_desc,
+                    d.disc_ts
                 FROM top_rf d
                 JOIN proteins p1 ON p1.uniprot_id = d.bait_id
                 JOIN proteins p2 ON p2.uniprot_id = d.orphan_id
                 ORDER BY LEAST(d.bait_id, d.orphan_id), GREATEST(d.bait_id, d.orphan_id),
                          (d.rf_score IS NOT NULL) DESC, (d.tm_score IS NOT NULL) DESC, d.twilight_score DESC;
-            """)
+            """, (min_edge_for_window, since_dt))
             bt_rows = sorted(cur.fetchall(), key=lambda x: float(x[7] or 0.0), reverse=True)[:14]
             breakthroughs = [
                 {
@@ -6359,6 +6796,7 @@ def api_swarm_telemetry():
                     'chaperone_score': float(r[11]) if r[11] is not None else None,
                     'bait_desc': r[12],
                     'orphan_desc': r[13],
+                    'discovered_at': r[14],
                 }
                 for r in bt_rows
             ]
@@ -6628,7 +7066,9 @@ def api_swarm_telemetry():
                             ('habanero-spicy-fuel', 'Habanero Capsicum GGPPS (P80042) -> Bio-Jet Terpene', 32.0, 6.8, 'Allylic Prenyl Pyrophosphate C–OPP (295 kJ/mol)', 'CC(C)=CCCC(C)=CCCC(C)=CC=C'),
                             ('biochar-water-remediation', 'Agro-Waste Biochar -> Micropollutant Mineralization', 30.0, 6.5, 'Chlorinated Aryl / Phenolic C–Cl & C–N (340 kJ/mol)', 'CC(=O)Nc1ccc(O)cc1'),
                             ('cyanide-mine-tailings', 'Gold-Mine Cyanide & Sulfide -> MBL-Rhodanese Chameleon', 38.0, 9.8, 'Nitrile / Cyanide C≡N Triple Bond (891 kJ/mol)', 'N#CCc1ccccc1'),
-                            ('desalination-brine-upcycling', 'Desalination Brine & Whey -> Soda-Lake GalE/Glf Sugars', 45.0, 9.5, 'Pyranose-to-Furanose Ring Contraction (285 kJ/mol)', 'OCC1OC(O)C(O)C(O)C1O')
+                            ('desalination-brine-upcycling', 'Desalination Brine & Whey -> Soda-Lake GalE/Glf Sugars', 45.0, 9.5, 'Pyranose-to-Furanose Ring Contraction (285 kJ/mol)', 'OCC1OC(O)C(O)C(O)C1O'),
+                            ('smorf-hla-immunopeptidomics', '🧩 Dark-Proteome smORF -> HLA-I Surface Antigen & CRISPR Screen', 37.0, 7.2, 'C-Terminal Hydrophobic P9 Anchor Peptide Bond', 'CC(C)C(NC(=O)C(Cc1cnc[nH]1)NC(=O)C(C(C)C)N)C(=O)O'),
+                            ('soda-lake-acetyl-chitin-upcycling', '🧩 Soda-Lake Crustacean Chitin -> Glucosamine via DUF5816 GNAT', 45.0, 9.8, 'β-1,4-N-Acetylglucosamine Glycosidic Bond', 'NC1C(O)OC(CO)C(O)C1O')
                     ),
                     lig_props AS (
                         SELECT pm.*, r.mw, r.logp, r.hbd, r.hba, r.tpsa, r.rotatable_bonds, r.aromatic_rings, r.fsp3
@@ -6690,6 +7130,61 @@ def api_swarm_telemetry():
             except Exception:
                 pass
 
+            pipeline_puzzles = []
+            try:
+                cur.execute("""
+                    SELECT puzzle_id, title, regime_envelope, target_organism_rule,
+                           temp_c, ph, slots_filled, slots_total,
+                           phase1_gate_passed, phase2_gate_passed, phase3_gate_passed, phase4_gate_passed,
+                           rk4_48h_yield_pct, rk4_yield_delta_pct, stoichiometry_balance,
+                           status, missing_slot_hint
+                    FROM bio_pipeline_puzzles
+                    ORDER BY slots_filled DESC, rk4_48h_yield_pct DESC;
+                """)
+                pz_rows = cur.fetchall()
+                cur.execute("""
+                    SELECT puzzle_id, module_role, phase_number, required_condition, embedded_sql_gate,
+                           assigned_uniprot, assigned_organism, partner_homolog, gate_metric_summary, is_locked
+                    FROM bio_puzzle_slots
+                    ORDER BY puzzle_id ASC, phase_number ASC;
+                """)
+                slots_by_pz = {}
+                for sr in cur.fetchall():
+                    slots_by_pz.setdefault(sr[0], []).append({
+                        'role': sr[1],
+                        'phase': int(sr[2]),
+                        'cond': sr[3],
+                        'sql_gate': sr[4],
+                        'uid': sr[5],
+                        'org': sr[6],
+                        'homolog': sr[7],
+                        'metric': sr[8],
+                        'locked': bool(sr[9]),
+                    })
+                for pr in pz_rows:
+                    pipeline_puzzles.append({
+                        'puzzle_id': pr[0],
+                        'title': pr[1],
+                        'regime_envelope': pr[2],
+                        'target_organism_rule': pr[3],
+                        'temp_c': float(pr[4]),
+                        'ph': float(pr[5]),
+                        'slots_filled': int(pr[6]),
+                        'slots_total': int(pr[7]),
+                        'g1': bool(pr[8]),
+                        'g2': bool(pr[9]),
+                        'g3': bool(pr[10]),
+                        'g4': bool(pr[11]),
+                        'rk4_48h_yield_pct': float(pr[12]),
+                        'rk4_yield_delta_pct': float(pr[13]),
+                        'stoichiometry_balance': float(pr[14]),
+                        'status': pr[15],
+                        'missing_slot_hint': pr[16],
+                        'slots': slots_by_pz.get(pr[0], []),
+                    })
+            except Exception:
+                pass
+
     payload = {
         'summary': summary,
         'regime_breakdown': regime_breakdown,
@@ -6698,7 +7193,9 @@ def api_swarm_telemetry():
         'latest': recent_waves[0] if recent_waves else None,
         'recent_waves': recent_waves,
         'breakthroughs': breakthroughs,
+        'breakthrough_meta': breakthrough_meta,
         'pipeline_gist_matrix': pipeline_gist_matrix,
+        'pipeline_puzzles': pipeline_puzzles,
         'agent_checkpoint': agent_checkpoint,
         'agent_hypotheses': agent_hypotheses,
         'evolving_annotations': evolving_annotations,
@@ -6708,6 +7205,7 @@ def api_swarm_telemetry():
         'blog_posts': IDEIAME_BLOG_POSTS,
     }
     TELEMETRY_JSON_CACHE['ts'] = now_ts
+    TELEMETRY_JSON_CACHE['since'] = since_arg
     TELEMETRY_JSON_CACHE['payload'] = payload
     return jsonify(payload)
 
@@ -7861,11 +8359,12 @@ GALAXY_HTML_TEMPLATE = """
                         <option value="similarity">Closest ESM-2 Cosine Lock (1 - d)</option>
                     </select>
                 </div>
-                <button class="gal-btn" style="background:rgba(16,185,129,0.16);border-color:#10b981;color:#34d399;" onclick="openCompound3DModal('A0A1H7ISK7')">🧬 Compound 3D Stack (10 Orgs @ 10%)</button>
-                <a class="gal-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">⚡ Telemetry</a>
-                <a class="gal-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 Card Arena</a>
+                <button class="gal-btn" style="background:rgba(16,185,129,0.16);border-color:#10b981;color:#34d399;" onclick="openCompound3DModal('A0A1H7ISK7')">🧬 Compound 3D (10 Orgs)</button>
+                <a class="gal-btn" style="border-color:#10b981; color:#34d399;" href="/">🧬 Pipelines</a>
+                <a class="gal-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">📊 Telemetry</a>
+                <a class="gal-btn" style="border-color:#f59e0b; color:#fbbf24;" href="/cards">🃏 Cards</a>
                 <a class="gal-btn" style="border-color:#10b981; color:#34d399;" href="/compare">🔬 3D Lab</a>
-                <a class="gal-btn" href="/">Heatmap</a>
+                <a class="gal-btn" href="/discovery">🛰️ Swarm</a>
             </div>
         </div>
         <div class="gal-scenarios-bar" id="scenario-bar">

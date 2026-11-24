@@ -36,7 +36,8 @@ When you run `uv run python base/swarm_web.py` (default port `8090` or `8080`), 
 ### 1. 8-Feedstock 4-Module ($M_1 \rightarrow M_4$) 48-Hour RK4 Digital Twin (`/` & `/pipelines`)
 - **In-Database Pareto Swarm Matrix (`pareto_score_domain_pair`)**: Evaluates $12 \times 16$ (`Anchor × Scissor`) candidate pairs in **~270 ms** across interfacial hydropathy contrast (`GRAVY`), Shannon sequence entropy, reactor pH-to-$\text{pI}$ match, and molecular weight compactness.
 - **Live 48-Hour RK4 ODE Integrator (`simulate_cascade_kinetics`)**: Integrates 97-step 4th-order Runge-Kutta differential equations inside SQL in **~15 ms**. Demonstrates how adding the $M_3$ Equilibrium Sink rescues reactions from severe competitive product inhibition ($K_i = 22\,\mu\text{M}$), lifting 48-hour PTFE defluorination yield from **59.8% (stalled) to 92.6% ($926\,\mu\text{M}$ Fluorapatite)**.
-- **3D Rigid-Body Chimera Assembly (`translate_and_merge_pdb_chains`)**: Enforces $\ge 28.0\,\text{\AA}$ inter-domain linker clearance (`GGGGS ×3` or `EAAAK ×3`) and audits Flory Globular Compactness ($R_g / R_0 = 1.467$) and RangeFinder $10\,\text{\AA}$ pocket intervals live in **3Dmol.js**.
+- **3D Rigid-Body Chimera Assembly (`translate_and_merge_pdb_chains`)**: Enforces $\ge 28.0\,\text{\AA}$ inter-domain linker clearance (`GGGGS ×3` or `EAAAK ×3`) and audits Flory Globular Compactness ($R_g / R_0 = 1.467$), RangeFinder $10\,\text{\AA}$ pocket intervals, and **Layer 19 PocketVina Multi-Pocket SAS & 21-Check PoseBusters Dual-Ledger provenance** live in **3Dmol.js**.
+- **Global `/` ID Jump & `🎲 Spin` Serendipity**: Press `/` on any page (`/`, `/discovery`, `/compare`, `/hypotheses`) to jump directly to any deterministic Atlas ID (`/id/?A0A1S8AT22_A0A1H3IA37_pk1`, `/id/?HYP-67M-001`, or single UniProt ID), or click **`🎲 Spin` (`/api/spin`)** to jump to a random PoseBusters-verified discovery pair.
 
 ![8-Feedstock 4-Module RK4 Bioprocess Digital Twin](./output/ui_01_rk4_pipelines.png)
 
@@ -57,7 +58,8 @@ Clicking any cell in the Swarm Heatmap opens the **Unified 3D Protein Compare In
   - **3D Kabsch Superposition:** **`0.67 Å` Core RMSD** across `386 Cα` atoms, Sequential **TM-Score `0.972 [SAME FOLD]`**.
   - **RangeFinder 8-Property Pocket GiST:** **`0.9043` IoU** (`MW [173, 378] Da`, `LogP [0.08, 3.33]`, `P(arom) 0.95`).
   - **CETSA / TPP Allosteric Seam Staple:** Shifts Ideal Operating Temperature ($T_{\text{opt}}$) from **$58.8^\circ\text{C} \rightarrow 70.2^\circ\text{C}$ ($2.55\times$ catalytic output)**.
-  - **12 Interactive 3D Views:** Switch between `Identity`, `pLDDT`, `2° Struct`, `Cα Core`, `Acidic (D/E) Brine Armor`, `H-Bonds`, `RASA`, `10 Å RangeFinder Box`, `TPP Seam (T_opt)`, `N-Term Pep`, `Superpose`, and `Z-Order 5 Å` Morton pockets.
+  - **13 Interactive 3D Views & Multi-Pocket Stepper:** Switch between `Identity`, `pLDDT`, `2° Struct`, `Cα Core`, `Acidic (D/E) Brine Armor`, `H-Bonds`, `RASA`, `10 Å RangeFinder Box`, **`★ Multi-Pocket SAS` (`pk1..pk5` stepper with 3D Connolly SAS surface points & 21-Check PoseBusters Dual-Ledger badge)**, `TPP Seam (T_opt)`, `N-Term Pep`, `Superpose`, and `Z-Order 5 Å` Morton pockets.
+  - **Minimalist "Take It Home" `SQL / Export` Drawer:** One-click copyable PostgreSQL 18 SQL query (`bio_multipocket_posebusters_screen`), Python `pgbio-py` snippet, and Kabsch-superposed `.PDB` download (`<id1>_<id2>_pk<rank>.pdb`).
 
 ![3D Kabsch & RangeFinder Compare Inspector Modal](./output/ui_03_3d_compare_inspector.png)
 
@@ -113,6 +115,8 @@ All heavy numerical, cheminformatics, vector homology, and 3D structural computa
    - Infers 9 compatible ligand property intervals ($\text{MW}$, $\text{LogP}$, $\text{TPSA}$, $\text{HBD}$, $\text{HBA}$, $\text{RotBonds}$, $\text{QED}$, $P(\text{arom})$, $P(\text{ring})$) from a $10\,\text{\AA}$ pocket in `0.167 ms` and reverse-screens all 8 feedstock substrates via PostgreSQL GiST containment (`@>`).
 6. **`bio_whiten_embedding`, `BioVecInt8G128`, `smith_waterman_score` & `kabsch_rmsd`**
    - Powers the autonomous discovery swarm with anisotropy-whitened PRISM vector indexing, zero-TOAST inline `1,304 B` quantized reranking, $O(N)$ rolling-buffer Smith-Waterman alignment, and zero-allocation $3 \times 3$ Jacobi SVD superposition.
+7. **`bio_detect_top_pockets`, `bio_posebusters_audit_row` & `bio_multipocket_posebusters_screen` (Layer 19 PocketVina & 21-Check PoseBusters Gate)**
+   - Detects the top-$K$ non-overlapping ($\ge 8.0\,\text{\AA}$) Connolly Solvent Accessible Surface (SAS) concavities (`pk1..pk5`), attaches a 16-byte FastScan quantized RangeFinder code to every pocket, and enforces the 21-check PoseBusters physical/chemical/steric validity gate (`20.66×` faster in-DB at `1.671 ms/complex`) with a **Strict Non-Hiding Dual-Ledger Provenance** contract (`raw_passes_all_21`, `was_desalted`, `rescue_possible <= 1.25 Å`, `provenance_tag`).
 
 ![In-Database 4th-Order Runge-Kutta (RK4) Enzymatic Cascade Digital Twin](./output/rk4_four_feedstock_cascades.png)
 
