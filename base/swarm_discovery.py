@@ -124,7 +124,9 @@ class AdaptiveLatencyGovernor:
             w = 4
             reason = f"Forced 4W Guaranteed Floor (idle={idle_sec:.0f}s)"
         else:
-            is_idle = (idle_sec >= self.IDLE_THRESHOLD_SEC)
+            hour_now = datetime.datetime.now().hour
+            is_overnight = (hour_now >= 23 or hour_now < 8)
+            is_idle = (idle_sec >= self.IDLE_THRESHOLD_SEC) or is_overnight
             max_allowed_workers = 16 if is_idle else 8
 
             rolling_mpe = (
@@ -1266,7 +1268,8 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
             SELECT
                 GREATEST(
                     COALESCE((SELECT MAX(total_graph_edges) FROM (SELECT total_graph_edges FROM swarm_telemetry_log ORDER BY id DESC LIMIT 10) s), 0),
-                    COALESCE((SELECT reltuples::bigint FROM pg_class WHERE relname = 'orphan_discoveries'), 0)
+                    COALESCE((SELECT reltuples::bigint FROM pg_class WHERE relname = 'orphan_discoveries'), 0),
+                    COALESCE((SELECT MAX(id) FROM orphan_discoveries), 0)
                 ) AS est_total_edges,
                 (SELECT COUNT(*) FROM orphan_discoveries WHERE rf_score IS NOT NULL) AS tot_rf,
                 (SELECT COUNT(*) FROM swarm_tpp_knockout_cascades) AS tot_tpp_cnt,
@@ -1377,6 +1380,7 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
                     tot_rf = cur.fetchone()[0]
                     cur.execute("SELECT COUNT(*) FROM swarm_tpp_knockout_cascades;")
                     tot_tpp = cur.fetchone()[0]
+                tot_graph = max(tot_graph, last_max_id)
                 cur.execute("""
                     INSERT INTO swarm_telemetry_log (
                         power_mode, active_workers, hid_idle_sec, load_avg_1m,
