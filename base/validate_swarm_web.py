@@ -59,6 +59,7 @@ def run_validation_suite():
     table.add_column("RK4 Mass Conservation", justify="right", style="magenta")
     table.add_column("Simplex Σw", justify="right", style="blue")
     table.add_column("3D Clearance ΔX", justify="right", style="bold cyan")
+    table.add_column("PocketVina & PoseBusters", justify="right", style="bold green")
 
     for pid in PIPELINES:
         # 1. Fetch /api/swarm
@@ -101,15 +102,19 @@ def run_validation_suite():
         w_sum = float(st["w1"]) + float(st["w2"]) + float(st["w3"])
         assert abs(w_sum - 1.0) < 1e-6, f"Simplex weights did not sum to 1.0: {w_sum}"
 
-        # 4. Fetch /api/complex3d for the #1 pair and verify >= 28.0 A clearance & globular metrics
+        # 4. Fetch /api/complex3d for the #1 pair and verify >= 28.0 A clearance & globular metrics + PocketVina/PoseBusters
         c3d = json.loads(
             urllib.request.urlopen(
-                f"{BASE_URL}/api/complex3d?anchor={top['anchor_id']}&scissor={top['scissor_id']}"
+                f"{BASE_URL}/api/complex3d?anchor={top['anchor_id']}&scissor={top['scissor_id']}&pipeline={pid}"
             ).read().decode()
         )
         dx_clearance = min_interchain_distance(c3d["merged_pdb"])
         assert abs(dx_clearance - 28.0) < 0.05, f"Expected 28.0 A X-clearance, got {dx_clearance}"
         assert c3d["globular"]["ca_count"] > 100, "Expected > 100 Ca atoms in merged complex"
+        pv = c3d.get("pocketvina") or {}
+        pb = pv.get("posebusters") or {}
+        assert len(pv.get("pockets") or []) >= 1, f"Expected >= 1 detected SAS pocket for {pid}"
+        assert pb.get("provenance_tag") is not None, f"Missing Dual-Ledger provenance_tag for {pid}"
 
         table.add_row(
             pid,
@@ -119,11 +124,34 @@ def run_validation_suite():
             f"1000.0 ± {max_mass_err:.1f} µM ✅",
             f"{w_sum:.2f} ✅",
             f"{dx_clearance:.2f} Å ✅",
+            f"{len(pv['pockets'])}p · {pv.get('best_vina_kcal_mol', 0):.1f} kcal · {pb.get('provenance_tag')} ✅",
         )
+
+    # 5. Validate /api/compare/<id1>/<id2>, /api/spin, /api/meta, and /id/?<AtlasID>
+    cmp_data = json.loads(
+        urllib.request.urlopen(f"{BASE_URL}/api/compare/A0A1S8AT22/A0A1H3IA37").read().decode()
+    )
+    cmp_pv = cmp_data.get("pocketvina") or {}
+    cmp_pb = cmp_pv.get("posebusters") or {}
+    assert len(cmp_pv.get("pockets_2") or []) >= 1, "Expected pockets_2 in /api/compare/A0A1S8AT22/A0A1H3IA37"
+    assert cmp_pb.get("passes_all_21") is True, f"Expected PoseBusters 21/21 pass, got {cmp_pb}"
+
+    spin_data = json.loads(urllib.request.urlopen(f"{BASE_URL}/api/spin").read().decode())
+    assert "atlas_id" in spin_data and "url" in spin_data, f"Invalid /api/spin response: {spin_data}"
+
+    meta_data = json.loads(urllib.request.urlopen(f"{BASE_URL}/api/meta").read().decode())
+    assert len(meta_data.get("numbers_ledger") or []) >= 7, "Expected >= 7 rows in /api/meta numbers_ledger"
+
+    id_resp = urllib.request.urlopen(f"{BASE_URL}/id/?A0A1S8AT22_A0A1H3IA37_pk2")
+    assert "node1=A0A1S8AT22" in id_resp.geturl() and "pk=2" in id_resp.geturl(), (
+        f"Expected /id/?A0A1S8AT22_A0A1H3IA37_pk2 redirect to include node1 & pk=2, got {id_resp.geturl()}"
+    )
 
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
     console.print(table)
-    console.print(f"[bold green]✅ All 5 Pipelines Passed 100% of Mathematical, Kinetic & 3D Validation Checks in {elapsed_ms:.1f} ms![/]")
+    console.print(
+        f"[bold green]✅ All {len(PIPELINES)} Pipelines + Layer 19 PocketVina/PoseBusters Endpoints Passed 100% of Checks in {elapsed_ms:.1f} ms![/]"
+    )
 
 
 if __name__ == "__main__":
