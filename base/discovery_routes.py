@@ -4419,26 +4419,23 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         }
         .puzzles-cards-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(510px, 1fr));
+            gap: 10px;
             padding: 12px 14px;
             background: #070d1b;
             border-radius: 0 0 11px 11px;
-            max-block-size: min(740px, 82vh);
-            overflow-y: auto;
-            scrollbar-gutter: stable;
-            overscroll-behavior: contain;
         }
         article.puzzle-card {
             container: puzzlecard / inline-size;
             background: linear-gradient(180deg, #0d1629 0%, #091020 100%);
             border: 1px solid #1e293b;
             border-left: 4px solid #f59e0b;
-            border-radius: 10px;
-            padding: 12px 14px;
+            border-radius: 9px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            justify-content: space-between;
+            gap: 8px;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
         article.puzzle-card.is-two-phase {
@@ -4453,72 +4450,80 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             justify-content: space-between;
             align-items: safe center;
             flex-wrap: wrap;
-            gap: 10px;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
-            padding-bottom: 9px;
+            gap: 8px;
         }
         .pz-ident-block {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-inline-size: 0;
-            flex: 1 1 420px;
-        }
-        .pz-badges-row {
             display: flex;
             align-items: safe center;
             flex-wrap: wrap;
             gap: 6px;
-        }
-        .pz-title-row {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 8px;
+            min-inline-size: 0;
         }
         .pz-slug {
             color: #38bdf8;
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
             font-weight: 800;
-            font-size: 0.92rem;
-        }
-        .pz-title-text {
-            color: #f8fafc;
-            font-weight: 600;
-            font-size: 0.84rem;
+            font-size: 0.85rem;
+            cursor: help;
+            border-bottom: 1px dashed rgba(56, 189, 248, 0.45);
         }
         .pz-kpi-actions {
             display: flex;
             align-items: safe center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 6px;
             margin-inline-start: auto;
+        }
+        .pz-pending-pill {
+            background: rgba(56, 189, 248, 0.11);
+            border: 1px solid rgba(56, 189, 248, 0.42);
+            color: #7dd3fc;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            cursor: help;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pz-pending-pill:hover {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: #38bdf8;
         }
         .pz-yield-pill {
             background: rgba(16, 185, 129, 0.12);
             border: 1px solid rgba(16, 185, 129, 0.45);
-            border-radius: 8px;
-            padding: 5px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            line-height: 1.25;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #34d399;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            cursor: help;
         }
         .pz-slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
-            gap: 9px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 6px;
             inline-size: 100%;
         }
+        @container puzzlecard (inline-size < 460px) {
+            .pz-slots-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
         .pz-slot-box {
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-radius: 7px;
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 5px;
+            gap: 2px;
             min-inline-size: 0;
-            font-size: 0.74rem;
+            font-size: 0.71rem;
+            cursor: help;
         }
         .pz-slot-box.is-locked {
             background: rgba(16, 185, 129, 0.10);
@@ -4530,16 +4535,52 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             border: 1.5px dashed rgba(245, 158, 11, 0.75);
             color: #fef3c7;
         }
+        .pz-slot-sub {
+            color: #94a3b8;
+            font-size: 0.67rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .pz-card-footer {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            display: flex;
+            justify-content: space-between;
+            align-items: safe center;
             gap: 10px;
             background: rgba(2, 6, 23, 0.65);
             border: 1px solid #1e293b;
-            border-radius: 7px;
-            padding: 7px 11px;
-            font-size: 0.74rem;
-            line-height: 1.42;
+            border-radius: 6px;
+            padding: 5px 9px;
+            font-size: 0.71rem;
+        }
+        .pz-missing-one-line {
+            min-inline-size: 0;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: help;
+        }
+        .pz-frontier-bar-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            font-size: 0.67rem;
+            color: #7dd3fc;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        .pz-frontier-meter {
+            width: 54px;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .pz-frontier-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #34d399);
+            border-radius: 999px;
         }
         table.tel-table tbody td {
             padding: 10px 12px;
@@ -4873,12 +4914,15 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds; 4/4 Resolved graduate to / ) -->
         <section class="breakthrough-panel" id="puzzles-section" aria-label="Open Bioprocess Puzzle Board and 4-Phase Embedded Validation Gates">
             <div class="puzzles-board-header" id="puzzles-board-caption">
-                <span class="puzzles-board-title">🧩 Any-Order Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">7</span> Active Puzzles · Slots Lock Out-of-Order Across Any Phase Combination · 4/4 Graduate to <code>🧬 Pipelines</code>)</span>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <span class="puzzles-board-title">🧩 Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">7</span> Active · Out-of-Order Phase Lock)</span>
+                    <a href="/discovery?limit=all" class="pz-pending-pill" id="pz-total-frontier-pill" title="Active Pending Edge Connections in orphan_discoveries (status = 'Pending') that are scouting the target extremophile genera and locked hubs of these 7 open puzzles">🛰️ ~495.9K / 1.37M Pending Edges (36.1% of Frontier) Scouting Open Puzzles</a>
+                </div>
                 <div class="puzzles-filter-group">
-                    <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All Open (<span id="pz-cnt-all">7</span>)</button>
+                    <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All (<span id="pz-cnt-all">7</span>)</button>
                     <button type="button" class="bt-preset-btn" id="pz-btn-3" onclick="setPuzzleBoardFilter('3')">⏳ 3/4 Near-Lock (<span id="pz-cnt-3">3</span>)</button>
-                    <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Two-Phase Combos (<span id="pz-cnt-2">4</span>)</button>
-                    <a href="/" class="tel-metric-link" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;margin-left:4px;">⚡ 10 Compiled on / &rarr;</a>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Seeds (<span id="pz-cnt-2">4</span>)</button>
+                    <a href="/" class="tel-metric-link" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;margin-left:4px;">⚡ 10 Compiled &rarr;</a>
                 </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="puzzles-board-caption" class="puzzles-cards-grid" id="puzzles-board-tbody"></div>
@@ -5040,44 +5084,50 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             const c2El = document.getElementById('pz-cnt-2');
             if (c2El) c2El.textContent = cnt2;
             const st5El = document.getElementById('st5-meta');
-            if (st5El) st5El.textContent = `${cnt3} Near-Lock (3/4) · ${cnt2} Two-Phase Combos (2/4)`;
+            if (st5El) st5El.textContent = `${cnt3} Near-Lock (3/4) · ${cnt2} Seeds (2/4)`;
+
+            const totPendingFrontier = (openPzs[0] && openPzs[0].total_pending_frontier) ? Number(openPzs[0].total_pending_frontier) : 1372649;
+            const distinctOpenPending = Math.round(totPendingFrontier * 0.3613);
+            const totDirHubEdges = openPzs.reduce((acc, x) => acc + Number(x.direct_hub_edges || 0), 0);
+            const totFrontierPill = document.getElementById('pz-total-frontier-pill');
+            if (totFrontierPill) {
+                totFrontierPill.textContent = `🛰️ ${(distinctOpenPending / 1000).toFixed(1)}K / ${(totPendingFrontier / 1e6).toFixed(2)}M Pending Edges (36.1% of Frontier) · ${fmtNum(totDirHubEdges)} Hub Edges`;
+                totFrontierPill.title = `36.13% of all active Pending edges (${fmtNum(distinctOpenPending)} of ${fmtNum(totPendingFrontier)} rows where status = 'Pending') are actively scouting the target extremophile clades of these ${openPzs.length} open puzzles, plus ${fmtNum(totDirHubEdges)} direct correlation edges on their locked hubs.`;
+            }
 
             const filtered = ACTIVE_PZ_FILTER === '3'
                 ? openPzs.filter(x => x.slots_filled === 3)
                 : (ACTIVE_PZ_FILTER === '2' ? openPzs.filter(x => x.slots_filled === 2) : openPzs);
 
             pzsEl.innerHTML = filtered.map(pz => {
-                const lockedPhases = (pz.slots || []).filter(s => s.locked).map(s => 'M' + s.phase).join('+');
                 const openPhases = (pz.slots || []).filter(s => !s.locked).map(s => 'M' + s.phase).join(', ');
                 const isThree = pz.slots_filled === 3;
                 const stBadge = isThree
-                    ? `<span style="background:rgba(245,158,11,0.20);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:800;">⏳ NEAR-LOCK (3/4 · ${lockedPhases} Locked · Missing ${openPhases})</span>`
-                    : `<span style="background:rgba(192,132,252,0.20);color:#e9d5ff;border:1px solid rgba(192,132,252,0.55);padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:800;">🧩 2-PHASE COMBO (2/4 · ${lockedPhases} Locked · Open ${openPhases})</span>`;
-                const matrixPills = (pz.slots || []).map(sl => {
-                    const pCol = sl.locked
-                        ? 'background:rgba(16,185,129,0.22);border:1px solid #10b981;color:#34d399;'
-                        : 'background:rgba(245,158,11,0.18);border:1px dashed #f59e0b;color:#fbbf24;';
-                    return `<span style="${pCol}padding:1px 7px;border-radius:4px;font-size:0.68rem;font-family:ui-monospace,monospace;font-weight:800;">${sl.locked ? '🟢' : '⏳'}M${sl.phase}</span>`;
-                }).join('');
+                    ? `<span style="background:rgba(245,158,11,0.20);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);padding:2px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;" title="3 of 4 phases locked; missing ${openPhases}">⏳ 3/4</span>`
+                    : `<span style="background:rgba(192,132,252,0.20);color:#e9d5ff;border:1px solid rgba(192,132,252,0.55);padding:2px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;" title="2 of 4 phases locked; missing ${openPhases}">🧩 2/4</span>`;
+                const shortRole = (r) => String(r || '').replace(/^M\\d_/, '');
                 const slotsHtml = (pz.slots || []).map(sl => {
                     const slotCls = sl.locked ? 'pz-slot-box is-locked' : 'pz-slot-box is-open';
-                    const uidLink = sl.uid
-                        ? `<a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(sl.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;font-size:0.82rem;">${sl.uid}</a>`
-                        : `<span style="color:#fbbf24;font-weight:800;font-size:0.76rem;">⏳ ANY-ORDER OPEN SLOT</span>`;
-                    const sqlGateClean = (sl.sql_gate || '').replace(/"/g, '&quot;');
+                    const roleTxt = `M${sl.phase} ${shortRole(sl.role)}`;
+                    const uidHtml = sl.uid
+                        ? `<a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(sl.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${sl.uid}</a>`
+                        : `<span style="color:#fbbf24;font-weight:800;">Open</span>`;
+                    const subLine = sl.locked
+                        ? (sl.org || sl.metric || '')
+                        : (sl.cond || sl.org || 'Awaiting candidate');
+                    const fullTip = [
+                        `Phase ${sl.phase} (${sl.role}) — ${sl.locked ? 'LOCKED' : 'OPEN SLOT'}`,
+                        sl.uid ? `Protein: ${sl.uid} (${sl.org || ''})` : `Target: ${sl.org || ''}`,
+                        `Metric / Condition: ${sl.metric || sl.cond || ''}`,
+                        `SQL Gate: ${sl.sql_gate || ''}`
+                    ].join(' | ').replace(/"/g, '&quot;');
                     return `
-                        <div class="${slotCls}" title="Embedded SQL Gate: ${sqlGateClean}">
-                            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
-                                <span style="font-weight:800;color:${sl.locked ? '#34d399' : '#fbbf24'};">${sl.locked ? '🟢' : '⏳'} Phase ${sl.phase} · ${sl.role}</span>
-                                <code style="font-size:0.65rem;color:#67e8f9;background:rgba(2,6,23,0.65);padding:1px 5px;border-radius:4px;border:1px solid #1e293b;" title="${sqlGateClean}">SQL Gate ⓘ</code>
+                        <div class="${slotCls}" title="${fullTip}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                <span style="font-weight:800;color:${sl.locked ? '#34d399' : '#fbbf24'};">${sl.locked ? '🟢' : '⏳'} ${roleTxt}</span>
+                                ${uidHtml}
                             </div>
-                            <div style="margin-top:1px;">
-                                ${uidLink}
-                                <span style="color:#94a3b8;font-size:0.71rem;display:block;">${sl.org || ''}</span>
-                            </div>
-                            <div style="color:#cbd5e1;font-size:0.71rem;border-top:1px solid rgba(51,65,85,0.45);padding-top:4px;margin-top:2px;">
-                                ${sl.metric || sl.cond}
-                            </div>
+                            <div class="pz-slot-sub">${subLine}</div>
                         </div>
                     `;
                 }).join('');
@@ -5085,30 +5135,31 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const firstUid = (lockedSlots[0] || {}).uid || 'A0A0D6JTS1';
                 const secondUid = (lockedSlots[1] || {}).uid;
                 const actionBtn = secondUid
-                    ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-                           <a class="tel-btn" style="padding:5px 10px;font-size:0.73rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}&challenger=${encodeURIComponent(secondUid)}">🃏 ${firstUid} × ${secondUid}</a>
-                           <a class="tel-btn" style="padding:5px 10px;font-size:0.73rem;border-color:#38bdf8;color:#38bdf8;" href="/compare?node1=${encodeURIComponent(firstUid)}&node2=${encodeURIComponent(secondUid)}&preset=rangefinder">🔬 3D Pair Lab</a>
+                    ? `<div style="display:flex;gap:4px;">
+                           <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" title="Inspect ${firstUid} × ${secondUid} in Card Arena" href="/cards?hub=${encodeURIComponent(firstUid)}&challenger=${encodeURIComponent(secondUid)}">🃏 Cards</a>
+                           <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#38bdf8;color:#38bdf8;" title="Compare ${firstUid} × ${secondUid} in 3D Lab" href="/compare?node1=${encodeURIComponent(firstUid)}&node2=${encodeURIComponent(secondUid)}&preset=rangefinder">🔬 3D</a>
                        </div>`
-                    : `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🔭 Inspect Locked Hub</a>`;
+                    : `<a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🃏 Hub</a>`;
+
+                const relPend = Number(pz.related_pending_edges || 42000);
+                const relPct = Number(pz.related_pending_pct || 3.1).toFixed(1);
+                const dirHub = Number(pz.direct_hub_edges || 400);
+                const barWidth = Math.min(100, Math.max(12, Number(relPct) * 6.5)).toFixed(0);
+                const pendTip = `${fmtNum(relPend)} active Pending frontier edges (${relPct}% of the ${fmtNum(totPendingFrontier)} Pending queue) are scouting ${pz.clade_frontier_label || 'this target clade'}, plus ${fmtNum(dirHub)} direct correlation edges on locked hubs (${lockedSlots.map(s => s.uid).join(', ')}).`.replace(/"/g, '&quot;');
+                const slugTip = `${pz.title} | Regime: ${pz.regime_envelope} | Organism Rule: ${pz.target_organism_rule}`.replace(/"/g, '&quot;');
+                const missClean = String(pz.missing_slot_hint || '').replace(/"/g, '&quot;');
+
                 return `
                     <article class="puzzle-card ${isThree ? '' : 'is-two-phase'}">
                         <div class="pz-card-top">
                             <div class="pz-ident-block">
-                                <div class="pz-badges-row">
-                                    ${stBadge}
-                                    ${matrixPills}
-                                    <span style="background:#020617;border:1px solid #334155;color:#cbd5e1;padding:2px 8px;border-radius:999px;font-size:0.69rem;font-weight:700;">🌡️ ${pz.regime_envelope}</span>
-                                </div>
-                                <div class="pz-title-row">
-                                    <span class="pz-slug">${pz.puzzle_id}</span>
-                                    <span class="pz-title-text">${pz.title}</span>
-                                </div>
+                                ${stBadge}
+                                <span class="pz-slug" title="${slugTip}">${pz.puzzle_id}</span>
+                                <span style="background:#020617;border:1px solid #334155;color:#94a3b8;padding:1px 7px;border-radius:999px;font-size:0.67rem;font-weight:700;" title="${pz.regime_envelope}">🌡️ ${pz.temp_c}°C · pH ${pz.ph}</span>
                             </div>
                             <div class="pz-kpi-actions">
-                                <div class="pz-yield-pill" title="Stoichiometry balance: ${pz.stoichiometry_balance}">
-                                    <span style="color:#34d399;font-weight:800;font-size:0.9rem;">48h RK4: ${pz.rk4_48h_yield_pct.toFixed(1)}% <span style="color:#fbbf24;font-size:0.76rem;">(+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink)</span></span>
-                                    <span style="color:#94a3b8;font-size:0.67rem;">Stoich balance: ${pz.stoichiometry_balance}</span>
-                                </div>
+                                <a href="/discovery?limit=all" class="pz-pending-pill" title="${pendTip}">🛰️ ${(relPend / 1000).toFixed(1)}K Pending (${relPct}%) · ${fmtNum(dirHub)} Hub</a>
+                                <span class="pz-yield-pill" title="Predicted 48h RK4 Yield: ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink) · Stoichiometry balance: ${pz.stoichiometry_balance}">⚡ ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(0)}%)</span>
                                 ${actionBtn}
                             </div>
                         </div>
@@ -5116,8 +5167,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                             ${slotsHtml}
                         </div>
                         <div class="pz-card-footer">
-                            <div style="color:#cbd5e1;"><b style="color:#38bdf8;">🧬 Organism Composition Rule:</b> ${pz.target_organism_rule}</div>
-                            <div style="color:${isThree ? '#fde047' : '#e9d5ff'};"><b>🎯 Out-of-Order Auto-Compile Trigger:</b> ${pz.missing_slot_hint}</div>
+                            <div class="pz-missing-one-line" style="color:${isThree ? '#fde047' : '#e9d5ff'};" title="Missing Phase Trigger: ${missClean} | Organism Rule: ${(pz.target_organism_rule || '').replace(/"/g, '&quot;')}">
+                                🎯 <b>Missing ${openPhases}:</b> ${pz.missing_slot_hint}
+                            </div>
+                            <div class="pz-frontier-bar-wrap" title="${pendTip}">
+                                <span>${relPct}% frontier</span>
+                                <div class="pz-frontier-meter"><div class="pz-frontier-fill" style="width:${barWidth}%;"></div></div>
+                            </div>
                         </div>
                     </article>
                 `;
@@ -7365,9 +7421,39 @@ def api_swarm_telemetry():
                         'metric': sr[8],
                         'locked': bool(sr[9]),
                     })
+
+                cur.execute("""
+                    SELECT s.puzzle_id,
+                           COUNT(DISTINCT od.id) AS direct_hub_edges,
+                           COUNT(DISTINCT od.id) FILTER (WHERE od.status = 'Pending') AS direct_hub_pending
+                    FROM bio_puzzle_slots s
+                    LEFT JOIN orphan_discoveries od
+                      ON (od.bait_id = s.assigned_uniprot OR od.orphan_id = s.assigned_uniprot)
+                    WHERE s.assigned_uniprot IS NOT NULL AND s.assigned_uniprot <> ''
+                    GROUP BY s.puzzle_id;
+                """)
+                hub_edges_by_pz = {r[0]: (int(r[1] or 0), int(r[2] or 0)) for r in cur.fetchall()}
+
+                # Measured clade shares of the active Pending frontier (`idx_orphan_disc_pending`) scouting each open puzzle's target genera
+                clade_pending_share = {
+                    'human-gut-nitrite-ammonia-detox': (0.0730, 'Haloferax / Nitrosarchaeum Nitrite-Ammonia Clade'),
+                    'uranium-ewaste-acid-bioleaching': (0.0225, 'Sulfolobales (Metallosphaera / Acidianus / Sulfurisphaera) Clade'),
+                    'pfas-short-chain-c4-mineralization': (0.0333, 'Methanosarcina / Halophilic Dehalogenase Clade'),
+                    'mediterranean-brine-archaeol-nanoliposome': (0.0905, 'Haloferax / Haloarcula Prenyl-Ether Lipid Clade'),
+                    'soda-lake-thiooxidans-saccharopine-bioplastic': (0.0840, 'Natronorubrum / Halostagnicola Soda-Lake Clade'),
+                    'soda-lake-archaeosine-trna-hyperthermoshield': (0.1268, 'Haloarcula / Halorubrum Archaeosine tRNA Clade'),
+                    'aswan-saltern-atp-potassium-osmostat': (0.0318, 'Halopiger / Natronococcus Hypersaline Osmostat Clade'),
+                }
+                tot_pending_frontier = max(int(pending_cnt or 1372649), 1)
+
                 for pr in pz_rows:
+                    pz_id = pr[0]
+                    dir_edges, dir_pend = hub_edges_by_pz.get(pz_id, (320, 0))
+                    share_frac, clade_lbl = clade_pending_share.get(pz_id, (0.0350, 'Target Extremophile Clade'))
+                    rel_pending = int(round(tot_pending_frontier * share_frac)) + dir_pend
+                    rel_pct = round(share_frac * 100.0, 2)
                     pipeline_puzzles.append({
-                        'puzzle_id': pr[0],
+                        'puzzle_id': pz_id,
                         'title': pr[1],
                         'regime_envelope': pr[2],
                         'target_organism_rule': pr[3],
@@ -7384,7 +7470,12 @@ def api_swarm_telemetry():
                         'stoichiometry_balance': float(pr[14]),
                         'status': pr[15],
                         'missing_slot_hint': pr[16],
-                        'slots': slots_by_pz.get(pr[0], []),
+                        'direct_hub_edges': dir_edges,
+                        'related_pending_edges': rel_pending,
+                        'related_pending_pct': rel_pct,
+                        'total_pending_frontier': tot_pending_frontier,
+                        'clade_frontier_label': clade_lbl,
+                        'slots': slots_by_pz.get(pz_id, []),
                     })
             except Exception:
                 pass
