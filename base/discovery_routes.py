@@ -7284,10 +7284,20 @@ def api_tpp_lab():
                 }
                 for r in cur.fetchall()
             ]
+
+            # Complementary Phase 2 & 3 Disordered Microprotein SLiM Metabolon Coupler Track (`bio_pslim_window_pool` + `bio_match_dual_slim_tether`)
+            pslim_couplers = []
+            try:
+                from hypothesis_agent import discover_disordered_dual_slim_tethers
+                pslim_couplers = discover_disordered_dual_slim_tethers(cur, limit=8)
+            except Exception:
+                pass
+
     return jsonify({
         'tpp_summary': tpp_summary,
         'tpp_pleiotropic_hubs': tpp_pleiotropic_hubs,
         'tpp_cascades': tpp_cascades,
+        'tpp_disordered_slim_couplers': pslim_couplers,
     })
 
 

@@ -103,10 +103,19 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                 host = spec["hosts"][0]
                 sink_prod = spec["modules"]["module_3_sink"]["sink_product"]
 
-                # Layer 7 + Layer 14 Pareto + Layer 14 RK4 Cascade in a single SQL query
+                # Layer 7 + Layer 14 Pareto + Phase 1 EnzRef Role-Contrast + Layer 14 RK4 Cascade in a single SQL query
+                rxn_smiles = f"{smiles}>>{ref_smiles}"
                 cur.execute(
                     """
-                    WITH top_anchors AS (
+                    WITH rxn_roles AS (
+                        SELECT
+                            sr.reactants_smiles,
+                            sr.products_smiles,
+                            smiles_to_fingerprint(sr.reactants_smiles) AS r_fp,
+                            smiles_to_fingerprint(COALESCE(NULLIF(sr.products_smiles, ''), %s)) AS p_fp
+                        FROM bio_split_reaction_roles(%s) sr
+                    ),
+                    top_anchors AS (
                         SELECT uniprot_id, gravy_hydropathy, shannon_entropy
                         FROM bio_domain_atlas
                         WHERE pipeline_family = %s AND module_role = 'M1_Anchor'
@@ -114,11 +123,31 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                         LIMIT 15
                     ),
                     top_scissors AS (
-                        SELECT uniprot_id, mw_kda, isoelectric_pi, shannon_entropy
-                        FROM bio_domain_atlas
-                        WHERE pipeline_family = %s AND module_role = 'M2_Scissor'
-                          AND mw_kda BETWEEN 18.0 AND 65.0
-                        ORDER BY shannon_entropy DESC
+                        SELECT a.uniprot_id, a.mw_kda, a.isoelectric_pi, a.shannon_entropy,
+                               COALESCE(
+                                   (SELECT ek.forward_flux_score
+                                    FROM rxn_roles rr,
+                                         LATERAL bio_enzref_kinetics(
+                                             smiles_to_fingerprint(%s),
+                                             rr.r_fp,
+                                             rr.p_fp
+                                         ) ek),
+                                   0.35
+                               ) AS enzref_flux,
+                               COALESCE(
+                                   (SELECT ek.backpressure_risk
+                                    FROM rxn_roles rr,
+                                         LATERAL bio_enzref_kinetics(
+                                             smiles_to_fingerprint(%s),
+                                             rr.r_fp,
+                                             rr.p_fp
+                                         ) ek),
+                                   0.10
+                               ) AS enzref_bp
+                        FROM bio_domain_atlas a
+                        WHERE a.pipeline_family = %s AND a.module_role = 'M2_Scissor'
+                          AND a.mw_kda BETWEEN 18.0 AND 65.0
+                        ORDER BY a.shannon_entropy DESC
                         LIMIT 25
                     ),
                     ranked AS (
@@ -126,6 +155,8 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                                s.uniprot_id AS scissor_id,
                                a.gravy_hydropathy,
                                s.mw_kda,
+                               s.enzref_flux,
+                               s.enzref_bp,
                                pareto_score_domain_pair(
                                    a.gravy_hydropathy,
                                    a.shannon_entropy,
@@ -136,7 +167,16 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                                ) AS pareto_score
                         FROM top_anchors a
                         CROSS JOIN top_scissors s
-                        ORDER BY pareto_score DESC
+                        ORDER BY (
+                            pareto_score_domain_pair(
+                                a.gravy_hydropathy,
+                                a.shannon_entropy,
+                                s.mw_kda,
+                                s.isoelectric_pi,
+                                s.shannon_entropy,
+                                %s
+                            ) + 0.08 * s.enzref_flux - 0.12 * s.enzref_bp
+                        ) DESC
                         LIMIT 3
                     )
                     SELECT r.anchor_id,
@@ -156,14 +196,16 @@ def run_declarative_compiler(rebuild_atlas: bool = False):
                                    3.5 + GREATEST(r.gravy_hydropathy, 0.0) * 4.0,
                                    1000.0,
                                    48.0,
-                                   48
+                                   48,
+                                   r.enzref_bp::real,
+                                   0.45::real
                                )
                                ORDER BY time_hr DESC
                                LIMIT 1
                            ) AS rk4_48h_conversion
                     FROM ranked r;
                     """,
-                    (pid, pid, ph, smiles, ref_smiles),
+                    (ref_smiles, rxn_smiles, pid, smiles, smiles, pid, ph, ph, smiles, ref_smiles),
                 )
                 pareto_hits = cur.fetchall()
 
