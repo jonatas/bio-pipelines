@@ -46,7 +46,15 @@ fi
 cd /app/bio-pipelines
 
 # 2. Seed database if proteins / bio_domain_atlas are empty
-PROT_COUNT=$(psql "${PG_BIO_URL}" -tAc "SELECT CASE WHEN to_regclass('public.proteins') IS NOT NULL THEN (SELECT COUNT(*) FROM proteins) ELSE 0 END;" || echo "0")
+# Two queries: a single CASE fails on a fresh database, because PostgreSQL
+# resolves `FROM proteins` before the CASE runs. Each result is assigned
+# on its own line, so a failed query stops the script (set -e) instead
+# of reading as "no table" and seeding a database that has data.
+PROT_TABLE=$(psql "${PG_BIO_URL}" -XtAc "SELECT to_regclass('public.proteins') IS NOT NULL;")
+PROT_COUNT=0
+if [ "${PROT_TABLE}" = "t" ]; then
+    PROT_COUNT=$(psql "${PG_BIO_URL}" -XtAc "SELECT COUNT(*) FROM public.proteins;")
+fi
 if [ "${PROT_COUNT}" -eq "0" ]; then
     echo "🌱 Loading curated multi-feedstock seed dataset (base/docker_seed.sql)..."
     psql "${PG_BIO_URL}" -v ON_ERROR_STOP=1 -f base/docker_seed.sql >/dev/null
