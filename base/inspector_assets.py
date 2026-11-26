@@ -1524,8 +1524,8 @@ print(f"${atlasId} (${subName}):", screen[0])`;
             const dlPdbBtn = document.getElementById(`${this.instanceId}_dl_pdb_btn`);
             if (dlPdbBtn) dlPdbBtn.onclick = () => {
                 const pdbBlob = new Blob([
-                    `REMARK 100 PG_BIO ATLAS ID: ${atlasId}\nREMARK 101 SUBSTRATE: ${subName} (${smiles})\n`,
-                    c.pdb1 || '', '\n', c.pdb2_aligned || ''
+                    `REMARK 100 PG_BIO ATLAS ID: ${atlasId}\\nREMARK 101 SUBSTRATE: ${subName} (${smiles})\\n`,
+                    c.pdb1 || '', '\\n', c.pdb2_aligned || ''
                 ], { type: 'chemical/x-pdb' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(pdbBlob);

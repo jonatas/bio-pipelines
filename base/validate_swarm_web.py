@@ -147,6 +147,31 @@ def run_validation_suite():
         f"Expected /id/?A0A1S8AT22_A0A1H3IA37_pk2 redirect to include node1 & pk=2, got {id_resp.geturl()}"
     )
 
+    # 6. Validate inline JavaScript syntax across all primary HTML routes via `node --check`
+    import re
+    import subprocess
+    import tempfile
+    for route in [
+        "/",
+        "/discovery",
+        "/compare?node1=A0A3P3R4S2&node2=A0A897MT85&preset=pocketvina",
+        "/wiki",
+        "/cards",
+        "/tpp",
+        "/telemetry",
+        "/hypotheses",
+    ]:
+        html = urllib.request.urlopen(f"{BASE_URL}{route}").read().decode("utf-8")
+        scripts = re.findall(r"<script(?![^>]*src=)[^>]*>(.*?)</script>", html, flags=re.S)
+        assert len(scripts) >= 1, f"Expected inline <script> on {route}"
+        for idx, sc in enumerate(scripts):
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as tf:
+                tf.write(sc)
+                tf_path = tf.name
+            res = subprocess.run(["node", "--check", tf_path], capture_output=True, text=True)
+            os.unlink(tf_path)
+            assert res.returncode == 0, f"JavaScript syntax error on {route}#script{idx}:\n{res.stderr}"
+
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
     console.print(table)
     console.print(

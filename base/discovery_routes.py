@@ -2830,6 +2830,140 @@ def fetch_uniprot_domains_cached(uid, fallback_name=""):
         UNIPROT_META_CACHE[uid] = {"organism": organism, "domains": []}
     return organism, domains[:6]
 
+def _compute_pocketvina_payload(cur, pdb1_str, pdb2_al_str, sub_smiles_pv, fallback_center=(0.0, 0.0, 0.0)):
+    try:
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, p2rank_score, probability,
+                   center_x, center_y, center_z, sas_points_count, residue_count,
+                   mean_plddt, residue_ids, sas_coords_flat
+            FROM bio_detect_top_pockets(%s::text, 5);
+        """, (pdb2_al_str,))
+        pk_rows_2 = cur.fetchall()
+
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, p2rank_score, probability,
+                   center_x, center_y, center_z, sas_points_count, residue_count,
+                   mean_plddt, residue_ids, sas_coords_flat
+            FROM bio_detect_top_pockets(%s::text, 5);
+        """, (pdb1_str,))
+        pk_rows_1 = cur.fetchall()
+
+        cur.execute("""
+            SELECT pocket_rank, pocket_id, is_best_pocket, p2rank_score,
+                   pocket_probability, estimated_vina_kcal_mol, rangefinder_compatibility,
+                   posebusters_valid, posebusters_passed_checks, failed_checks,
+                   min_vdw_ratio, contact_residues
+            FROM bio_multipocket_posebusters_screen(%s::text, %s::text, 5);
+        """, (pdb2_al_str, sub_smiles_pv))
+        mp_rows = cur.fetchall()
+
+        best_cx, best_cy, best_cz = fallback_center
+        for mr in mp_rows:
+            if mr[2]:
+                for pr in pk_rows_2:
+                    if pr[0] == mr[0]:
+                        best_cx, best_cy, best_cz = float(pr[4]), float(pr[5]), float(pr[6])
+                        break
+
+        cur.execute("""
+            SELECT passes_all_21, raw_passes_all_21, was_desalted,
+                   rescue_possible, rescue_rmsd_shift_a, provenance_tag,
+                   passed_count, total_checks, failed_checks,
+                   protein_steric_clash_ok, bond_lengths_ok, aromatic_ring_flatness_ok,
+                   salt_stripped_drug, pains_aggregator_clean,
+                   min_protein_ligand_dist_a, min_vdw_ratio, max_ring_rmsd_a,
+                   pocket_contact_atoms, ligand_heavy_atoms
+            FROM bio_posebusters_audit_row(%s::text, %s::text, %s::float8, %s::float8, %s::float8);
+        """, (pdb2_al_str, sub_smiles_pv, best_cx, best_cy, best_cz))
+        pb_row = cur.fetchone()
+
+        def _parse_resi_nums(res_ids):
+            nums = []
+            for token in (res_ids or []):
+                part = token.split(':')[-1]
+                digits = ''.join(ch for ch in part if ch.isdigit())
+                if digits:
+                    nums.append(int(digits))
+            return nums
+
+        pockets_2 = []
+        mp_by_rank = {int(r[0]): r for r in mp_rows}
+        for pr in pk_rows_2:
+            rk = int(pr[0])
+            mr = mp_by_rank.get(rk)
+            pockets_2.append({
+                'rank': rk,
+                'id': pr[1],
+                'is_best': bool(mr[2]) if mr else (rk == 1),
+                'p2rank_score': float(pr[2]),
+                'probability': float(pr[3]),
+                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
+                'sas_count': int(pr[7]),
+                'residue_count': int(pr[8]),
+                'mean_plddt': float(pr[9]),
+                'residue_ids': pr[10][:10] if pr[10] else [],
+                'resi_nums': _parse_resi_nums(pr[10]),
+                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
+                'vina_kcal_mol': float(mr[5]) if mr else -6.8,
+                'rf_compat': float(mr[6]) if mr else 0.92,
+                'pb_valid': bool(mr[7]) if mr else True,
+                'pb_passed': int(mr[8]) if mr else 21,
+                'min_vdw_ratio': float(mr[10]) if mr else 0.90,
+            })
+
+        pockets_1 = []
+        for pr in pk_rows_1:
+            rk = int(pr[0])
+            pockets_1.append({
+                'rank': rk,
+                'id': pr[1],
+                'p2rank_score': float(pr[2]),
+                'probability': float(pr[3]),
+                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
+                'sas_count': int(pr[7]),
+                'residue_count': int(pr[8]),
+                'resi_nums': _parse_resi_nums(pr[10]),
+                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
+            })
+
+        best_vina = min((p['vina_kcal_mol'] for p in pockets_2), default=-7.2)
+        rank_on_protein = 1 if best_vina <= -7.0 else 2
+        rank_on_substrate_pct = round(max(0.4, min(15.0, (best_vina + 9.8) * 3.2)), 1)
+
+        return {
+            'substrate_smiles': sub_smiles_pv,
+            'pockets_1': pockets_1,
+            'pockets_2': pockets_2,
+            'best_vina_kcal_mol': best_vina,
+            'rank_on_protein': rank_on_protein,
+            'total_substrates_ranked': 8,
+            'rank_on_substrate_pct': rank_on_substrate_pct,
+            'posebusters': {
+                'passes_all_21': bool(pb_row[0]) if pb_row else True,
+                'raw_passes_all_21': bool(pb_row[1]) if pb_row else True,
+                'was_desalted': bool(pb_row[2]) if pb_row else False,
+                'rescue_possible': bool(pb_row[3]) if pb_row else True,
+                'rescue_rmsd_shift_a': float(pb_row[4]) if pb_row else 0.0,
+                'provenance_tag': pb_row[5] if pb_row else 'as_screened_valid',
+                'passed_count': int(pb_row[6]) if pb_row else 21,
+                'total_checks': int(pb_row[7]) if pb_row else 21,
+                'failed_checks': pb_row[8] if pb_row else [],
+                'protein_steric_clash_ok': bool(pb_row[9]) if pb_row else True,
+                'bond_lengths_ok': bool(pb_row[10]) if pb_row else True,
+                'aromatic_ring_flatness_ok': bool(pb_row[11]) if pb_row else True,
+                'salt_stripped_drug': bool(pb_row[12]) if pb_row else True,
+                'pains_aggregator_clean': bool(pb_row[13]) if pb_row else True,
+                'min_protein_ligand_dist_a': float(pb_row[14]) if pb_row else 2.85,
+                'min_vdw_ratio': float(pb_row[15]) if pb_row else 0.92,
+                'max_ring_rmsd_a': float(pb_row[16]) if pb_row else 0.0,
+                'pocket_contact_atoms': int(pb_row[17]) if pb_row else 12,
+                'ligand_heavy_atoms': int(pb_row[18]) if pb_row else 14,
+            }
+        }
+    except Exception:
+        return None
+
+
 @app.route('/api/compare/<id1>/<id2>')
 def compare_proteins(id1, id2):
     cache_key = f"{id1}|{id2}"
@@ -2845,37 +2979,27 @@ def compare_proteins(id1, id2):
     # Tier L3: Persistent PostgreSQL swarm_comparison_cache + Disk Aligned PDBs (< 2.5 ms)
     try:
         cur.execute("""
-            SELECT metrics_payload, pdb1_path, pdb2_aligned_path
+            SELECT metrics_payload, pdb1_path, pdb2_aligned_path, schema_version
             FROM swarm_comparison_cache
-            WHERE id1 = %s AND id2 = %s AND schema_version = %s
-        """, (id1, id2, CACHE_SCHEMA_VERSION))
+            WHERE id1 = %s AND id2 = %s AND schema_version >= 5
+        """, (id1, id2))
         row = cur.fetchone()
         if row and row[0] and row[1] and row[2] and os.path.exists(row[1]) and os.path.exists(row[2]):
             metrics = row[0] if isinstance(row[0], dict) else json.loads(row[0])
-            rf_cached = metrics.get('rangefinder') or {}
-            al_cached = metrics.get('alignment') or {}
-            ch_cached = metrics.get('chaperone') or {}
-            if rf_cached.get('rf_score') is not None:
-                cur.execute("""
-                    UPDATE orphan_discoveries
-                    SET rf_range_iou = COALESCE(rf_range_iou, %s),
-                        rf_giou_loss = COALESCE(rf_giou_loss, %s),
-                        rf_score = COALESCE(rf_score, %s),
-                        tm_score = COALESCE(tm_score, %s),
-                        chaperone_score = COALESCE(chaperone_score, %s)
-                    WHERE ((bait_id = %s AND orphan_id = %s) OR (bait_id = %s AND orphan_id = %s))
-                      AND (rf_score IS NULL OR tm_score IS NULL);
-                """, (
-                    float(rf_cached['range_iou']),
-                    float(rf_cached.get('giou_loss', 0.0)),
-                    float(rf_cached['rf_score']),
-                    float(al_cached['tm_score']) if al_cached.get('tm_score') is not None else None,
-                    float(ch_cached['chaperone_score']) if ch_cached.get('chaperone_score') is not None else None,
-                    id1, id2, id2, id1
-                ))
             with open(row[1], 'r') as f1, open(row[2], 'r') as f2:
                 pdb1_cached = f1.read()
                 pdb2_al_cached = f2.read()
+            if not metrics.get('pocketvina'):
+                sub_ci = metrics.get('substrate_cheminfo') or {}
+                sub_sm = sub_ci.get('canonical_smiles') or 'O=C(O)c1ccc(O)c(OC)c1'
+                rf_c = metrics.get('rangefinder') or {}
+                fb_c = tuple(rf_c.get('pocket_center_2') or (0.0, 0.0, 0.0))
+                metrics['pocketvina'] = _compute_pocketvina_payload(cur, pdb1_cached, pdb2_al_cached, sub_sm, fb_c)
+                cur.execute("""
+                    UPDATE swarm_comparison_cache
+                    SET schema_version = %s, metrics_payload = %s::jsonb, updated_at = NOW()
+                    WHERE id1 = %s AND id2 = %s;
+                """, (CACHE_SCHEMA_VERSION, json.dumps(metrics), id1, id2))
             full_payload = dict(metrics)
             full_payload['pdb1'] = pdb1_cached
             full_payload['pdb2_aligned'] = pdb2_al_cached
@@ -3170,7 +3294,6 @@ def compare_proteins(id1, id2):
             SELECT family_name
             FROM orphan_discoveries
             WHERE orphan_id IN (%s, %s) OR bait_id IN (%s, %s)
-            ORDER BY id DESC
             LIMIT 1;
         """, (id1, id2, id1, id2))
         fam_row = cur.fetchone()
@@ -3355,140 +3478,9 @@ def compare_proteins(id1, id2):
     except Exception:
         pass
 
-    pocketvina_data = None
-    try:
-        sub_smiles_pv = substrate_cheminfo['canonical_smiles'] if substrate_cheminfo else 'O=C(O)c1ccc(O)c(OC)c1'
-        cur.execute("""
-            SELECT pocket_rank, pocket_id, p2rank_score, probability,
-                   center_x, center_y, center_z, sas_points_count, residue_count,
-                   mean_plddt, residue_ids, sas_coords_flat
-            FROM bio_detect_top_pockets(%s::text, 5);
-        """, (pdb2_aligned,))
-        pk_rows_2 = cur.fetchall()
-
-        cur.execute("""
-            SELECT pocket_rank, pocket_id, p2rank_score, probability,
-                   center_x, center_y, center_z, sas_points_count, residue_count,
-                   mean_plddt, residue_ids, sas_coords_flat
-            FROM bio_detect_top_pockets(%s::text, 5);
-        """, (pdb1,))
-        pk_rows_1 = cur.fetchall()
-
-        cur.execute("""
-            SELECT pocket_rank, pocket_id, is_best_pocket, p2rank_score,
-                   pocket_probability, estimated_vina_kcal_mol, rangefinder_compatibility,
-                   posebusters_valid, posebusters_passed_checks, failed_checks,
-                   min_vdw_ratio, contact_residues
-            FROM bio_multipocket_posebusters_screen(%s::text, %s::text, 5);
-        """, (pdb2_aligned, sub_smiles_pv))
-        mp_rows = cur.fetchall()
-
-        best_cx, best_cy, best_cz = (cx2, cy2, cz2) if 'cx2' in locals() else (0.0, 0.0, 0.0)
-        for mr in mp_rows:
-            if mr[2]:
-                for pr in pk_rows_2:
-                    if pr[0] == mr[0]:
-                        best_cx, best_cy, best_cz = float(pr[4]), float(pr[5]), float(pr[6])
-                        break
-
-        cur.execute("""
-            SELECT passes_all_21, raw_passes_all_21, was_desalted,
-                   rescue_possible, rescue_rmsd_shift_a, provenance_tag,
-                   passed_count, total_checks, failed_checks,
-                   protein_steric_clash_ok, bond_lengths_ok, aromatic_ring_flatness_ok,
-                   salt_stripped_drug, pains_aggregator_clean,
-                   min_protein_ligand_dist_a, min_vdw_ratio, max_ring_rmsd_a,
-                   pocket_contact_atoms, ligand_heavy_atoms
-            FROM bio_posebusters_audit_row(%s::text, %s::text, %s::float8, %s::float8, %s::float8);
-        """, (pdb2_aligned, sub_smiles_pv, best_cx, best_cy, best_cz))
-        pb_row = cur.fetchone()
-
-        def _parse_resi_nums(res_ids):
-            nums = []
-            for token in (res_ids or []):
-                part = token.split(':')[-1]
-                digits = ''.join(ch for ch in part if ch.isdigit())
-                if digits:
-                    nums.append(int(digits))
-            return nums
-
-        pockets_2 = []
-        mp_by_rank = {int(r[0]): r for r in mp_rows}
-        for pr in pk_rows_2:
-            rk = int(pr[0])
-            mr = mp_by_rank.get(rk)
-            pockets_2.append({
-                'rank': rk,
-                'id': pr[1],
-                'is_best': bool(mr[2]) if mr else (rk == 1),
-                'p2rank_score': float(pr[2]),
-                'probability': float(pr[3]),
-                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
-                'sas_count': int(pr[7]),
-                'residue_count': int(pr[8]),
-                'mean_plddt': float(pr[9]),
-                'residue_ids': pr[10][:10] if pr[10] else [],
-                'resi_nums': _parse_resi_nums(pr[10]),
-                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
-                'vina_kcal_mol': float(mr[5]) if mr else -6.8,
-                'rf_compat': float(mr[6]) if mr else 0.92,
-                'pb_valid': bool(mr[7]) if mr else True,
-                'pb_passed': int(mr[8]) if mr else 21,
-                'min_vdw_ratio': float(mr[10]) if mr else 0.90,
-            })
-
-        pockets_1 = []
-        for pr in pk_rows_1:
-            rk = int(pr[0])
-            pockets_1.append({
-                'rank': rk,
-                'id': pr[1],
-                'p2rank_score': float(pr[2]),
-                'probability': float(pr[3]),
-                'center': [float(pr[4]), float(pr[5]), float(pr[6])],
-                'sas_count': int(pr[7]),
-                'residue_count': int(pr[8]),
-                'resi_nums': _parse_resi_nums(pr[10]),
-                'sas_coords': [float(x) for x in (pr[11] or [])[:48]],
-            })
-
-        # Compute Dual-Rank Percentile Contextualization (Rank on Protein & Rank on Substrate)
-        best_vina = min((p['vina_kcal_mol'] for p in pockets_2), default=-7.2)
-        rank_on_protein = 1 if best_vina <= -7.0 else 2
-        rank_on_substrate_pct = round(max(0.4, min(15.0, (best_vina + 9.8) * 3.2)), 1)
-
-        pocketvina_data = {
-            'substrate_smiles': sub_smiles_pv,
-            'pockets_1': pockets_1,
-            'pockets_2': pockets_2,
-            'best_vina_kcal_mol': best_vina,
-            'rank_on_protein': rank_on_protein,
-            'total_substrates_ranked': 8,
-            'rank_on_substrate_pct': rank_on_substrate_pct,
-            'posebusters': {
-                'passes_all_21': bool(pb_row[0]) if pb_row else True,
-                'raw_passes_all_21': bool(pb_row[1]) if pb_row else True,
-                'was_desalted': bool(pb_row[2]) if pb_row else False,
-                'rescue_possible': bool(pb_row[3]) if pb_row else True,
-                'rescue_rmsd_shift_a': float(pb_row[4]) if pb_row else 0.0,
-                'provenance_tag': pb_row[5] if pb_row else 'as_screened_valid',
-                'passed_count': int(pb_row[6]) if pb_row else 21,
-                'total_checks': int(pb_row[7]) if pb_row else 21,
-                'failed_checks': pb_row[8] if pb_row else [],
-                'protein_steric_clash_ok': bool(pb_row[9]) if pb_row else True,
-                'bond_lengths_ok': bool(pb_row[10]) if pb_row else True,
-                'aromatic_ring_flatness_ok': bool(pb_row[11]) if pb_row else True,
-                'salt_stripped_drug': bool(pb_row[12]) if pb_row else True,
-                'pains_aggregator_clean': bool(pb_row[13]) if pb_row else True,
-                'min_protein_ligand_dist_a': float(pb_row[14]) if pb_row else 2.85,
-                'min_vdw_ratio': float(pb_row[15]) if pb_row else 0.92,
-                'max_ring_rmsd_a': float(pb_row[16]) if pb_row else 0.0,
-                'pocket_contact_atoms': int(pb_row[17]) if pb_row else 12,
-                'ligand_heavy_atoms': int(pb_row[18]) if pb_row else 14,
-            }
-        }
-    except Exception:
-        pass
+    sub_smiles_pv = substrate_cheminfo['canonical_smiles'] if substrate_cheminfo else 'O=C(O)c1ccc(O)c(OC)c1'
+    fb_center = (cx2, cy2, cz2) if 'cx2' in locals() else (0.0, 0.0, 0.0)
+    pocketvina_data = _compute_pocketvina_payload(cur, pdb1, pdb2_aligned, sub_smiles_pv, fb_center)
 
     metrics_only = {
         'meta1': m1,
