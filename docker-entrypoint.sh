@@ -25,11 +25,34 @@ if [[ "${PG_BIO_URL}" == *"127.0.0.1"* ]] || [[ "${PG_BIO_URL}" == *"localhost"*
         echo "port = ${PGPORT}" >> "${PGDATA}/postgresql.conf"
         echo "shared_buffers = 512MB" >> "${PGDATA}/postgresql.conf"
         echo "work_mem = 64MB" >> "${PGDATA}/postgresql.conf"
-        echo "host all all 0.0.0.0/0 trust" >> "${PGDATA}/pg_hba.conf"
+    fi
+
+    # Inside the container (the app over 127.0.0.1, psql over the socket)
+    # stays trusted, as initdb --auth=trust set it up. Any other client,
+    # such as the host through the published port, needs a password: set
+    # POSTGRES_PASSWORD to allow it; without one, remote access is off.
+    # Volumes created before this change carry a trust-everyone line: drop it.
+    sed -i '/^host all all 0\.0\.0\.0\/0 trust$/d' "${PGDATA}/pg_hba.conf"
+    # The block below is rewritten on every start; lines outside it stay.
+    sed -i '/^# bio-pipelines: remote access begin$/,/^# bio-pipelines: remote access end$/d' "${PGDATA}/pg_hba.conf"
+    if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+        printf '%s\n' '# bio-pipelines: remote access begin' \
+            'host all all 0.0.0.0/0 scram-sha-256' \
+            'host all all ::/0 scram-sha-256' \
+            '# bio-pipelines: remote access end' >> "${PGDATA}/pg_hba.conf"
     fi
 
     echo "🚀 Starting PostgreSQL 18 on port ${PGPORT}..."
     su - postgres -c "/usr/lib/postgresql/18/bin/pg_ctl -D '${PGDATA}' -l /tmp/postgres.log -w start"
+
+    if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+        # \getenv reads the password inside psql, so it never appears in
+        # a process's command line.
+        psql -h 127.0.0.1 -p "${PGPORT}" -U postgres -d postgres -q -v ON_ERROR_STOP=1 <<'SQL'
+\getenv pw POSTGRES_PASSWORD
+ALTER ROLE postgres PASSWORD :'pw';
+SQL
+    fi
 
     # Ensure database & pg_bio extension exist
     su - postgres -c "psql -p ${PGPORT} -tc \"SELECT 1 FROM pg_database WHERE datname = '${PGDATABASE}'\" | grep -q 1 || createdb -p ${PGPORT} ${PGDATABASE}"
