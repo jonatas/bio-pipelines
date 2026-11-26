@@ -899,7 +899,7 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
     # Check if the swarm has discovered an NsrR/ArsR transcriptional regulator in Haloferacaceae for Puzzle #3
     cur.execute(
         """
-        SELECT uniprot_id, organism_name, best_partner_uniprot, ROUND((COALESCE(rf_range_iou, 0.969)*100)::numeric, 1), ROUND((gated_synergy_score*100)::numeric, 1)
+        SELECT uniprot_id, organism_name, best_partner_uniprot, ROUND((rf_range_iou*100)::numeric, 1), ROUND(tm_score::numeric, 3)
         FROM bio_annotation_evolution
         WHERE evolved_annotation ILIKE '%%ArsR%%' OR evolved_annotation ILIKE '%%regulator%%' OR evolved_annotation ILIKE '%%TFIIB%%'
         ORDER BY (rf_range_iou IS NOT NULL) DESC, gated_synergy_score DESC
@@ -907,6 +907,11 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
         """
     )
     reg_cand = cur.fetchone()
+    # Show what was measured; a NULL IoU or TM is reported as unmeasured,
+    # not replaced by a number.
+    reg_uid, reg_org, reg_partner, reg_iou_pct, reg_tm_val = reg_cand or (None,) * 5
+    reg_iou = "unmeasured" if reg_iou_pct is None else f"{reg_iou_pct}%"
+    reg_tm = "unmeasured" if reg_tm_val is None else f"{reg_tm_val}"
 
     # Check if the swarm has evolved DUF5816 GNAT acetyltransferase for Puzzle #2
     cur.execute(
@@ -1041,7 +1046,7 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
             "beacon_name": "Awaiting Haloferacaceae NsrR/ArsR Nitric-Oxide Allosteric Beacon",
             "kcat1": 25.0, "km1": 355.0, "kcat2": 42.0, "km2": 27.0, "ki": 18.0, "boost": 8.9,
             "missing_slot_hint": (
-                f"⏳ 3/4 Locked · Awaiting M4: Haloferacaceae NsrR/ArsR NO-Sensor (Closest candidate: {reg_cand[0]} × {reg_cand[2]} at {reg_cand[3]}% IoU in {reg_cand[1]} — needs Haloferax genus match)"
+                f"⏳ 3/4 Locked · Awaiting M4: Haloferacaceae NsrR/ArsR NO-Sensor (Closest candidate: {reg_uid} × {reg_partner} at IoU {reg_iou} in {reg_org} — needs Haloferax genus match)"
                 if reg_cand else "⏳ 3/4 Locked · Awaiting M4: Haloferacaceae NsrR/ArsR Allosteric Beacon"
             ),
             "slots": [
@@ -1068,13 +1073,13 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
                 },
                 {
                     "role": "M4_Beacon", "phase": 4, "locked": False,
-                    "uid": reg_cand[0] if reg_cand else None,
-                    "org": reg_cand[1] if reg_cand else "Awaiting Haloferax sp.",
-                    "homolog": reg_cand[2] if reg_cand else None,
+                    "uid": reg_uid,
+                    "org": reg_org or "Awaiting Haloferax sp.",
+                    "homolog": reg_partner,
                     "cond": "Phase 4 (M4) OPEN CONDITION: Requires a Haloferacaceae NsrR/ArsR transcriptional sensor with TM >= 0.85, Pocket IoU >= 0.92 & Allosteric CSR Index >= 0.45",
                     "sql_gate": "organism ILIKE 'Haloferax%' AND evolved_annotation ILIKE '%regulator%' AND allosteric_mechanism_index(bio_hbond_network(pdb, 3.5)) >= 0.45",
                     "metric": (
-                        f"⏳ Candidate {reg_cand[0]} ({reg_cand[1]}) has {reg_cand[3]}% IoU (TM 0.921), awaiting same-family Haloferacaceae bridge to auto-lock 4/4"
+                        f"⏳ Candidate {reg_uid} ({reg_org}) has IoU {reg_iou} (TM {reg_tm}), awaiting same-family Haloferacaceae bridge to auto-lock 4/4"
                         if reg_cand else "⏳ Awaiting Swarm Discovery of Haloferacaceae NsrR/ArsR Allosteric Sensor"
                     ),
                 },
