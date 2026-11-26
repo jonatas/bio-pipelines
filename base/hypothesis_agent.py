@@ -827,6 +827,12 @@ def run_hypothesis_evolution_cycle():
     )
 
 
+# Soda-Lake M3: the pocket IoU the slot's own sql_gate asks for, and the text
+# shown while no candidate reaches it.
+GNAT_SINK_MIN_IOU = 0.95
+GNAT_SINK_AWAITED = "Awaiting DUF5816 GNAT acetyltransferase"
+
+
 def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
     cur.execute(
         """
@@ -911,18 +917,25 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
     # Check if the swarm has evolved DUF5816 GNAT acetyltransferase for Puzzle #2
     cur.execute(
         """
-        SELECT uniprot_id, organism_name, best_partner_uniprot, ROUND((COALESCE(rf_range_iou, 0.955)*100)::numeric, 1), ROUND((gated_synergy_score*100)::numeric, 1)
+        SELECT uniprot_id, organism_name, best_partner_uniprot, rf_range_iou, ROUND((gated_synergy_score*100)::numeric, 1)
         FROM bio_annotation_evolution
         WHERE original_annotation ILIKE '%%DUF5816%%' OR evolved_annotation ILIKE '%%acetyltransferase%%'
-        ORDER BY gated_synergy_score DESC
+        ORDER BY rf_range_iou DESC NULLS LAST, gated_synergy_score DESC NULLS LAST
         LIMIT 1;
         """
     )
     gnat_row = cur.fetchone()
-    gnat_uid = gnat_row[0] if gnat_row else "A0AAE3P9N2"
-    gnat_org = gnat_row[1] if gnat_row else "Natranaeroarchaeum aerophilum"
-    gnat_part = gnat_row[2] if gnat_row else "M0AEU6"
-    gnat_iou = float(gnat_row[3]) if gnat_row else 95.5
+    # The best-measured candidate comes first, so a row with no pocket IoU
+    # never hides one that passes the gate. No row, no measured IoU, or an
+    # IoU under the gate all mean the swarm has not found the sink yet: the
+    # slot stays open instead of showing a remembered hit. The gate is read
+    # off the stored value, not off the rounded percentage on display.
+    gnat_uid = gnat_row[0] if gnat_row else None
+    gnat_org = gnat_row[1] if gnat_row else GNAT_SINK_AWAITED
+    gnat_part = gnat_row[2] if gnat_row else None
+    gnat_iou = float(gnat_row[3]) if gnat_row and gnat_row[3] is not None else None
+    gnat_locked = gnat_iou is not None and gnat_iou >= GNAT_SINK_MIN_IOU
+    gnat_iou_text = "unmeasured" if gnat_iou is None else f"{gnat_iou * 100:.1f}%"
 
     puzzles_spec = [
         {
@@ -978,7 +991,11 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
             "puzzle_id": "soda-lake-acetyl-chitin-upcycling",
             "title": "Soda-Lake Chitin & Brine Waste -> Functionalized Glucosamine Biopolymer via DUF5816 GNAT (45°C, pH 9.8)",
             "regime_envelope": "Haloalkaliphile Soda-Lake Brine (45°C, pH 9.8, 3.0 M NaCl)",
-            "target_organism_rule": "Co-Adapted Natrialbales Soda-Lake Consortium (pI 4.2–4.8, >=20% Asp/Glu brine armor): Locked when Cycle #229 evolved DUF5816 (A0AAE3P9N2 × M0AEU6) as the missing M3 GNAT Acetyltransferase Sink!",
+            "target_organism_rule": (
+                f"Co-Adapted Natrialbales Soda-Lake Consortium (pI 4.2–4.8, >=20% Asp/Glu brine armor): Locked by evolved DUF5816 ({gnat_uid} × {gnat_part}) as the M3 GNAT Acetyltransferase Sink!"
+                if gnat_locked
+                else f"Co-Adapted Natrialbales Soda-Lake Consortium (pI 4.2–4.8, >=20% Asp/Glu brine armor): Locks when an evolved DUF5816 GNAT acetyltransferase reaches >={GNAT_SINK_MIN_IOU:.0%} Pocket IoU as the missing M3 Sink"
+            ),
             "temp_c": 45.0,
             "ph": 9.8,
             "substrate_smiles": "CC(=O)NC1C(O)OC(CO)C(O)C1O",
@@ -988,10 +1005,19 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
             "prod_label": "N-Acylated Functional Bio-Polymer Sink (µM)",
             "target_bond": "β-1,4-N-Acetylglucosamine Glycosidic & Amide Bond (320 kJ/mol)",
             "linker_name": "Haloalkaliphile Acidic GGGGS ×3 Bridge (28.0 Å Separation)",
-            "sink_name": f"Solved DUF5816 ({gnat_uid} × {gnat_part}) GNAT Acetyltransferase Sink",
+            "sink_name": (
+                f"Solved DUF5816 ({gnat_uid} × {gnat_part}) GNAT Acetyltransferase Sink"
+                if gnat_locked else "Awaiting DUF5816 GNAT Acetyltransferase Sink"
+            ),
             "beacon_name": "DUF1156 (L9VS02) SAM-Epigenetic Methylase Host Shield Beacon",
             "kcat1": 26.2, "km1": 340.0, "kcat2": 44.5, "km2": 25.0, "ki": 18.5, "boost": 9.3,
-            "missing_slot_hint": f"AUTO-COMPILED (Unlocked by Cycle #229 DUF5816 -> {gnat_uid} GNAT Sink!)",
+            "missing_slot_hint": (
+                f"AUTO-COMPILED (Unlocked by DUF5816 -> {gnat_uid} GNAT Sink!)"
+                if gnat_locked
+                else f"⏳ 3/4 Locked · Awaiting M3: DUF5816 GNAT acetyltransferase with >={GNAT_SINK_MIN_IOU:.0%} Pocket IoU (Best candidate: {gnat_uid}, IoU {gnat_iou_text})"
+                if gnat_row
+                else f"⏳ 3/4 Locked · Awaiting M3: DUF5816 GNAT acetyltransferase with >={GNAT_SINK_MIN_IOU:.0%} Pocket IoU"
+            ),
             "slots": [
                 {
                     "role": "M1_Anchor", "phase": 1, "locked": True,
@@ -1008,11 +1034,19 @@ def evaluate_and_advance_open_puzzles(cur) -> list[dict]:
                     "metric": "TM 0.996 (0.44 Å over 328/328 Cα) · 95.5% Pocket IoU · pH 10.5 Lake Magadi Soda-Lake Optimal · PASS",
                 },
                 {
-                    "role": "M3_Sink", "phase": 3, "locked": True,
-                    "uid": gnat_uid, "org": gnat_org, "homolog": gnat_part,
-                    "cond": "Phase 3 (M3) Haloalkaliphile GNAT Acetyltransferase Equilibrium Sink: Evolved from Dark-Proteome DUF5816 with >=95% Pocket IoU",
-                    "sql_gate": "bio_annotation_evolution.evolved_annotation ILIKE '%GNAT%acetyltransferase%' AND rf_range_iou >= 0.95",
-                    "metric": f"UNLOCKED IN CYCLE #229: DUF5816 -> GNAT Acetyltransferase ({gnat_iou:.1f}% Pocket IoU vs {gnat_part}) · PASS",
+                    "role": "M3_Sink", "phase": 3, "locked": gnat_locked,
+                    "uid": gnat_uid if gnat_locked else None,
+                    "org": gnat_org if gnat_locked else GNAT_SINK_AWAITED,
+                    "homolog": gnat_part if gnat_locked else None,
+                    "cond": f"Phase 3 (M3) Haloalkaliphile GNAT Acetyltransferase Equilibrium Sink: Evolved from Dark-Proteome DUF5816 with >={GNAT_SINK_MIN_IOU:.0%} Pocket IoU",
+                    "sql_gate": f"bio_annotation_evolution.evolved_annotation ILIKE '%GNAT%acetyltransferase%' AND rf_range_iou >= {GNAT_SINK_MIN_IOU}",
+                    "metric": (
+                        f"UNLOCKED: DUF5816 -> GNAT Acetyltransferase ({gnat_iou_text} Pocket IoU vs {gnat_part}) · PASS"
+                        if gnat_locked
+                        else f"⏳ Candidate {gnat_uid} ({gnat_org}) has pocket IoU {gnat_iou_text}, needs >={GNAT_SINK_MIN_IOU:.0%}"
+                        if gnat_row
+                        else "⏳ Awaiting Swarm Discovery of a DUF5816 GNAT Acetyltransferase Sink"
+                    ),
                 },
                 {
                     "role": "M4_Beacon", "phase": 4, "locked": True,
