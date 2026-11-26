@@ -5,8 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: bio_pipelines_full
     ports:
-      - "8090:8090"
-      - "28819:5432"
+      # Loopback only: the UI and the database are not for the LAN.
+      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:28819:5432"
     environment:
       PGDATA: /var/lib/postgresql/data
       PGPORT: "5432"
@@ -15,6 +16,8 @@ services:
       PG_BIO_URL: postgresql://postgres@127.0.0.1:5432/bio_demo
       SWARM_WEB_HOST: 0.0.0.0
       SWARM_WEB_PORT: "8090"
+      # Set to reach the database from the host (port 28819) with a password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
     volumes:
       - bio_pipelines_pgdata:/var/lib/postgresql/data
     healthcheck:
