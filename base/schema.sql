@@ -205,13 +205,23 @@ CREATE TABLE IF NOT EXISTS bio_hypothesis_ledger (
     chimera_partner_uniprot VARCHAR(20),
     chimera_flory_ratio FLOAT8,
     pareto_score FLOAT8,
+    forward_flux_score FLOAT4 DEFAULT 0.0,
+    backpressure_risk FLOAT4 DEFAULT 0.0,
+    role_contrast_norm FLOAT4 DEFAULT 0.0,
+    c_over_cstar FLOAT4 DEFAULT 0.0,
     baseline_48h_yield_pct FLOAT8,
     predicted_48h_yield_pct FLOAT8,
     yield_delta_pct FLOAT8,
-    status VARCHAR(30) NOT NULL DEFAULT 'Proposed', -- 'Proposed', '3D_Verified', 'RK4_Validated', 'Promoted_To_Atlas', 'New_Scenario_Ready', 'Rejected'
+    status VARCHAR(30) NOT NULL DEFAULT 'Proposed', -- 'Proposed', '3D_Verified', 'RK4_Validated', 'Promoted_To_Atlas', 'New_Scenario_Ready', 'Down_Ranked_Backpressure', 'Rejected'
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE bio_hypothesis_ledger
+    ADD COLUMN IF NOT EXISTS forward_flux_score FLOAT4 DEFAULT 0.0,
+    ADD COLUMN IF NOT EXISTS backpressure_risk FLOAT4 DEFAULT 0.0,
+    ADD COLUMN IF NOT EXISTS role_contrast_norm FLOAT4 DEFAULT 0.0,
+    ADD COLUMN IF NOT EXISTS c_over_cstar FLOAT4 DEFAULT 0.0;
 
 CREATE TABLE IF NOT EXISTS bio_agent_checkpoint (
     id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),

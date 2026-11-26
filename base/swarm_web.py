@@ -3200,6 +3200,8 @@ def api_rk4():
     ki = float(request.args.get("ki", preset["ki"]))
     boost = float(request.args.get("boost", preset["boost"]))
     km2 = preset["km2"]
+    backpressure_risk = float(request.args.get("backpressure_risk", 0.0))
+    c_over_cstar = float(request.args.get("c_over_cstar", 0.0))
 
     t0 = time.perf_counter()
     with psycopg.connect(DB_URI) as conn:
@@ -3207,27 +3209,27 @@ def api_rk4():
             cur.execute(
                 """
                 SELECT time_hr, substrate_u_m, intermediate_u_m, sink_product_u_m, fractional_conversion
-                FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48)
+                FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48, %s::real, %s::real)
                 ORDER BY time_hr ASC;
                 """,
-                (kcat1, km1, kcat2, km2, ki, boost),
+                (kcat1, km1, kcat2, km2, ki, boost, backpressure_risk, c_over_cstar),
             )
             ws = cur.fetchall()
 
             cur.execute(
                 """
                 SELECT time_hr, substrate_u_m
-                FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, %s, 1000.0, 48.0, 48)
+                FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, %s, 1000.0, 48.0, 48, %s::real, %s::real)
                 ORDER BY time_hr ASC;
                 """,
-                (kcat1, km1, km2, ki, boost),
+                (kcat1, km1, km2, ki, boost, backpressure_risk, c_over_cstar),
             )
             ns = cur.fetchall()
 
             cur.execute(
                 """
                 SELECT time_hr, substrate_u_m
-                FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, 1.0, 1000.0, 48.0, 48)
+                FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, 1.0, 1000.0, 48.0, 48, 0.0::real, 0.0::real)
                 ORDER BY time_hr ASC;
                 """,
                 (kcat1, km1, km2, ki),
@@ -3246,6 +3248,8 @@ def api_rk4():
             "sink_48h_pct": round(ws[-1][4] * 100.0, 1),
             "sink_48h_um": int(round(ws[-1][3])),
             "nosink_48h_pct": round((1000.0 - ns[-1][1]) / 10.0, 1),
+            "backpressure_risk": round(backpressure_risk, 4),
+            "c_over_cstar": round(c_over_cstar, 3),
             "elapsed_ms": elapsed_ms,
         }
     )

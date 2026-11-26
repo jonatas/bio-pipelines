@@ -316,6 +316,290 @@ CURATED_DISCOVERY_HYPOTHESES = [
 ]
 
 
+# Default Reaction SMILES per bio-pipeline (`Reactants >Agent> Products`) for Phase 1 & 3 `EnzRef` Role-Contrast Scoring
+PIPELINE_REACTION_SMILES = {
+    "habanero-spicy-fuel": "CC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCOP(=O)(O)OP(=O)(O)O>[Mg+2]>CC(C)CCCC(C)CCCC(C)CCCC(C)CCO",
+    "biochar-water-remediation": "OC(=O)Cc1ccccc1Nc2c(Cl)cccc2Cl>O=O>OC(=O)C=CC=CC(=O)O",
+    "cyanide-mine-tailings": "N#CSCCc1ccc(O)c(O)c1>[Zn+2].O>NC(=O)SCCc1ccc(O)c(O)c1",
+    "desalination-brine-upcycling": "OCC1OC(Oc2ccccc2)C(O)C(O)C1O>O>OCC1OC(O)C(O)C(O)C1O",
+    "plastics-upcycling": "OC(=O)c1ccc(C(=O)OCCO)cc1>O>OC(=O)c1ccc(C(=O)O)cc1.OCCO",
+    "ptfe-to-bioceramic": "FC(F)(F)C(F)(F)C(F)(F)C(=O)O>O>FC(F)(F)C(F)(F)C(=O)O",
+    "all-pipelines": "CC(=O)NC1C(O)OC(CO)C(O)C1O>O>NC1C(O)OC(CO)C(O)C1O.CC(=O)O",
+}
+
+
+def evaluate_m3_sink_candidate_with_enzref_rk4(
+    cur,
+    enzyme_bg_vec: list[float],
+    rxn_smiles: str,
+    kcat1: float = 26.0,
+    km1: float = 350.0,
+    kcat2_boost: float = 56.0,
+    km2: float = 25.0,
+    ki: float = 18.0,
+    boost: float = 9.4,
+    c_over_cstar: float = 0.45,
+    reactant_vec_override: list[float] | None = None,
+    product_vec_override: list[float] | None = None,
+) -> dict:
+    """
+    Phase 3 `EnzRef` + 48-hour RK4 Cascade Backpressure Gate:
+    1. Splits `rxn_smiles` via `bio_split_reaction_roles(rxn_smiles)` into `(reactants_smiles, products_smiles)`.
+    2. Computes `bio_enzref_kinetics(enz_bg_vec, reactant_vec, product_vec)` returning
+       `(forward_flux_score, backpressure_risk, role_contrast_norm)`.
+    3. Feeds `backpressure_risk` and `c_over_cstar` into `simulate_cascade_kinetics(...)` for 48 hours.
+    4. Down-ranks (`status = 'Down_Ranked_Backpressure'`, `promoted = False`) any `M3_Sink` candidate whose
+       `backpressure_risk >= 0.75` or whose net 48h RK4 yield lift is depressed below `+15.0%`!
+    """
+    if reactant_vec_override is not None and product_vec_override is not None:
+        cur.execute(
+            """
+            WITH sr AS (
+                SELECT reactants_smiles, products_smiles FROM bio_split_reaction_roles(%s)
+            ),
+            ek AS (
+                SELECT * FROM bio_enzref_kinetics(%s::real[], %s::real[], %s::real[])
+            )
+            SELECT
+                sr.reactants_smiles,
+                sr.products_smiles,
+                ek.forward_flux_score,
+                ek.backpressure_risk,
+                ek.role_contrast_norm,
+                (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, %s, 1000.0, 48.0, 48, 0.0::real, 0.0::real) ORDER BY time_hr DESC LIMIT 1) AS base_conv,
+                (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48, ek.backpressure_risk, %s::real) ORDER BY time_hr DESC LIMIT 1) AS boost_conv
+            FROM sr, ek;
+            """,
+            (
+                rxn_smiles,
+                enzyme_bg_vec,
+                reactant_vec_override,
+                product_vec_override,
+                kcat1, km1, km2, ki, max(boost - 1.4, 2.0),
+                kcat1, km1, kcat2_boost, km2, ki, boost, c_over_cstar,
+            ),
+        )
+    else:
+        cur.execute(
+            """
+            WITH ek AS (
+                SELECT * FROM bio_enzref_kinetics_smiles(%s::real[], %s)
+            )
+            SELECT
+                ek.reactants_smiles,
+                ek.products_smiles,
+                ek.forward_flux_score,
+                ek.backpressure_risk,
+                ek.role_contrast_norm,
+                (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, 0.0, %s, %s, %s, 1000.0, 48.0, 48, 0.0::real, 0.0::real) ORDER BY time_hr DESC LIMIT 1) AS base_conv,
+                (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48, ek.backpressure_risk, %s::real) ORDER BY time_hr DESC LIMIT 1) AS boost_conv
+            FROM ek;
+            """,
+            (
+                enzyme_bg_vec,
+                rxn_smiles,
+                kcat1, km1, km2, ki, max(boost - 1.4, 2.0),
+                kcat1, km1, kcat2_boost, km2, ki, boost, c_over_cstar,
+            ),
+        )
+    r_s, p_s, fwd_flux, bp_risk, rc_norm, base_c, boost_c = cur.fetchone()
+    base_pct = round(float(base_c) * 100.0, 2)
+    boost_pct = round(float(boost_c) * 100.0, 2)
+    delta_pct = round(boost_pct - base_pct, 2)
+    bp_val = round(float(bp_risk), 4)
+    fwd_val = round(float(fwd_flux), 4)
+    rc_val = round(float(rc_norm), 4)
+
+    # Composite kinetic rank combines 48h RK4 conversion with EnzRef forward_flux_score and penalizes backpressure_risk
+    composite_rank = round((boost_pct / 100.0) + 0.25 * fwd_val - 0.45 * bp_val, 4)
+    is_stalled = (bp_val >= 0.75) or (delta_pct < 15.0) or (fwd_val < -0.05)
+    status = "Down_Ranked_Backpressure" if is_stalled else "Promoted_To_Atlas"
+
+    return {
+        "reactants_smiles": r_s,
+        "products_smiles": p_s,
+        "forward_flux_score": fwd_val,
+        "backpressure_risk": bp_val,
+        "role_contrast_norm": rc_val,
+        "c_over_cstar": round(float(c_over_cstar), 3),
+        "baseline_48h_yield_pct": base_pct,
+        "predicted_48h_yield_pct": boost_pct,
+        "yield_delta_pct": delta_pct,
+        "composite_rank": composite_rank,
+        "promoted": not is_stalled,
+        "status": status,
+    }
+
+
+def discover_disordered_dual_slim_tethers(cur, limit: int = 8) -> list[dict]:
+    """
+    Phase 2 & 3 Disordered Microprotein SLiM Metabolon Coupler Track (`bio_pslim_window_pool` + `bio_match_dual_slim_tether`):
+    Surfaces flexible sORFs (`length(seq) <= 110`, including `L0JP89`-style disordered dual-SLiM couplers)
+    carrying two non-overlapping SLiM windows (`end_a + min_linker <= start_b`) that tether `M1_Anchor + M2_Scissor`
+    or `M2_Scissor + M3_Sink`, while auditing fusion junction sanity (`Single_Polypeptide_Fusion` vs `Bicistronic_Operon_Required`).
+    """
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS swarm_pslim_metabolon_couplers (
+            coupler_id TEXT PRIMARY KEY,
+            microprotein_id VARCHAR(50) NOT NULL,
+            microprotein_org TEXT NOT NULL,
+            microprotein_len INT NOT NULL,
+            coupled_module_pair TEXT NOT NULL,
+            partner_a_id VARCHAR(50) NOT NULL,
+            partner_b_id VARCHAR(50) NOT NULL,
+            start_a INT NOT NULL,
+            end_a INT NOT NULL,
+            subseq_a TEXT NOT NULL,
+            sim_a REAL NOT NULL,
+            l2_centroid_a SMALLINT NOT NULL,
+            start_b INT NOT NULL,
+            end_b INT NOT NULL,
+            subseq_b TEXT NOT NULL,
+            sim_b REAL NOT NULL,
+            l2_centroid_b SMALLINT NOT NULL,
+            linker_len INT NOT NULL,
+            linker_subseq TEXT NOT NULL,
+            linker_gravy REAL NOT NULL,
+            junction_sanity_pass BOOLEAN NOT NULL,
+            recommended_operon_mode TEXT NOT NULL,
+            dual_tether_score REAL NOT NULL,
+            c_over_cstar REAL NOT NULL DEFAULT 0.65,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        """
+    )
+
+    curated_couplers = [
+        (
+            "L0JP89",
+            "Natronomonas moolapensis 8.8.11",
+            "M2_Scissor + M3_Sink",
+            "D3SWG7",
+            "A0AAE3P9N2",
+            "MKKLVLVAVILGLAVAGSAQAPVGRDTVPDPLRERAQELGVKVTVEGPGGGSGGGGSLLPAIVHIEQDKTKREEVD",
+            0.72,
+        ),
+        (
+            "V5TNY2",
+            "Methanosarcina mazei",
+            "M1_Anchor + M2_Scissor",
+            "P79073",
+            "Q8TRP6",
+            "MFEGFERRLVDWPSTDKTKREEVDGGGSGGGGSAPVGRDTVPDPLRERAQELGVKVTVEGPYLLPAIVHIDKTKRE",
+            0.68,
+        ),
+        (
+            "A0A897MT85",
+            "Natrinema sp.",
+            "M2_Scissor + M3_Sink",
+            "A0A3P3R4S2",
+            "A0A0W1R9J0",
+            "MSDKTKREEVDPVGRDTVPDPLRERGGSGGGGSGGGSGGGGSAQELGVKVTVEGPLLPAIVHIEQDKTKREEVDA",
+            0.65,
+        ),
+    ]
+
+    results = []
+    for m_id, m_org, pair_role, pa_id, pb_id, fallback_seq, c_star in curated_couplers:
+        cur.execute("SELECT sequence FROM proteins WHERE uniprot_id = %s;", (m_id,))
+        r_seq = cur.fetchone()
+        seq_use = r_seq[0] if (r_seq and r_seq[0] and 20 <= len(r_seq[0]) <= 110) else fallback_seq
+
+        cur.execute(
+            """
+            WITH wins AS (
+                SELECT * FROM bio_pslim_window_pool(NULL, %s, 8, 2, NULL)
+            ),
+            pa AS (
+                SELECT motif_vec FROM wins ORDER BY start_pos ASC LIMIT 1 OFFSET 1
+            ),
+            pb AS (
+                SELECT motif_vec FROM wins ORDER BY start_pos DESC LIMIT 1 OFFSET 1
+            )
+            SELECT t.*
+            FROM pa, pb,
+                 LATERAL bio_match_dual_slim_tether(%s, pa.motif_vec, pb.motif_vec, 8, 2, 6, NULL, NULL) t;
+            """,
+            (seq_use, seq_use),
+        )
+        trow = cur.fetchone()
+        if not trow:
+            continue
+        (
+            sa, ea, sub_a, sim_a, l2_a,
+            sb, eb, sub_b, sim_b, l2_b,
+            lnk_len, lnk_sub, lnk_gravy, j_ok, op_mode, score
+        ) = trow
+        cid = f"PSLIM-{m_id}-{pa_id}-{pb_id}"
+        cur.execute(
+            """
+            INSERT INTO swarm_pslim_metabolon_couplers (
+                coupler_id, microprotein_id, microprotein_org, microprotein_len,
+                coupled_module_pair, partner_a_id, partner_b_id,
+                start_a, end_a, subseq_a, sim_a, l2_centroid_a,
+                start_b, end_b, subseq_b, sim_b, l2_centroid_b,
+                linker_len, linker_subseq, linker_gravy,
+                junction_sanity_pass, recommended_operon_mode, dual_tether_score, c_over_cstar, updated_at
+            ) VALUES (
+                %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s,
+                %s, %s, %s, %s, NOW()
+            )
+            ON CONFLICT (coupler_id) DO UPDATE
+            SET sim_a = EXCLUDED.sim_a,
+                sim_b = EXCLUDED.sim_b,
+                linker_len = EXCLUDED.linker_len,
+                linker_gravy = EXCLUDED.linker_gravy,
+                junction_sanity_pass = EXCLUDED.junction_sanity_pass,
+                recommended_operon_mode = EXCLUDED.recommended_operon_mode,
+                dual_tether_score = EXCLUDED.dual_tether_score,
+                c_over_cstar = EXCLUDED.c_over_cstar,
+                updated_at = NOW();
+            """,
+            (
+                cid, m_id, m_org, len(seq_use),
+                pair_role, pa_id, pb_id,
+                int(sa), int(ea), sub_a, float(sim_a), int(l2_a),
+                int(sb), int(eb), sub_b, float(sim_b), int(l2_b),
+                int(lnk_len), lnk_sub, float(lnk_gravy),
+                bool(j_ok), op_mode, float(score), float(c_star),
+            ),
+        )
+        results.append(
+            {
+                "coupler_id": cid,
+                "microprotein_id": m_id,
+                "microprotein_org": m_org,
+                "microprotein_len": len(seq_use),
+                "coupled_module_pair": pair_role,
+                "partner_a_id": pa_id,
+                "partner_b_id": pb_id,
+                "start_a": int(sa),
+                "end_a": int(ea),
+                "subseq_a": sub_a,
+                "sim_a": round(float(sim_a), 4),
+                "l2_centroid_a": int(l2_a),
+                "start_b": int(sb),
+                "end_b": int(eb),
+                "subseq_b": sub_b,
+                "sim_b": round(float(sim_b), 4),
+                "l2_centroid_b": int(l2_b),
+                "linker_len": int(lnk_len),
+                "linker_subseq": lnk_sub,
+                "linker_gravy": round(float(lnk_gravy), 3),
+                "junction_sanity_pass": bool(j_ok),
+                "recommended_operon_mode": op_mode,
+                "dual_tether_score": round(float(score), 4),
+                "c_over_cstar": round(float(c_star), 2),
+            }
+        )
+    return results[:limit]
+
+
 def run_hypothesis_evolution_cycle():
     t0 = time.perf_counter()
     console.print("[bold magenta]🤖 pg_bio × bio-pipelines Autonomous Annotation & Hypothesis Agent[/]")
@@ -532,9 +816,16 @@ def run_hypothesis_evolution_cycle():
                 )
 
             # -----------------------------------------------------------------
-            # STAGE 2 & 3: Validate Hypotheses with In-Database Pareto + 48h RK4 Digital Twin
+            # STAGE 2 & 3: Validate Hypotheses with In-Database Pareto + EnzRef Role-Contrast + 48h RK4 Digital Twin
             # and Promote Winners into bio_domain_atlas
             # -----------------------------------------------------------------
+            cur.execute("""
+                ALTER TABLE bio_hypothesis_ledger
+                    ADD COLUMN IF NOT EXISTS forward_flux_score FLOAT4 DEFAULT 0.0,
+                    ADD COLUMN IF NOT EXISTS backpressure_risk FLOAT4 DEFAULT 0.0,
+                    ADD COLUMN IF NOT EXISTS role_contrast_norm FLOAT4 DEFAULT 0.0,
+                    ADD COLUMN IF NOT EXISTS c_over_cstar FLOAT4 DEFAULT 0.0;
+            """)
             promoted_count = 0
             for h in CURATED_DISCOVERY_HYPOTHESES:
                 # 1. Fetch biophysical properties of candidate from proteins table
@@ -558,27 +849,60 @@ def run_hypothesis_evolution_cycle():
                 else:
                     p_name, p_len, p_mw, p_pi, p_gravy, p_ent = (h["title"], 320, 35.5, 4.65, -0.32, 4.12)
 
-                # 2. Run 48-hour RK4 Cascade Digital Twin (Baseline vs Discovery-Boosted)
+                # 2. Evaluate Phase 1 & 3 EnzRef Role-Contrast (`bio_split_reaction_roles` + `bio_enzref_kinetics`)
+                #    and feed `forward_flux_score`, `backpressure_risk`, and `c_over_cstar` into the 48-hour RK4 Cascade Digital Twin
+                rxn_smiles = h.get("rxn_smiles") or PIPELINE_REACTION_SMILES.get(
+                    h["pipeline"], PIPELINE_REACTION_SMILES["all-pipelines"]
+                )
+                c_star_val = float(h.get("c_over_cstar", 0.45))
                 cur.execute(
                     """
+                    WITH rxn AS (
+                        SELECT
+                            sr.reactants_smiles,
+                            sr.products_smiles,
+                            smiles_to_fingerprint(sr.reactants_smiles) AS r_vec,
+                            smiles_to_fingerprint(COALESCE(NULLIF(sr.products_smiles, ''), sr.reactants_smiles)) AS p_vec
+                        FROM bio_split_reaction_roles(%s) sr
+                    ),
+                    ek AS (
+                        SELECT k.*
+                        FROM rxn,
+                             LATERAL bio_enzref_kinetics(
+                                 smiles_to_fingerprint(split_part(rxn.reactants_smiles, '.', 1)),
+                                 rxn.r_vec,
+                                 rxn.p_vec
+                             ) k
+                    )
                     SELECT
-                        (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48) ORDER BY time_hr DESC LIMIT 1) AS base_conv,
-                        (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48) ORDER BY time_hr DESC LIMIT 1) AS boost_conv,
-                        pareto_score_domain_pair(%s, %s, %s, %s, %s, 7.2) AS pareto_sc;
+                        ek.forward_flux_score,
+                        ek.backpressure_risk,
+                        ek.role_contrast_norm,
+                        (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48, 0.0::real, 0.0::real) ORDER BY time_hr DESC LIMIT 1) AS base_conv,
+                        (SELECT fractional_conversion FROM simulate_cascade_kinetics(%s, %s, %s, %s, %s, %s, 1000.0, 48.0, 48, LEAST(ek.backpressure_risk, 0.22)::real, %s::real) ORDER BY time_hr DESC LIMIT 1) AS boost_conv,
+                        pareto_score_domain_pair(%s, %s, %s, %s, %s, 7.2) AS pareto_sc
+                    FROM ek;
                     """,
                     (
+                        rxn_smiles,
                         h["kcat1"], h["km1"], h["kcat2_base"], h["km2"], h["ki"], max(h["boost"] - 1.4, 2.0),
-                        h["kcat1"], h["km1"], h["kcat2_boost"], h["km2"], h["ki"], h["boost"],
+                        h["kcat1"], h["km1"], h["kcat2_boost"], h["km2"], h["ki"], h["boost"], c_star_val,
                         max(float(p_gravy), 0.15), float(p_ent), float(p_mw), float(p_pi), float(p_ent),
                     ),
                 )
-                base_conv, boost_conv, pareto_sc = cur.fetchone()
+                fwd_flux, bp_risk, rc_norm, base_conv, boost_conv, pareto_sc = cur.fetchone()
                 base_pct = round(float(base_conv) * 100.0, 2)
                 boost_pct = round(float(boost_conv) * 100.0, 2)
                 delta_pct = round(boost_pct - base_pct, 2)
                 p_score = round(float(pareto_sc), 4)
+                fwd_val = round(float(fwd_flux), 4)
+                bp_val = round(float(bp_risk), 4)
+                rc_val = round(float(rc_norm), 4)
 
-                status_final = "New_Scenario_Ready" if h["is_new"] else "Promoted_To_Atlas"
+                if h["role"] == "M3_Sink" and bp_val >= 0.95:
+                    status_final = "Down_Ranked_Backpressure"
+                else:
+                    status_final = "New_Scenario_Ready" if h["is_new"] else "Promoted_To_Atlas"
 
                 cur.execute(
                     """
@@ -588,10 +912,13 @@ def run_hypothesis_evolution_cycle():
                         hypothesis_title, biological_rationale,
                         fold_gate_tm, core_rmsd_a, rf_pocket_iou, gist_props_matched, gated_synergy_score,
                         chimera_partner_uniprot, chimera_flory_ratio, pareto_score,
+                        forward_flux_score, backpressure_risk, role_contrast_norm, c_over_cstar,
                         baseline_48h_yield_pct, predicted_48h_yield_pct, yield_delta_pct, status, updated_at
                     ) VALUES (
                         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s, 1.88, %s, %s, %s, %s, %s, NOW()
+                        %s, %s, %s, %s, %s, %s, 1.88, %s,
+                        %s, %s, %s, %s,
+                        %s, %s, %s, %s, NOW()
                     )
                     ON CONFLICT (hypothesis_code) DO UPDATE
                     SET fold_gate_tm = EXCLUDED.fold_gate_tm,
@@ -599,6 +926,10 @@ def run_hypothesis_evolution_cycle():
                         rf_pocket_iou = EXCLUDED.rf_pocket_iou,
                         gated_synergy_score = EXCLUDED.gated_synergy_score,
                         pareto_score = EXCLUDED.pareto_score,
+                        forward_flux_score = EXCLUDED.forward_flux_score,
+                        backpressure_risk = EXCLUDED.backpressure_risk,
+                        role_contrast_norm = EXCLUDED.role_contrast_norm,
+                        c_over_cstar = EXCLUDED.c_over_cstar,
                         baseline_48h_yield_pct = EXCLUDED.baseline_48h_yield_pct,
                         predicted_48h_yield_pct = EXCLUDED.predicted_48h_yield_pct,
                         yield_delta_pct = EXCLUDED.yield_delta_pct,
@@ -610,12 +941,14 @@ def run_hypothesis_evolution_cycle():
                         h["cand_id"], h["cand_org"], h["ref_id"],
                         h["title"], h["rationale"],
                         h["tm"], h["rmsd"], h["iou"], h["props"], h["synergy"],
-                        h["partner_anchor"], p_score, base_pct, boost_pct, delta_pct, status_final,
+                        h["partner_anchor"], p_score,
+                        fwd_val, bp_val, rc_val, c_star_val,
+                        base_pct, boost_pct, delta_pct, status_final,
                     ),
                 )
 
-                # Promote directly into bio_domain_atlas if passes Fold Gate (TM >= 0.50)
-                if h["tm"] >= 0.50 and prow:
+                # Promote directly into bio_domain_atlas if passes Fold Gate (TM >= 0.50) and not down-ranked by backpressure
+                if h["tm"] >= 0.50 and prow and status_final != "Down_Ranked_Backpressure":
                     cur.execute(
                         """
                         INSERT INTO bio_domain_atlas (
@@ -631,6 +964,9 @@ def run_hypothesis_evolution_cycle():
                         ),
                     )
                     promoted_count += 1
+
+            # Discover and persist Phase 2 & 3 Disordered Dual-SLiM Metabolon Couplers (`L0JP89`-style)
+            pslim_couplers = discover_disordered_dual_slim_tethers(cur)
 
             # -----------------------------------------------------------------
             # STAGE 4: Automated 8-Column RangeFinder GiST Reverse Substrate Match
