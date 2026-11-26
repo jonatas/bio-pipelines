@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.pg_bio.progressive_backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/jonatas/code/bio-pipelines/.venv/bin/python</string>
+        <string>/Users/jonatas/code/bio-pipelines/base/pg_progressive_backup.py</string>
+        <string>daily-auto</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/jonatas/code/bio-pipelines</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>PG_BIO_DB_URI</key>
+        <string>postgresql://jonatas@localhost:28818/bio_demo</string>
+        <key>PG_BIO_BACKUP_ROOT</key>
+        <string>/Users/jonatas/code/bio-pipelines/backups</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>15</integer>
+    </dict>
+
+    <key>Nice</key>
+    <integer>10</integer>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/jonatas/code/bio-pipelines/backups/launchd_backup.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/jonatas/code/bio-pipelines/backups/launchd_backup.err.log</string>
+</dict>
+</plist>
