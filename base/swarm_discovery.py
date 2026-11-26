@@ -629,7 +629,7 @@ def _ensure_3d_pocket_indexed(cur, uid: str) -> int:
             SELECT predict_pocket_ranges(%s::text, %s::text, %s::float8, %s::float8, %s::float8, 10.0::float8) AS pk
         )
         INSERT INTO swarm_pocket_ranges (
-            uniprot_id, pocket_cx, pocket_cy, pocket_cz, pocket_radius, pdb_path, pocket,
+            uniprot_id, pocket_cx, pocket_cy, pocket_cz, pocket_radius, pdb_path,
             mw_range, logp_range, hbd_range, hba_range, tpsa_range, rot_range, charge_range, arom_range, fsp3_range,
             mw_min, mw_max, logp_min, logp_max, hbd_min, hbd_max, hba_min, hba_max,
             tpsa_min, tpsa_max, rot_min, rot_max, charge_min, charge_max, arom_min, arom_max, fsp3_min, fsp3_max,
@@ -637,7 +637,7 @@ def _ensure_3d_pocket_indexed(cur, uid: str) -> int:
             l1_centroid, l2_centroid, soar_centroid, lo_code, hi_code
         )
         SELECT
-            %s, %s, %s, %s, 10.0, %s, r.pk,
+            %s, %s, %s, %s, 10.0, %s,
             nr.mw_range, nr.logp_range, nr.hbd_range, nr.hba_range, nr.tpsa_range, nr.rot_range, nr.charge_range, nr.arom_range, nr.fsp3_range,
             b.mw_min, b.mw_max, b.logp_min, b.logp_max, b.hbd_min, b.hbd_max, b.hba_min, b.hba_max,
             b.tpsa_min, b.tpsa_max, b.rot_min, b.rot_max, b.charge_min, b.charge_max, b.arom_min, b.arom_max, b.fsp3_min, b.fsp3_max,
@@ -695,7 +695,12 @@ def expand_3d_pocket_ranges_batch(cur, batch_size: int = 12, min_edge_id: int = 
                     po.mw_min, po.mw_max, po.logp_min, po.logp_max, po.hbd_min, po.hbd_max, po.hba_min, po.hba_max,
                     po.tpsa_min, po.tpsa_max, po.rot_min, po.rot_max, po.arom_min, po.arom_max, po.fsp3_min, po.fsp3_max
                 )::numeric, 4),
-                rf_giou_loss = ROUND(pocket_giou_loss(pb.pocket, po.pocket, false)::numeric, 4),
+                rf_giou_loss = ROUND((1.0 - pocket_iou_8prop_raw(
+                    pb.mw_min, pb.mw_max, pb.logp_min, pb.logp_max, pb.hbd_min, pb.hbd_max, pb.hba_min, pb.hba_max,
+                    pb.tpsa_min, pb.tpsa_max, pb.rot_min, pb.rot_max, pb.arom_min, pb.arom_max, pb.fsp3_min, pb.fsp3_max,
+                    po.mw_min, po.mw_max, po.logp_min, po.logp_max, po.hbd_min, po.hbd_max, po.hba_min, po.hba_max,
+                    po.tpsa_min, po.tpsa_max, po.rot_min, po.rot_max, po.arom_min, po.arom_max, po.fsp3_min, po.fsp3_max
+                ))::numeric, 4),
                 rf_arom_prob = ROUND(po.aromatic_probability::numeric, 4),
                 rf_score = ROUND((
                     0.75 * pocket_iou_8prop_raw(
@@ -737,9 +742,23 @@ def expand_3d_pocket_ranges_batch(cur, batch_size: int = 12, min_edge_id: int = 
                 po.mw_min, po.mw_max, po.logp_min, po.logp_max, po.hbd_min, po.hbd_max, po.hba_min, po.hba_max,
                 po.tpsa_min, po.tpsa_max, po.rot_min, po.rot_max, po.arom_min, po.arom_max, po.fsp3_min, po.fsp3_max
             )::numeric, 4),
-            rf_giou_loss = ROUND(pocket_giou_loss(pb.pocket, po.pocket, false)::numeric, 4),
+            rf_giou_loss = ROUND((1.0 - pocket_iou_8prop_raw(
+                pb.mw_min, pb.mw_max, pb.logp_min, pb.logp_max, pb.hbd_min, pb.hbd_max, pb.hba_min, pb.hba_max,
+                pb.tpsa_min, pb.tpsa_max, pb.rot_min, pb.rot_max, pb.arom_min, pb.arom_max, pb.fsp3_min, pb.fsp3_max,
+                po.mw_min, po.mw_max, po.logp_min, po.logp_max, po.hbd_min, po.hbd_max, po.hba_min, po.hba_max,
+                po.tpsa_min, po.tpsa_max, po.rot_min, po.rot_max, po.arom_min, po.arom_max, po.fsp3_min, po.fsp3_max
+            ))::numeric, 4),
             rf_substrate_match = CASE
-                WHEN s.ligand_props IS NOT NULL THEN pocket_matches_ligand_8prop(po.pocket, s.ligand_props)
+                WHEN s.mw IS NOT NULL THEN (
+                    (po.mw_range @> s.mw::numeric) AND
+                    (po.logp_range @> s.logp::numeric) AND
+                    (po.hbd_range @> s.hbd::numeric) AND
+                    (po.hba_range @> s.hba::numeric) AND
+                    (po.tpsa_range @> s.tpsa::numeric) AND
+                    (po.rot_range @> s.rotatable_bonds::numeric) AND
+                    (po.arom_range @> s.aromatic_rings::numeric) AND
+                    (po.fsp3_range @> s.fsp3::numeric)
+                )
                 ELSE NULL
             END,
             rf_substrate_props_matched = CASE
@@ -1072,12 +1091,21 @@ def claim_dense_frontier_batch(conn, target_nodes: int = 48) -> list[tuple]:
                     MAX(confidence_score) DESC NULLS LAST
                 LIMIT %s
             ),
+            mark_exploring_ids AS (
+                SELECT t.id
+                FROM fresh_candidates fc
+                CROSS JOIN LATERAL (
+                    SELECT od.id
+                    FROM orphan_discoveries od
+                    WHERE od.orphan_id = fc.orphan_id
+                      AND od.status IN ('Pending', 'Exploring')
+                ) t
+            ),
             mark_exploring AS (
                 UPDATE orphan_discoveries od
                 SET status = 'Exploring'
-                FROM fresh_candidates fc
-                WHERE od.orphan_id = fc.orphan_id
-                  AND od.status IN ('Pending', 'Exploring')
+                FROM mark_exploring_ids m
+                WHERE od.id = m.id
                 RETURNING od.orphan_id
             )
             SELECT orphan_id, family_name, orphan_organism, min_dist, in_degree_window
@@ -1219,6 +1247,11 @@ def expand_dense_node(conn, node_tuple: tuple, neighbor_limit: int = 12, ef_sear
 
 
 def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
+    if sys.platform == "darwin":
+        try:
+            subprocess.Popen(["caffeinate", "-i", "-w", str(os.getpid())], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
     admin_conn = psycopg.connect(DB_URI, autocommit=True)
     claim_conn = psycopg.connect(DB_URI)
     with admin_conn.cursor() as cur:
@@ -1227,6 +1260,7 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
         cur.execute("UPDATE orphan_discoveries SET status = 'Pending' WHERE status = 'Exploring';")
         if cur.rowcount > 0:
             print(f"[Swarm Governor] Recovered {cur.rowcount} stranded 'Exploring' nodes back to 'Pending'.")
+        cur.execute("ANALYZE orphan_discoveries;")
         cur.execute("SELECT COUNT(*) FROM orphan_discoveries WHERE status = 'Pending';")
         initial_pending = cur.fetchone()[0]
 
@@ -1244,6 +1278,7 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
         for nd in seeded_boot[:8]:
             expand_dense_node(claim_conn, nd, neighbor_limit=12, ef_search=64)
         with admin_conn.cursor() as cur:
+            cur.execute("ANALYZE orphan_discoveries;")
             cur.execute("SELECT COUNT(*) FROM orphan_discoveries WHERE status = 'Pending';")
             boot_pending = cur.fetchone()[0]
             print(f"[Swarm Governor] Pre-seeded Pass-{_PASS_RING} frontier -> {boot_pending:,} Pending edges queued.")
@@ -1380,6 +1415,8 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
                     tot_rf = cur.fetchone()[0]
                     cur.execute("SELECT COUNT(*) FROM swarm_tpp_knockout_cascades;")
                     tot_tpp = cur.fetchone()[0]
+                if cycle > 0 and cycle % 250 == 0:
+                    cur.execute("ANALYZE orphan_discoveries;")
                 tot_graph = max(tot_graph, last_max_id)
                 cur.execute("""
                     INSERT INTO swarm_telemetry_log (
@@ -1405,19 +1442,21 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
                 f"Graph: {tot_graph:,} edges ({tot_rf:,} 3D RF, {tot_tpp:,} TPP KOs)"
             )
 
-            # In-process Pipeline Intelligence Hook: Evolve Dark-Proteome (DUF) annotations & validate bio-pipeline hypotheses
-            if cycle % 25 == 0:
-                try:
-                    from base.hypothesis_agent import run_hypothesis_evolution_cycle
-                    run_hypothesis_evolution_cycle()
-                except ImportError:
+            # In-process Pipeline Intelligence Hook (non-blocking background thread)
+            if cycle % 25 == 0 and not getattr(run_adaptive_swarm, "_hyp_thread_busy", False):
+                def _bg_hyp():
+                    run_adaptive_swarm._hyp_thread_busy = True
                     try:
-                        from hypothesis_agent import run_hypothesis_evolution_cycle
+                        try:
+                            from base.hypothesis_agent import run_hypothesis_evolution_cycle
+                        except ImportError:
+                            from hypothesis_agent import run_hypothesis_evolution_cycle
                         run_hypothesis_evolution_cycle()
                     except Exception as he:
-                        print(f"[Pipeline Hypothesis Hook] Skipped: {he}")
-                except Exception as he:
-                    print(f"[Pipeline Hypothesis Hook] Warning: {he}")
+                        print(f"[Pipeline Hypothesis Hook] Warning: {he}")
+                    finally:
+                        run_adaptive_swarm._hyp_thread_busy = False
+                threading.Thread(target=_bg_hyp, daemon=True).start()
 
             cycle += 1
             if max_cycles > 0 and cycle >= max_cycles:

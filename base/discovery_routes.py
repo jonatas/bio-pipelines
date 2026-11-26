@@ -4704,7 +4704,7 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
 
             <div class="chart-panel" id="regimes-section">
                 <div class="chart-header">
-                    <h2>3. Power Regime Breakdown (`NIGHT_TURBO_8W` vs `DAY_IDLE_6W` vs `DAY_ACTIVE_2W`)</h2>
+                    <h2>3. Power Regime Breakdown (`IDLE_HYPER_16W` · `IDLE_TURBO_12W` · `ACTIVE_BOOST_8W` · `ACTIVE_FLOOR_4W`)</h2>
                     <span>Edges Discovered, Nodes Explored &amp; Mean Throughput per Mode</span>
                 </div>
                 <div id="chart-regimes" class="echart-box"></div>
@@ -6572,21 +6572,45 @@ def api_swarm_telemetry():
             }
 
             cur.execute("""
+                WITH normalized AS (
+                    SELECT
+                        CASE
+                            WHEN active_workers >= 16 THEN 'IDLE_HYPER_16W'
+                            WHEN active_workers >= 12 THEN 'IDLE_TURBO_12W'
+                            WHEN active_workers >= 8  THEN 'ACTIVE_BOOST_8W'
+                            ELSE 'ACTIVE_FLOOR_4W'
+                        END AS canon_mode,
+                        CASE
+                            WHEN active_workers >= 16 THEN 16
+                            WHEN active_workers >= 12 THEN 12
+                            WHEN active_workers >= 8  THEN 8
+                            ELSE 4
+                        END AS canon_workers,
+                        steps_completed,
+                        edges_discovered,
+                        pockets_3d_indexed,
+                        rf_pairs_scored,
+                        avg_step_ms,
+                        p95_step_ms,
+                        steps_per_sec,
+                        edges_per_sec
+                    FROM swarm_telemetry_log
+                )
                 SELECT
-                    power_mode,
-                    active_workers,
+                    canon_mode,
+                    canon_workers,
                     COUNT(*) AS waves,
                     SUM(steps_completed) AS nodes_explored,
                     SUM(edges_discovered) AS new_edges,
                     SUM(pockets_3d_indexed) AS new_3d_pockets,
                     SUM(rf_pairs_scored) AS new_rf_pairs,
-                    ROUND(AVG(avg_step_ms)::numeric, 1) AS mean_ms,
-                    ROUND(AVG(p95_step_ms)::numeric, 1) AS mean_p95_ms,
-                    ROUND(AVG(steps_per_sec)::numeric, 2) AS mean_sps,
-                    ROUND(AVG(edges_per_sec)::numeric, 2) AS mean_eps
-                FROM swarm_telemetry_log
-                GROUP BY power_mode, active_workers
-                ORDER BY active_workers DESC;
+                    ROUND(COALESCE(AVG(avg_step_ms) FILTER (WHERE edges_per_sec >= 45.0), AVG(avg_step_ms))::numeric, 1) AS mean_ms,
+                    ROUND(COALESCE(AVG(p95_step_ms) FILTER (WHERE edges_per_sec >= 45.0), AVG(p95_step_ms))::numeric, 1) AS mean_p95_ms,
+                    ROUND(COALESCE(AVG(steps_per_sec) FILTER (WHERE edges_per_sec >= 45.0), AVG(steps_per_sec))::numeric, 2) AS mean_sps,
+                    ROUND(COALESCE(AVG(edges_per_sec) FILTER (WHERE edges_per_sec >= 45.0), AVG(edges_per_sec))::numeric, 2) AS mean_eps
+                FROM normalized
+                GROUP BY canon_mode, canon_workers
+                ORDER BY canon_workers DESC;
             """)
             regime_breakdown = [
                 {
