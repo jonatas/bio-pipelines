@@ -4353,6 +4353,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             background: #020617;
             border-bottom: 1px solid #1e293b;
         }
+        .caption-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: safe center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
         table.tel-table thead {
             position: sticky;
             inset-block-start: 0;
@@ -4381,9 +4388,158 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             color: #f8fafc;
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
             font-weight: 700;
+            text-align: left;
             padding: 10px 12px;
             border-bottom: 1px solid #1e293b;
             white-space: nowrap;
+        }
+        /* Full-Width Any-Order Bioprocess Puzzle Board Cards */
+        .puzzles-board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: safe center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 11px 16px;
+            background: #020617;
+            border-bottom: 1px solid #1e293b;
+            border-radius: 11px 11px 0 0;
+        }
+        .puzzles-board-title {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #e9d5ff;
+        }
+        .puzzles-filter-group {
+            display: flex;
+            align-items: safe center;
+            flex-wrap: wrap;
+            flex-wrap: balance;
+            gap: 6px;
+        }
+        .puzzles-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #070d1b;
+            border-radius: 0 0 11px 11px;
+            max-block-size: min(740px, 82vh);
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            overscroll-behavior: contain;
+        }
+        article.puzzle-card {
+            container: puzzlecard / inline-size;
+            background: linear-gradient(180deg, #0d1629 0%, #091020 100%);
+            border: 1px solid #1e293b;
+            border-left: 4px solid #f59e0b;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        article.puzzle-card.is-two-phase {
+            border-left-color: #c084fc;
+        }
+        article.puzzle-card:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 6px 20px rgba(2, 6, 23, 0.7);
+        }
+        .pz-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: safe center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+            padding-bottom: 9px;
+        }
+        .pz-ident-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-inline-size: 0;
+            flex: 1 1 420px;
+        }
+        .pz-badges-row {
+            display: flex;
+            align-items: safe center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .pz-title-row {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .pz-slug {
+            color: #38bdf8;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-weight: 800;
+            font-size: 0.92rem;
+        }
+        .pz-title-text {
+            color: #f8fafc;
+            font-weight: 600;
+            font-size: 0.84rem;
+        }
+        .pz-kpi-actions {
+            display: flex;
+            align-items: safe center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-inline-start: auto;
+        }
+        .pz-yield-pill {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            border-radius: 8px;
+            padding: 5px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            line-height: 1.25;
+        }
+        .pz-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+            gap: 9px;
+            inline-size: 100%;
+        }
+        .pz-slot-box {
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 5px;
+            min-inline-size: 0;
+            font-size: 0.74rem;
+        }
+        .pz-slot-box.is-locked {
+            background: rgba(16, 185, 129, 0.10);
+            border: 1px solid rgba(16, 185, 129, 0.42);
+            color: #d1fae5;
+        }
+        .pz-slot-box.is-open {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1.5px dashed rgba(245, 158, 11, 0.75);
+            color: #fef3c7;
+        }
+        .pz-card-footer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            background: rgba(2, 6, 23, 0.65);
+            border: 1px solid #1e293b;
+            border-radius: 7px;
+            padding: 7px 11px;
+            font-size: 0.74rem;
+            line-height: 1.42;
         }
         table.tel-table tbody td {
             padding: 10px 12px;
@@ -4598,12 +4754,12 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
     </header>
 
     <main class="tel-container">
-        <!-- 5-Stage Closed-Loop Pipeline System Architecture Bar -->
-        <section class="pipeline-stage-bar" aria-label="5-Stage Closed-Loop Bio-Pipeline Architecture">
+        <!-- 4-Stage Closed-Loop Pipeline System Architecture Bar -->
+        <section class="pipeline-stage-bar" style="grid-template-columns: repeat(4, minmax(180px, 1fr));" aria-label="4-Stage Closed-Loop Bio-Pipeline Architecture">
             <a class="stage-step" style="border-left-color:#38bdf8;" href="/discovery" title="Stage 1: Open Multi-Worker Protein Correlation Swarm Heatmap">
                 <span class="st-num">Stage 1 · Continuous Discovery</span>
                 <span class="st-title">🛰️ Multi-Worker pg_bio Swarm</span>
-                <span class="st-meta" id="st1-meta">103.6M+ Edges · 1.76M Proteins</span>
+                <span class="st-meta" id="st1-meta">138.7M+ Edges · 1.76M Proteins</span>
             </a>
             <a class="stage-step" style="border-left-color:#f43f5e;" href="#pipelines-gist-section" title="Stage 2: Jump to 8-Column RangeFinder GiST Reverse Target Fishing Matrix">
                 <span class="st-num">Stage 2 · 3D Pocket Indexing</span>
@@ -4613,17 +4769,12 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <a class="stage-step" style="border-left-color:#fbbf24;" href="#duf-section" title="Stage 3: Jump to Evolving Dark-Proteome (DUF) Functional Annotations">
                 <span class="st-num">Stage 3 · Dark Proteome Rescue</span>
                 <span class="st-title">🧬 Evolving DUF Annotations</span>
-                <span class="st-meta" id="st3-meta">50 Orphans Fold-Gated (TM ≥ 0.50)</span>
+                <span class="st-meta" id="st3-meta">59 Orphans Fold-Gated (TM ≥ 0.50)</span>
             </a>
-            <a class="stage-step" style="border-left-color:#c084fc;" href="#hypotheses-section" title="Stage 4: Jump to Autonomous Hypothesis Ledger">
-                <span class="st-num">Stage 4 · In-Process Agent</span>
-                <span class="st-title">🤖 Validated Hypotheses</span>
-                <span class="st-meta" id="st4-meta">13 Active Hypotheses Promoted</span>
-            </a>
-            <a class="stage-step" style="border-left-color:#10b981;" href="#puzzles-section" title="Stage 5: Inspect the Open Bioprocess Puzzle Board &amp; 10 Auto-Compiled 4-Module (M1→M2→M3→M4) 48h RK4 Digital Twins">
-                <span class="st-num">Stage 5 · Open Puzzle Board &amp; RK4</span>
-                <span class="st-title">🧩 10 Compiled + 3 Open Puzzles</span>
-                <span class="st-meta" id="st5-meta">4-Phase Embedded Gate Engine</span>
+            <a class="stage-step" style="border-left-color:#10b981;" href="#puzzles-section" title="Stage 4: Inspect the 3 Active Open Puzzles (Auto-Compiled 4/4 Pipelines are live on the main 🧬 Pipelines screen)">
+                <span class="st-num">Stage 4 · Open Puzzle Board</span>
+                <span class="st-title">🧩 3 Open Puzzles (10 Compiled on /)</span>
+                <span class="st-meta" id="st5-meta">3 Active Puzzles Awaiting 4th Module</span>
             </a>
         </section>
 
@@ -4666,8 +4817,8 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <a class="tel-metric-link kpi-delta" id="kpi-rf-pairs" href="/discovery?limit=rangefinder-40" title="Click to explore 3D RangeFinder scored pairs">--</a>
                 <span class="kpi-sub" id="kpi-elite-counts">--</span>
                 <div class="kpi-quick-jumps">
-                    <a class="kpi-pill-link" href="#pipelines-gist-section">🎯 8 Pipelines GiST</a>
-                    <a class="kpi-pill-link" href="#hypotheses-section">🤖 Hypotheses</a>
+                    <a class="kpi-pill-link" href="#puzzles-section">🧩 Open Puzzles</a>
+                    <a class="kpi-pill-link" href="#pipelines-gist-section">🎯 GiST Matrix</a>
                     <a class="kpi-pill-link" href="#duf-section">🧬 Evolving DUFs</a>
                 </div>
             </article>
@@ -4719,36 +4870,29 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             </div>
         </section>
 
-        <!-- Open Bioprocess Puzzle Board & 4-Phase Embedded Validation Engine -->
+        <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds; 4/4 Resolved graduate to / ) -->
         <section class="breakthrough-panel" id="puzzles-section" aria-label="Open Bioprocess Puzzle Board and 4-Phase Embedded Validation Gates">
-            <div tabindex="0" role="region" aria-labelledby="puzzles-board-caption" class="table-wrapper">
-                <table class="tel-table">
-                    <caption id="puzzles-board-caption" style="color:#e9d5ff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>🧩 Open Bioprocess Puzzle Board &amp; 4-Phase Embedded Validation Engine (`bio_pipeline_puzzles` · Auto-Compiles New Pipelines When 4/4 Phase Gates Lock)</span>
-                        <a href="/?pipeline=smorf-hla-immunopeptidomics" class="tel-metric-link" style="font-size:0.76rem;color:#34d399;font-family:ui-monospace,monospace;">⚡ Launch Dark-Proteome smORF &rarr; HLA-I RK4 Twin &rarr;</a>
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th>Puzzle Pipeline ID &amp; Status</th>
-                            <th>Organism Composition Rule &amp; Regime</th>
-                            <th>4-Phase Embedded SQL Validation Gates (M1 &rarr; M2 &rarr; M3 &rarr; M4)</th>
-                            <th>48h RK4 Yield (&Delta;)</th>
-                            <th>Missing Piece / Auto-Compile Verdict</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="puzzles-board-tbody"></tbody>
-                </table>
+            <div class="puzzles-board-header" id="puzzles-board-caption">
+                <span class="puzzles-board-title">🧩 Any-Order Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">7</span> Active Puzzles · Slots Lock Out-of-Order Across Any Phase Combination · 4/4 Graduate to <code>🧬 Pipelines</code>)</span>
+                <div class="puzzles-filter-group">
+                    <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All Open (<span id="pz-cnt-all">7</span>)</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-3" onclick="setPuzzleBoardFilter('3')">⏳ 3/4 Near-Lock (<span id="pz-cnt-3">3</span>)</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Two-Phase Combos (<span id="pz-cnt-2">4</span>)</button>
+                    <a href="/" class="tel-metric-link" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;margin-left:4px;">⚡ 10 Compiled on / &rarr;</a>
+                </div>
             </div>
+            <div tabindex="0" role="region" aria-labelledby="puzzles-board-caption" class="puzzles-cards-grid" id="puzzles-board-tbody"></div>
         </section>
 
         <!-- 10 Compiled 4-Module Bio-Pipelines & Live RangeFinder 8-Column GiST Reverse Target Fishing Matrix -->
         <section class="breakthrough-panel" id="pipelines-gist-section" aria-label="10 Compiled Bio-Pipelines and RangeFinder GiST Reverse Target Fishing">
             <div tabindex="0" role="region" aria-labelledby="pipelines-gist-caption" class="table-wrapper">
                 <table class="tel-table">
-                    <caption id="pipelines-gist-caption" style="color:#34d399;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>🧬 10 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
-                        <a href="/" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">Open Interactive 48h RK4 Digital Twin &rarr;</a>
+                    <caption id="pipelines-gist-caption" style="color:#34d399;">
+                        <div class="caption-bar">
+                            <span>🧬 10 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
+                            <a href="/" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">Open Interactive 48h RK4 Digital Twin &rarr;</a>
+                        </div>
                     </caption>
                     <thead>
                         <tr>
@@ -4770,18 +4914,20 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         <section class="breakthrough-panel" id="breakthroughs-section" aria-label="Top Breakthrough Discoveries Since Selected Date">
             <div tabindex="0" role="region" aria-labelledby="overnight-breakthroughs-caption" class="table-wrapper">
                 <table class="tel-table">
-                    <caption id="overnight-breakthroughs-caption" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                        <span id="bt-caption-text">🏆 Top Breakthrough Discoveries (<span id="bt-window-label" style="color:#38bdf8;">Last 24 Hours</span> · <span id="bt-edge-range-label" style="color:#34d399;font-family:ui-monospace,monospace;">Loading…</span>) — Click any Protein ID, Organism, or Metric Score</span>
-                        <search class="bt-filter-search" aria-label="Filter top breakthrough discoveries by since date">
-                            <form class="bt-filter-form" action="/telemetry" method="GET" id="bt-since-form" aria-labelledby="overnight-breakthroughs-caption" onsubmit="event.preventDefault(); applySinceDateFromInput();">
-                                <label class="bt-filter-label" for="bt-since-date">📅 Since:</label>
-                                <input type="date" id="bt-since-date" name="since" class="bt-date-input" onchange="applySinceDateFromInput()" />
-                                <button type="submit" class="bt-preset-btn" style="border-color:#38bdf8;color:#38bdf8;">Apply</button>
-                                <button type="button" class="bt-preset-btn is-active" id="bt-btn-24h" onclick="setBreakthroughWindowPreset('24h')">Last 24h</button>
-                                <button type="button" class="bt-preset-btn" id="bt-btn-7d" onclick="setBreakthroughWindowPreset('7d')">Last 7d</button>
-                                <button type="button" class="bt-preset-btn" id="bt-btn-all" onclick="setBreakthroughWindowPreset('all')">All Overnight (&gt;390K)</button>
-                            </form>
-                        </search>
+                    <caption id="overnight-breakthroughs-caption">
+                        <div class="caption-bar">
+                            <span id="bt-caption-text">🏆 Top Breakthrough Discoveries (<span id="bt-window-label" style="color:#38bdf8;">Last 24 Hours</span> · <span id="bt-edge-range-label" style="color:#34d399;font-family:ui-monospace,monospace;">Loading…</span>) — Click any Protein ID, Organism, or Metric Score</span>
+                            <search class="bt-filter-search" aria-label="Filter top breakthrough discoveries by since date">
+                                <form class="bt-filter-form" action="/telemetry" method="GET" id="bt-since-form" aria-labelledby="overnight-breakthroughs-caption" onsubmit="event.preventDefault(); applySinceDateFromInput();">
+                                    <label class="bt-filter-label" for="bt-since-date">📅 Since:</label>
+                                    <input type="date" id="bt-since-date" name="since" class="bt-date-input" onchange="applySinceDateFromInput()" />
+                                    <button type="submit" class="bt-preset-btn" style="border-color:#38bdf8;color:#38bdf8;">Apply</button>
+                                    <button type="button" class="bt-preset-btn is-active" id="bt-btn-24h" onclick="setBreakthroughWindowPreset('24h')">Last 24h</button>
+                                    <button type="button" class="bt-preset-btn" id="bt-btn-7d" onclick="setBreakthroughWindowPreset('7d')">Last 7d</button>
+                                    <button type="button" class="bt-preset-btn" id="bt-btn-all" onclick="setBreakthroughWindowPreset('all')">All Overnight (&gt;390K)</button>
+                                </form>
+                            </search>
+                        </div>
                     </caption>
                     <thead>
                         <tr>
@@ -4799,33 +4945,15 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             </div>
         </section>
 
-        <!-- Autonomous Agent Hypothesis & Bio-Pipeline Validation Ledger -->
-        <section class="breakthrough-panel" id="hypotheses-section" aria-label="Autonomous Agent Hypothesis and DUF Evolution Ledger">
-            <div tabindex="0" role="region" aria-labelledby="agent-hypotheses-caption" class="table-wrapper">
-                <table class="tel-table">
-                    <caption id="agent-hypotheses-caption" style="color:#c084fc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>🤖 Autonomous Bio-Pipeline Hypothesis Ledger (`bio_hypothesis_ledger`) — Click any Metric, Protein, or Pipeline to jump to its RK4 Twin or 3D Compare Lab</span>
-                        <a id="agent-chk-badge" href="#hypotheses-section" class="tel-metric-link" style="font-size:0.76rem;color:#34d399;font-family:ui-monospace,monospace;">In-Process Swarm Hook (Every 25 Waves) + Cron (*/30m) Active</a>
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th>Hypothesis Code &amp; Status</th>
-                            <th>Target Bio-Pipeline &amp; Role</th>
-                            <th>Discovery Pair (Candidate × Ref)</th>
-                            <th>Hypothesis &amp; Biological Rationale</th>
-                            <th>3D Fold Gate &amp; Pocket IoU</th>
-                            <th>48h RK4 Yield (Δ)</th>
-                            <th>Inspect RK4 / 3D</th>
-                        </tr>
-                    </thead>
-                    <tbody id="agent-hypotheses-tbody"></tbody>
-                </table>
-            </div>
-
-            <div tabindex="0" role="region" aria-labelledby="agent-duf-caption" class="table-wrapper" id="duf-section" style="margin-top:8px;">
+        <!-- Evolving Dark-Proteome (DUF) Annotations & Published Blog Library (Resolved Hypotheses Promoted to Main Screen) -->
+        <section class="breakthrough-panel" id="hypotheses-section" aria-label="Evolving Dark-Proteome DUF Annotations and Blog Library">
+            <div tabindex="0" role="region" aria-labelledby="agent-duf-caption" class="table-wrapper" id="duf-section">
                 <table class="tel-table">
                     <caption id="agent-duf-caption" style="color:#38bdf8;">
-                        🧬 Evolving Dark-Proteome (`DUF` / Uncharacterized) Functional Annotations (`bio_annotation_evolution`) — Click any Orphan ID, Partner, or Metric to inspect in 3D
+                        <div class="caption-bar">
+                            <span>🧬 Evolving Dark-Proteome (`DUF` / Uncharacterized) Functional Annotations (`bio_annotation_evolution`) — Click any Orphan ID, Partner, or Metric to inspect in 3D</span>
+                            <span id="agent-chk-badge" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;">In-Process Swarm Hook (Every 25 Waves) + Cron (*/30m) Active</span>
+                        </div>
                     </caption>
                     <thead>
                         <tr>
@@ -4844,9 +4972,11 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
 
             <div tabindex="0" role="region" aria-labelledby="blog-posts-caption" class="table-wrapper" id="blog-posts-section" style="margin-top:12px;">
                 <table class="tel-table">
-                    <caption id="blog-posts-caption" style="color:#fbbf24;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <span>📚 Published `ideia.me` Swarm Discovery &amp; Bio-Pipelines Blog Posts Library (18 Articles) — Linked to Live 3D Arenas &amp; 48h RK4 Digital Twins</span>
-                        <a href="https://ideia.me" target="_blank" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">https://ideia.me ↗</a>
+                    <caption id="blog-posts-caption" style="color:#fbbf24;">
+                        <div class="caption-bar">
+                            <span>📚 Published `ideia.me` Swarm Discovery &amp; Bio-Pipelines Blog Posts Library (18 Articles) — Linked to Live 3D Arenas &amp; 48h RK4 Digital Twins</span>
+                            <a href="https://ideia.me" target="_blank" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">https://ideia.me ↗</a>
+                        </div>
                     </caption>
                     <thead>
                         <tr>
@@ -4882,6 +5012,117 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
 
         // Breakthrough Since-Date Filter State (Default: '24h' = Last 24 Hours)
         var ACTIVE_BT_SINCE = (new URLSearchParams(window.location.search).get('since') || '24h').trim() || '24h';
+        var ACTIVE_PZ_FILTER = 'all';
+        var LAST_OPEN_PUZZLES = [];
+
+        function setPuzzleBoardFilter(mode) {
+            ACTIVE_PZ_FILTER = mode || 'all';
+            const bAll = document.getElementById('pz-btn-all');
+            const b3 = document.getElementById('pz-btn-3');
+            const b2 = document.getElementById('pz-btn-2');
+            if (bAll) bAll.classList.toggle('is-active', ACTIVE_PZ_FILTER === 'all');
+            if (b3) b3.classList.toggle('is-active', ACTIVE_PZ_FILTER === '3');
+            if (b2) b2.classList.toggle('is-active', ACTIVE_PZ_FILTER === '2');
+            renderOpenPuzzlesRows(LAST_OPEN_PUZZLES);
+        }
+
+        function renderOpenPuzzlesRows(openPzs) {
+            const pzsEl = document.getElementById('puzzles-board-tbody');
+            if (!pzsEl) return;
+            const cnt3 = openPzs.filter(x => x.slots_filled === 3).length;
+            const cnt2 = openPzs.filter(x => x.slots_filled === 2).length;
+            const cntLbl = document.getElementById('open-puzzles-cnt-lbl');
+            if (cntLbl) cntLbl.textContent = openPzs.length;
+            const cAllEl = document.getElementById('pz-cnt-all');
+            if (cAllEl) cAllEl.textContent = openPzs.length;
+            const c3El = document.getElementById('pz-cnt-3');
+            if (c3El) c3El.textContent = cnt3;
+            const c2El = document.getElementById('pz-cnt-2');
+            if (c2El) c2El.textContent = cnt2;
+            const st5El = document.getElementById('st5-meta');
+            if (st5El) st5El.textContent = `${cnt3} Near-Lock (3/4) · ${cnt2} Two-Phase Combos (2/4)`;
+
+            const filtered = ACTIVE_PZ_FILTER === '3'
+                ? openPzs.filter(x => x.slots_filled === 3)
+                : (ACTIVE_PZ_FILTER === '2' ? openPzs.filter(x => x.slots_filled === 2) : openPzs);
+
+            pzsEl.innerHTML = filtered.map(pz => {
+                const lockedPhases = (pz.slots || []).filter(s => s.locked).map(s => 'M' + s.phase).join('+');
+                const openPhases = (pz.slots || []).filter(s => !s.locked).map(s => 'M' + s.phase).join(', ');
+                const isThree = pz.slots_filled === 3;
+                const stBadge = isThree
+                    ? `<span style="background:rgba(245,158,11,0.20);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:800;">⏳ NEAR-LOCK (3/4 · ${lockedPhases} Locked · Missing ${openPhases})</span>`
+                    : `<span style="background:rgba(192,132,252,0.20);color:#e9d5ff;border:1px solid rgba(192,132,252,0.55);padding:2px 9px;border-radius:999px;font-size:0.7rem;font-weight:800;">🧩 2-PHASE COMBO (2/4 · ${lockedPhases} Locked · Open ${openPhases})</span>`;
+                const matrixPills = (pz.slots || []).map(sl => {
+                    const pCol = sl.locked
+                        ? 'background:rgba(16,185,129,0.22);border:1px solid #10b981;color:#34d399;'
+                        : 'background:rgba(245,158,11,0.18);border:1px dashed #f59e0b;color:#fbbf24;';
+                    return `<span style="${pCol}padding:1px 7px;border-radius:4px;font-size:0.68rem;font-family:ui-monospace,monospace;font-weight:800;">${sl.locked ? '🟢' : '⏳'}M${sl.phase}</span>`;
+                }).join('');
+                const slotsHtml = (pz.slots || []).map(sl => {
+                    const slotCls = sl.locked ? 'pz-slot-box is-locked' : 'pz-slot-box is-open';
+                    const uidLink = sl.uid
+                        ? `<a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(sl.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;font-size:0.82rem;">${sl.uid}</a>`
+                        : `<span style="color:#fbbf24;font-weight:800;font-size:0.76rem;">⏳ ANY-ORDER OPEN SLOT</span>`;
+                    const sqlGateClean = (sl.sql_gate || '').replace(/"/g, '&quot;');
+                    return `
+                        <div class="${slotCls}" title="Embedded SQL Gate: ${sqlGateClean}">
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                                <span style="font-weight:800;color:${sl.locked ? '#34d399' : '#fbbf24'};">${sl.locked ? '🟢' : '⏳'} Phase ${sl.phase} · ${sl.role}</span>
+                                <code style="font-size:0.65rem;color:#67e8f9;background:rgba(2,6,23,0.65);padding:1px 5px;border-radius:4px;border:1px solid #1e293b;" title="${sqlGateClean}">SQL Gate ⓘ</code>
+                            </div>
+                            <div style="margin-top:1px;">
+                                ${uidLink}
+                                <span style="color:#94a3b8;font-size:0.71rem;display:block;">${sl.org || ''}</span>
+                            </div>
+                            <div style="color:#cbd5e1;font-size:0.71rem;border-top:1px solid rgba(51,65,85,0.45);padding-top:4px;margin-top:2px;">
+                                ${sl.metric || sl.cond}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                const lockedSlots = (pz.slots || []).filter(s => s.locked && s.uid);
+                const firstUid = (lockedSlots[0] || {}).uid || 'A0A0D6JTS1';
+                const secondUid = (lockedSlots[1] || {}).uid;
+                const actionBtn = secondUid
+                    ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+                           <a class="tel-btn" style="padding:5px 10px;font-size:0.73rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}&challenger=${encodeURIComponent(secondUid)}">🃏 ${firstUid} × ${secondUid}</a>
+                           <a class="tel-btn" style="padding:5px 10px;font-size:0.73rem;border-color:#38bdf8;color:#38bdf8;" href="/compare?node1=${encodeURIComponent(firstUid)}&node2=${encodeURIComponent(secondUid)}&preset=rangefinder">🔬 3D Pair Lab</a>
+                       </div>`
+                    : `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🔭 Inspect Locked Hub</a>`;
+                return `
+                    <article class="puzzle-card ${isThree ? '' : 'is-two-phase'}">
+                        <div class="pz-card-top">
+                            <div class="pz-ident-block">
+                                <div class="pz-badges-row">
+                                    ${stBadge}
+                                    ${matrixPills}
+                                    <span style="background:#020617;border:1px solid #334155;color:#cbd5e1;padding:2px 8px;border-radius:999px;font-size:0.69rem;font-weight:700;">🌡️ ${pz.regime_envelope}</span>
+                                </div>
+                                <div class="pz-title-row">
+                                    <span class="pz-slug">${pz.puzzle_id}</span>
+                                    <span class="pz-title-text">${pz.title}</span>
+                                </div>
+                            </div>
+                            <div class="pz-kpi-actions">
+                                <div class="pz-yield-pill" title="Stoichiometry balance: ${pz.stoichiometry_balance}">
+                                    <span style="color:#34d399;font-weight:800;font-size:0.9rem;">48h RK4: ${pz.rk4_48h_yield_pct.toFixed(1)}% <span style="color:#fbbf24;font-size:0.76rem;">(+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink)</span></span>
+                                    <span style="color:#94a3b8;font-size:0.67rem;">Stoich balance: ${pz.stoichiometry_balance}</span>
+                                </div>
+                                ${actionBtn}
+                            </div>
+                        </div>
+                        <div class="pz-slots-grid">
+                            ${slotsHtml}
+                        </div>
+                        <div class="pz-card-footer">
+                            <div style="color:#cbd5e1;"><b style="color:#38bdf8;">🧬 Organism Composition Rule:</b> ${pz.target_organism_rule}</div>
+                            <div style="color:${isThree ? '#fde047' : '#e9d5ff'};"><b>🎯 Out-of-Order Auto-Compile Trigger:</b> ${pz.missing_slot_hint}</div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
 
         function syncBreakthroughFilterUI(meta) {
             const dtInput = document.getElementById('bt-since-date');
@@ -5188,64 +5429,10 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                         </tr>
                     `).join('');
 
-                    // 5b. Render Open Bioprocess Puzzle Board & 4-Phase Embedded Validation Gates
-                    const pzs = d.pipeline_puzzles || [];
-                    const pzsEl = document.getElementById('puzzles-board-tbody');
-                    if (pzsEl) {
-                        const autoCnt = pzs.filter(x => x.slots_filled === 4).length;
-                        const openCnt = pzs.length - autoCnt;
-                        const st5El = document.getElementById('st5-meta');
-                        if (st5El) st5El.textContent = `${8 + autoCnt} Compiled RK4 · ${openCnt} Open Puzzles (3/4)`;
-                        pzsEl.innerHTML = pzs.map(pz => {
-                            const isComplete = pz.slots_filled === 4;
-                            const stBadge = isComplete
-                                ? `<span style="background:rgba(16,185,129,0.20);color:#34d399;border:1px solid rgba(16,185,129,0.5);padding:2px 8px;border-radius:999px;font-size:0.68rem;font-weight:800;">🟢 AUTO-COMPILED (4/4)</span>`
-                                : `<span style="background:rgba(245,158,11,0.20);color:#fbbf24;border:1px solid rgba(245,158,11,0.5);padding:2px 8px;border-radius:999px;font-size:0.68rem;font-weight:800;">⏳ NEAR-LOCK (${pz.slots_filled}/4)</span>`;
-                            const slotsHtml = (pz.slots || []).map(sl => {
-                                const bStyle = sl.locked
-                                    ? 'background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#34d399;'
-                                    : 'background:rgba(245,158,11,0.16);border:1px dashed rgba(245,158,11,0.65);color:#fbbf24;';
-                                const uidLink = sl.uid
-                                    ? `<a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(sl.uid)}" style="color:#f8fafc;font-weight:800;">${sl.uid}</a>`
-                                    : `<span style="color:#fbbf24;font-weight:800;">OPEN SLOT</span>`;
-                                return `
-                                    <div style="${bStyle}border-radius:6px;padding:5px 8px;margin-bottom:4px;font-size:0.72rem;" title="SQL Gate: ${(sl.sql_gate || '').replace(/"/g, '&quot;')}">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
-                                            <span><b>${sl.locked ? '🟢' : '⏳'} Phase ${sl.phase} (${sl.role}):</b> ${uidLink} <span style="color:#94a3b8;">(${sl.org || ''})</span></span>
-                                            <code style="font-size:0.66rem;color:#67e8f9;">${(sl.sql_gate || '').slice(0, 44)}${(sl.sql_gate || '').length > 44 ? '…' : ''}</code>
-                                        </div>
-                                        <div style="color:#cbd5e1;font-size:0.69rem;margin-top:2px;">${sl.metric || sl.cond}</div>
-                                    </div>
-                                `;
-                            }).join('');
-                            const actionBtn = isComplete
-                                ? `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#10b981;color:#34d399;background:rgba(16,185,129,0.15);" href="/?pipeline=${encodeURIComponent(pz.puzzle_id)}">⚡ Launch 48h RK4 Twin</a>`
-                                : `<a class="tel-btn" style="padding:5px 10px;font-size:0.74rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent((pz.slots.find(s => s.uid) || {}).uid || 'A0A0D6JTS1')}">🔭 Inspect Locked Hub</a>`;
-                            return `
-                                <tr>
-                                    <th>
-                                        <div style="margin-bottom:4px;">${stBadge}</div>
-                                        <b style="color:#38bdf8;font-size:0.86rem;">${pz.puzzle_id}</b><br>
-                                        <span style="color:#cbd5e1;font-size:0.73rem;font-weight:400;">${pz.title}</span>
-                                    </th>
-                                    <td>
-                                        <b style="color:#f8fafc;">${pz.regime_envelope}</b><br>
-                                        <span style="color:#a5f3fc;font-size:0.73rem;"><b>Organism Rule:</b> ${pz.target_organism_rule}</span>
-                                    </td>
-                                    <td style="min-width:360px;">${slotsHtml}</td>
-                                    <td>
-                                        <b style="color:#34d399;font-size:0.94rem;">${pz.rk4_48h_yield_pct.toFixed(1)}%</b><br>
-                                        <span style="color:#6ee7b7;font-size:0.73rem;">(+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink)</span><br>
-                                        <span style="color:#94a3b8;font-size:0.69rem;">Stoich err: ${pz.stoichiometry_balance}</span>
-                                    </td>
-                                    <td style="max-width:270px;font-size:0.75rem;color:${isComplete ? '#6ee7b7' : '#fde047'};line-height:1.45;">
-                                        ${pz.missing_slot_hint}
-                                    </td>
-                                    <td>${actionBtn}</td>
-                                </tr>
-                            `;
-                        }).join('');
-                    }
+                    // 5b. Render Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds; 4/4 graduate to main screen)
+                    const allPzs = d.pipeline_puzzles || [];
+                    LAST_OPEN_PUZZLES = allPzs.filter(x => x.slots_filled < 4);
+                    renderOpenPuzzlesRows(LAST_OPEN_PUZZLES);
 
                     // 6. Render 10 Compiled 4-Module Bio-Pipelines & RangeFinder GiST Matrix
                     const pgm = d.pipeline_gist_matrix || [];
@@ -7155,6 +7342,7 @@ def api_swarm_telemetry():
                            rk4_48h_yield_pct, rk4_yield_delta_pct, stoichiometry_balance,
                            status, missing_slot_hint
                     FROM bio_pipeline_puzzles
+                    WHERE slots_filled < slots_total
                     ORDER BY slots_filled DESC, rk4_48h_yield_pct DESC;
                 """)
                 pz_rows = cur.fetchall()
