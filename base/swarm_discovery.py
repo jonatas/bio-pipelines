@@ -310,6 +310,15 @@ def ensure_swarm_indexes(cur):
         ON orphan_discoveries (rf_score DESC NULLS LAST)
         WHERE rf_score IS NOT NULL;
     """)
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_orphan_disc_puzzle_pending
+        ON orphan_discoveries (vector_distance ASC, id ASC)
+        WHERE status = 'Pending' AND family_name LIKE 'Puzzle Retro-Feed (%';
+    """)
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_proteins_os_genus
+        ON proteins (split_part(split_part(name, 'OS=', 2), ' ', 1));
+    """)
 
     # Ensure pg_vectorsearch PRISM & Layered Centroid Register-Direct Fastscan columns and indexes exist
     cur.execute("CREATE EXTENSION IF NOT EXISTS pg_vectorsearch;")
@@ -996,6 +1005,156 @@ def expand_tpp_microprotein_knockouts_batch(cur, batch_size: int = 16, min_edge_
     return len(inserted_rows)
 
 
+def retro_feed_open_puzzle_frontier_nodes(conn, max_seeds: int = 12, target_puzzle_id: str = None) -> list[tuple]:
+    """
+    Closed-Loop Goal-Directed Puzzle Retro-Feeding Engine:
+    1. Queries `bio_pipeline_puzzles` and `bio_puzzle_slots` for active unresolved puzzles (`slots_filled < 4`,
+       or a specific `target_puzzle_id`).
+    2. Pairs each open/missing slot (`M1_Anchor`, `M2_Scissor`, `M3_Sink`, `M4_Beacon`) with the puzzle's locked
+       hub proteins (`s_locked.assigned_uniprot`) and scans the HNSW vector index (`p2.embedding <=> pt.hub_emb`)
+       for the closest unexpanded candidate proteins matching the target extremophile genus and missing module's
+       biophysical signature.
+    3. Enqueues those candidate edges directly into `orphan_discoveries` with `status = 'Pending'` and
+       `family_name = 'Puzzle Retro-Feed (' || puzzle_id || ' · Missing M' || missing_phase || ')'` so both the
+       swarm workers and the `/discovery?limit=puzzle-pending` heatmap recognize them as enqueued `Pending` next baits!
+    """
+    with conn.cursor() as cur:
+        try:
+            cur.execute("SELECT to_regclass('public.bio_pipeline_puzzles');")
+            if cur.fetchone()[0] is None:
+                return []
+            cur.execute("SET LOCAL hnsw.ef_search = 100;")
+            cur.execute("SET LOCAL synchronous_commit = off;")
+            pz_filter_sql = "AND p.puzzle_id = %s" if target_puzzle_id else ""
+            cand_per_pair = 8 if target_puzzle_id else 3
+            params = [target_puzzle_id, cand_per_pair] if target_puzzle_id else [cand_per_pair]
+            cur.execute(
+                f"""
+                WITH puzzle_targets AS (
+                    SELECT DISTINCT ON (p.puzzle_id, s_open.phase_number, s_locked.phase_number)
+                        p.puzzle_id,
+                        s_open.phase_number AS missing_phase,
+                        s_open.module_role AS missing_role,
+                        s_locked.assigned_uniprot AS hub_uid,
+                        COALESCE(NULLIF(s_locked.assigned_organism, ''), 'Archaea sp.') AS hub_org,
+                        CASE
+                            WHEN p.puzzle_id LIKE 'auto-%%-organic-machine' THEN initcap(split_part(p.puzzle_id, '-', 2))
+                            WHEN s_locked.assigned_organism IS NOT NULL
+                                 AND s_locked.assigned_organism <> ''
+                                 AND split_part(s_locked.assigned_organism, ' ', 1) NOT IN ('Candidatus','Solved','Auto-Discovered','Halophilic')
+                            THEN split_part(s_locked.assigned_organism, ' ', 1)
+                            ELSE split_part(p.title, ' ', 1)
+                        END AS target_genus,
+                        p_hub.sequence AS hub_seq,
+                        p_hub.embedding AS hub_emb
+                    FROM bio_pipeline_puzzles p
+                    JOIN bio_puzzle_slots s_open ON s_open.puzzle_id = p.puzzle_id AND s_open.is_locked = FALSE
+                    JOIN bio_puzzle_slots s_locked ON s_locked.puzzle_id = p.puzzle_id AND s_locked.is_locked = TRUE
+                    JOIN proteins p_hub ON p_hub.uniprot_id = s_locked.assigned_uniprot
+                    WHERE p.slots_filled < p.slots_total
+                      {pz_filter_sql}
+                    ORDER BY p.puzzle_id, s_open.phase_number, s_locked.phase_number
+                ),
+                hnsw_candidates AS (
+                    SELECT
+                        pt.puzzle_id,
+                        pt.missing_phase,
+                        pt.missing_role,
+                        pt.hub_uid,
+                        pt.hub_org,
+                        pt.hub_seq,
+                        pt.hub_emb,
+                        pt.target_genus,
+                        cand.uniprot_id AS next_bait_uid,
+                        cand.cand_org,
+                        cand.cand_seq,
+                        cand.cand_emb,
+                        GREATEST(0.01, cand.dist)::real AS vec_dist,
+                        'Puzzle Retro-Feed (' || pt.puzzle_id || ' · Missing M' || pt.missing_phase::text || ')' AS fam_tag
+                    FROM puzzle_targets pt
+                    JOIN LATERAL (
+                        SELECT
+                            h.uniprot_id,
+                            h.sequence AS cand_seq,
+                            h.embedding AS cand_emb,
+                            h.dist,
+                            COALESCE(NULLIF(split_part(split_part(h.name, 'OS=', 2), ' OX=', 1), ''), pt.target_genus || ' sp.') AS cand_org
+                        FROM (
+                            SELECT
+                                p2.uniprot_id,
+                                p2.name,
+                                p2.sequence,
+                                p2.embedding,
+                                (p2.embedding <=> pt.hub_emb) AS dist
+                            FROM proteins p2
+                            WHERE p2.uniprot_id <> pt.hub_uid
+                              AND p2.name LIKE '%%OS=%%'
+                            ORDER BY p2.embedding <=> pt.hub_emb ASC
+                            LIMIT 100
+                        ) h
+                        ORDER BY
+                            (split_part(split_part(h.name, 'OS=', 2), ' ', 1) = pt.target_genus) DESC,
+                            (
+                                (pt.missing_role = 'M1_Anchor' AND (length(h.sequence) <= 190 OR h.name ILIKE ANY(ARRAY['%%membrane%%','%%ferredoxin%%','%%carrier%%','%%PUA%%','%%lipoprotein%%','%%DUF%%','%%Uncharacterized%%'])))
+                                OR (pt.missing_role = 'M2_Scissor' AND length(h.sequence) BETWEEN 160 AND 650)
+                                OR (pt.missing_role = 'M3_Sink' AND (h.name ILIKE ANY(ARRAY['%%ligase%%','%%reductase%%','%%dehydrogenase%%','%%decarboxylase%%','%%mutase%%','%%synthase%%','%%transaminase%%','%%PFL%%','%%DUF%%','%%Uncharacterized%%'])))
+                                OR (pt.missing_role = 'M4_Beacon' AND (length(h.sequence) <= 290 OR h.name ILIKE ANY(ARRAY['%%regulator%%','%%sensor%%','%%ArsR%%','%%MarR%%','%%HTH%%','%%repressor%%','%%integrase%%','%%PhoU%%','%%TrkA%%','%%DUF%%','%%Uncharacterized%%'])))
+                            ) DESC,
+                            h.dist ASC
+                        LIMIT %s
+                    ) cand ON TRUE
+                    LIMIT %s
+                ),
+                reenqueue_existing AS (
+                    UPDATE orphan_discoveries od
+                    SET status = 'Pending',
+                        family_name = hc.fam_tag
+                    FROM hnsw_candidates hc
+                    WHERE od.bait_id = hc.hub_uid
+                      AND od.orphan_id = hc.next_bait_uid
+                      AND od.rf_score IS NULL
+                    RETURNING od.bait_id, od.orphan_id
+                ),
+                insert_fresh_pending AS (
+                    INSERT INTO orphan_discoveries (
+                        family_name, bait_id, bait_organism, orphan_id, orphan_organism,
+                        vector_distance, status, confidence_score
+                    )
+                    SELECT
+                        hc.fam_tag,
+                        hc.hub_uid,
+                        hc.hub_org,
+                        hc.next_bait_uid,
+                        hc.cand_org,
+                        hc.vec_dist,
+                        'Pending',
+                        ROUND(GREATEST(0.60, 1.0 - hc.vec_dist)::numeric, 4)
+                    FROM hnsw_candidates hc
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM orphan_discoveries e
+                        WHERE e.bait_id = hc.hub_uid AND e.orphan_id = hc.next_bait_uid
+                    )
+                    RETURNING orphan_id
+                )
+                SELECT DISTINCT ON (hc.next_bait_uid)
+                    hc.next_bait_uid,
+                    hc.fam_tag,
+                    hc.cand_org,
+                    hc.vec_dist,
+                    1 AS in_deg
+                FROM hnsw_candidates hc
+                ORDER BY hc.next_bait_uid, hc.vec_dist ASC;
+                """,
+                (*params, max(max_seeds * 2, 16)),
+            )
+            rows = cur.fetchall()
+            conn.commit()
+            return rows[:max_seeds]
+        except Exception:
+            conn.rollback()
+            return []
+
+
 def seed_unexpanded_proteome_islands(conn, target_nodes: int = 48) -> list[tuple]:
     """
     Idempotent Multi-Pass Ring Seeder (Pass 3: k=25..36, Pass 4: k=37..48, etc.):
@@ -1053,11 +1212,24 @@ def claim_dense_frontier_batch(conn, target_nodes: int = 48) -> list[tuple]:
         cur.execute("SET LOCAL synchronous_commit = off;")
         cur.execute("""
             WITH window_pending AS (
-                SELECT id, family_name, orphan_id, orphan_organism, vector_distance, confidence_score
-                FROM orphan_discoveries
-                WHERE status = 'Pending'
-                ORDER BY vector_distance ASC, id ASC
-                LIMIT %s
+                (
+                    SELECT id, family_name, orphan_id, orphan_organism,
+                           GREATEST(0.0, vector_distance - 0.05)::real AS vector_distance,
+                           confidence_score
+                    FROM orphan_discoveries
+                    WHERE status = 'Pending'
+                      AND family_name LIKE 'Puzzle Retro-Feed (%%'
+                    ORDER BY vector_distance ASC, id ASC
+                    LIMIT 24
+                )
+                UNION ALL
+                (
+                    SELECT id, family_name, orphan_id, orphan_organism, vector_distance, confidence_score
+                    FROM orphan_discoveries
+                    WHERE status = 'Pending'
+                    ORDER BY vector_distance ASC, id ASC
+                    LIMIT %s
+                )
             ),
             classified AS (
                 SELECT
@@ -1336,6 +1508,11 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
 
             # Claim a deduplicated batch of the closest unexpanded frontier nodes
             nodes = []
+            # Closed-Loop Puzzle Retro-Feeding: Every 5th wave, inject up to 6 frontier nodes from active open puzzle genera
+            if cycle % 5 == 0:
+                retro_nodes = retro_feed_open_puzzle_frontier_nodes(claim_conn, max_seeds=min(6, steps_per_wave // 3))
+                if retro_nodes:
+                    nodes.extend(retro_nodes)
             for _ in range(6):
                 if len(nodes) >= steps_per_wave:
                     break

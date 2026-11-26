@@ -43,17 +43,18 @@ HTML_TEMPLATE = """
     <div class="topbar">
         <div>
             <h2>Protein Correlation Swarm</h2>
-            <span class="subtitle">Pending (gray) vs Explored (blue). Click any cell to inspect 3D-aligned structures &amp; configurable pg_bio layers.</span>
+            <span class="subtitle">★ Locked Puzzle Hub (emerald) · ⏳ Enqueued Pending Bait (amber) · 🔵 Explored (blue). Click any cell to inspect 3D-aligned structures.</span>
         </div>
         <div class="controls">
             <label style="color: #cbd5e1; font-size: 0.86em;">Grid ViewPreset:</label>
-            <select id="grid-limit" onchange="loadData()" style="background: #1e293b; color: #fff; border: 1px solid #475569; padding: 5px 10px; border-radius: 6px; font-size: 0.85em;">
+            <select id="grid-limit" onchange="onGridLimitChange()" style="background: #1e293b; color: #fff; border: 1px solid #475569; padding: 5px 10px; border-radius: 6px; font-size: 0.85em;">
                 <option value="40" selected>Latest 40</option>
                 <option value="best-40">Top Best 40 Matches</option>
                 <option value="twilight-40">Top 40 Twilight-Zone Discoveries</option>
                 <option value="chaperone-40">Top 40 Chaperone Biophysical Correlations</option>
                 <option value="rangefinder-40">Top 40 RangeFinder Pocket-Interval Matches</option>
                 <option value="tpp-knockout-40">Top 40 Microprotein TPP Knockout Cascades (ΔTm &amp; TPCA)</option>
+                <option value="puzzle-pending">🧩 Open Puzzles: Enqueued Pending &amp; Locked Hubs (40)</option>
                 <option value="100">Latest 100</option>
                 <option value="250">Latest 250</option>
                 <option value="all">Latest 800 (Max)</option>
@@ -67,6 +68,22 @@ HTML_TEMPLATE = """
             <button class="help-btn" style="background: rgba(192, 132, 252, 0.15); color: #c084fc; border-color: #a855f7;" onclick="window.location.href='/telemetry'"><svg class="cmp-ms-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg> Telemetry</button>
             <button class="help-btn" style="background: rgba(16, 185, 129, 0.14); color: #34d399; border-color: #10b981;" onclick="window.open('/compare' + (window.currentNode1Id && window.currentNode2Id ? '?node1=' + window.currentNode1Id + '&node2=' + window.currentNode2Id : ''), '_blank')">🔬 3D Lab</button>
             <button class="help-btn" onclick="openHelpCenter('vector')">Wiki</button>
+        </div>
+    </div>
+    <div id="puzzle-swarm-banner" style="display:none; background:#060c1a; border-bottom:1px solid #1e293b; padding:7px 20px; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:0.8em;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span style="color:#e9d5ff; font-weight:800;">🧩 Puzzle Retrofeed Swarm Focus:</span>
+            <select id="puzzle-filter-select" onchange="onPuzzleFilterChange()" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:4px 9px; border-radius:6px; font-weight:700; font-size:0.96em; font-family:ui-monospace,monospace;">
+                <option value="">All Active Open Puzzles (12)</option>
+            </select>
+            <span id="puzzle-banner-missing" style="color:#fde047; font-size:0.94em;"></span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span id="pz-cnt-hubs" style="background:rgba(16,185,129,0.16); border:1px solid #10b981; color:#34d399; padding:2px 8px; border-radius:999px; font-weight:700;" title="Locked M1..M4 hub proteins already anchored in this puzzle">★ 0 Locked Hubs</span>
+            <span id="pz-cnt-pending" style="background:rgba(245,158,11,0.18); border:1px dashed #f59e0b; color:#fbbf24; padding:2px 8px; border-radius:999px; font-weight:700;" title="Enqueued Pending candidate baits retrofed into orphan_discoveries (status = 'Pending') for next match">⏳ 0 Enqueued Pending Baits</span>
+            <span id="pz-cnt-explored" style="background:rgba(56,189,248,0.14); border:1px solid #38bdf8; color:#38bdf8; padding:2px 8px; border-radius:999px; font-weight:700;" title="Explored correlation neighbors of the puzzle hubs">🔵 0 Explored Neighbors</span>
+            <button type="button" class="help-btn" id="btn-retrofeed-now" style="background:rgba(192,132,252,0.2); border-color:#c084fc; color:#e9d5ff; padding:4px 10px;" onclick="triggerPuzzleRetrofeed()" title="Scan HNSW vector neighbors matching the missing M1/M2/M3/M4 phase gates and enqueue them as Pending next baits">🎯 Retrofeed Closer Missing-Piece Baits</button>
+            <a href="/telemetry#puzzles-section" class="help-btn" style="padding:4px 9px; font-size:0.92em;">← Puzzle Board</a>
         </div>
     </div>
     <div id="heatmap"></div>
@@ -142,23 +159,97 @@ HTML_TEMPLATE = """
             modalInspector.loadPair(id1, id2, distance);
         }
 
+        function onGridLimitChange() {
+            const selVal = document.getElementById('grid-limit').value;
+            const u = new URL(window.location);
+            u.searchParams.set('limit', selVal);
+            if (selVal !== 'puzzle-pending') {
+                u.searchParams.delete('puzzle');
+            }
+            window.history.pushState({}, '', u);
+            loadData();
+        }
+
+        function onPuzzleFilterChange() {
+            const pzVal = document.getElementById('puzzle-filter-select').value;
+            const u = new URL(window.location);
+            u.searchParams.set('limit', 'puzzle-pending');
+            if (pzVal) u.searchParams.set('puzzle', pzVal);
+            else u.searchParams.delete('puzzle');
+            window.history.pushState({}, '', u);
+            loadData();
+        }
+
+        function triggerPuzzleRetrofeed() {
+            const btn = document.getElementById('btn-retrofeed-now');
+            const pzSel = document.getElementById('puzzle-filter-select');
+            const pzId = (pzSel && pzSel.value) ? pzSel.value : (new URLSearchParams(window.location.search).get('puzzle') || '');
+            if (btn) btn.textContent = '⏳ Enqueuing Closer Baits...';
+            fetch('/api/puzzle_retrofeed' + (pzId ? '?puzzle=' + encodeURIComponent(pzId) : ''), { method: 'POST' })
+                .then(r => r.json())
+                .then(res => {
+                    if (btn) btn.textContent = `✅ Enqueued +${res.enqueued_count || 0} Pending Baits!`;
+                    setTimeout(() => {
+                        if (btn) btn.textContent = '🎯 Retrofeed Closer Missing-Piece Baits';
+                    }, 3200);
+                    loadData();
+                })
+                .catch(() => {
+                    if (btn) btn.textContent = '🎯 Retrofeed Closer Missing-Piece Baits';
+                });
+        }
+
         function loadData() {
             let urlParams = new URLSearchParams(window.location.search);
             let urlLimit = urlParams.get('limit');
-            if (urlLimit && !window._urlLimitApplied) {
+            let urlPuzzle = urlParams.get('puzzle') || '';
+            if (!window._urlLimitApplied) {
                 window._urlLimitApplied = true;
                 let sel = document.getElementById('grid-limit');
-                if (sel) sel.value = urlLimit;
+                if (urlPuzzle && (!urlLimit || urlLimit === 'all')) {
+                    urlLimit = 'puzzle-pending';
+                }
+                if (urlLimit && sel) {
+                    sel.value = urlLimit;
+                }
             }
             let limitVal = document.getElementById('grid-limit').value;
             let p1 = urlParams.get('node1') || '';
             let p2 = urlParams.get('node2') || '';
+            let pzParam = (limitVal === 'puzzle-pending')
+                ? (urlParams.get('puzzle') || (document.getElementById('puzzle-filter-select') || {}).value || '')
+                : '';
+
+            const bannerEl = document.getElementById('puzzle-swarm-banner');
+            if (bannerEl) {
+                bannerEl.style.display = (limitVal === 'puzzle-pending') ? 'flex' : 'none';
+                setTimeout(() => chart.resize(), 20);
+            }
 
             chart.showLoading({ text: 'Fetching Swarm Matrix...', color: '#38bdf8', textColor: '#fff', maskColor: 'rgba(9, 13, 22, 0.8)' });
-            fetch('/api/data?limit=' + limitVal + '&n1=' + p1 + '&n2=' + p2)
+            fetch('/api/data?limit=' + encodeURIComponent(limitVal) + '&puzzle=' + encodeURIComponent(pzParam) + '&n1=' + encodeURIComponent(p1) + '&n2=' + encodeURIComponent(p2))
                 .then(r => r.json())
                 .then(data => {
                     chart.hideLoading();
+                    if (data.puzzle_meta) {
+                        const pm = data.puzzle_meta;
+                        const pzSel = document.getElementById('puzzle-filter-select');
+                        if (pzSel && pm.open_puzzles) {
+                            const curVal = pm.active_puzzle_id || '';
+                            pzSel.innerHTML = `<option value="">All Active Open Puzzles (${pm.open_puzzles.length})</option>` +
+                                pm.open_puzzles.map(op =>
+                                    `<option value="${op.puzzle_id}" ${op.puzzle_id === curVal ? 'selected' : ''}>[${op.slots_filled}/${op.slots_total}] ${op.puzzle_id} (Missing ${op.missing_phases})</option>`
+                                ).join('');
+                        }
+                        const missEl = document.getElementById('puzzle-banner-missing');
+                        if (missEl) missEl.textContent = pm.active_hint || '';
+                        const cHub = document.getElementById('pz-cnt-hubs');
+                        const cPend = document.getElementById('pz-cnt-pending');
+                        const cExp = document.getElementById('pz-cnt-explored');
+                        if (cHub && pm.counts) cHub.textContent = `★ ${pm.counts.locked_hubs || 0} Locked Hubs`;
+                        if (cPend && pm.counts) cPend.textContent = `⏳ ${pm.counts.enqueued_pending || 0} Enqueued Pending Baits`;
+                        if (cExp && pm.counts) cExp.textContent = `🔵 ${pm.counts.explored_neighbors || 0} Explored Neighbors`;
+                    }
                     if (!data.nodes || data.nodes.length === 0) return;
 
                     let labels = data.nodes.map(n => n.id);
@@ -168,6 +259,33 @@ HTML_TEMPLATE = """
                             let val = data.matrix[i][j];
                             heatmapData.push([j, i, val === null ? '-' : Number(val.toFixed(4))]);
                         }
+                    }
+
+                    function nodeAxisColor(val) {
+                        let node = data.nodes.find(n => n.id === val);
+                        if (!node) return '#888';
+                        if (node.status === 'LockedHub') return '#34d399';
+                        if (node.status === 'Pending') return '#fbbf24';
+                        if (node.status === 'Explored') return '#38bdf8';
+                        return '#94a3b8';
+                    }
+
+                    function nodeAxisLabel(val) {
+                        let node = data.nodes.find(n => n.id === val);
+                        if (!node) return val;
+                        if (node.status === 'LockedHub') return '★ ' + val;
+                        if (node.status === 'Pending') return '⏳ ' + val;
+                        return val;
+                    }
+
+                    function statusBadgeHtml(n) {
+                        if (n.status === 'LockedHub') {
+                            return `<span style="background:rgba(16,185,129,0.22);border:1px solid #10b981;color:#34d399;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;">★ LOCKED PUZZLE HUB</span>`;
+                        }
+                        if (n.status === 'Pending') {
+                            return `<span style="background:rgba(245,158,11,0.22);border:1px dashed #f59e0b;color:#fbbf24;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;">⏳ ENQUEUED PENDING (Retrofed Next Bait)</span>`;
+                        }
+                        return `<span style="background:rgba(56,189,248,0.18);border:1px solid #38bdf8;color:#38bdf8;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;">🔵 EXPLORED</span>`;
                     }
 
                     let option = {
@@ -196,11 +314,19 @@ HTML_TEMPLATE = """
                                                `<span style="color:#fb7185;">Staple: <b>${micro.id} (${micro.length}aa)</b> → Complex: <b>${comp.id} (${comp.length}aa)</b></span><br>` +
                                                `<span style="color:#f43f5e;">CETSA Melting Shift: <b>WT ${tmWt}°C → KO ${tmKo}°C (ΔTm -${estDrop}°C)</b></span><br>` +
                                                `<span style="color:#34d399;">Ideal Reactor Temp (T_opt): <b>${tOptKo}°C → ${tOptWt}°C (${gainX}× Output)</b></span></div>`;
+                                } else if (limitVal === 'puzzle-pending') {
+                                    let pzNote = (n1.status === 'Pending' || n2.status === 'Pending')
+                                        ? `<span style="color:#fbbf24;">⏳ Enqueued in <code>orphan_discoveries</code> (<code>status='Pending'</code>) for next HNSW + 3D RangeFinder puzzle lock!</span>`
+                                        : `<span style="color:#34d399;">★ Locked Puzzle Hub correlation neighborhood</span>`;
+                                    tppExtra = `<div style="margin-top:4px;padding-top:4px;border-top:1px solid #334155;">` +
+                                               `<span style="color:#e9d5ff;"><b>${n1.family || 'Open Puzzle'}</b></span><br>${pzNote}</div>`;
                                 }
-                                return `<b>${n1.id}</b> (${n1.organism} · ${n1.length}aa)<br>vs<br><b>${n2.id}</b> (${n2.organism} · ${n2.length}aa)<br>` +
+                                return `<b>${n1.id}</b> ${statusBadgeHtml(n1)}<br><span style="color:#cbd5e1;font-size:11px;">${n1.organism} · ${n1.length}aa</span><br>` +
+                                       `vs<br>` +
+                                       `<b>${n2.id}</b> ${statusBadgeHtml(n2)}<br><span style="color:#cbd5e1;font-size:11px;">${n2.organism} · ${n2.length}aa</span><br>` +
                                        `<span style="color:#38bdf8">Cosine Distance: <b>${params.value[2]}</b></span>` +
                                        tppExtra + `<br>` +
-                                       `<span style="color:#94a3b8;font-size:11px;">Click to open 3D Compare Inspector (Phase 13 TPP Seam)</span>`;
+                                       `<span style="color:#94a3b8;font-size:11px;">Click to open 3D Compare Inspector</span>`;
                             }
                         },
                         grid: { top: '4%', bottom: '14%', left: '10%', right: '8%' },
@@ -208,20 +334,16 @@ HTML_TEMPLATE = """
                             type: 'category', data: labels, triggerEvent: true,
                             axisLabel: {
                                 rotate: 45, fontSize: 10,
-                                color: function(val) {
-                                    let node = data.nodes.find(n => n.id === val);
-                                    return node && node.status === 'Explored' ? '#38bdf8' : '#888';
-                                }
+                                formatter: nodeAxisLabel,
+                                color: nodeAxisColor
                             }
                         },
                         yAxis: {
                             type: 'category', data: labels, triggerEvent: true,
                             axisLabel: {
                                 fontSize: 10,
-                                color: function(val) {
-                                    let node = data.nodes.find(n => n.id === val);
-                                    return node && node.status === 'Explored' ? '#38bdf8' : '#888';
-                                }
+                                formatter: nodeAxisLabel,
+                                color: nodeAxisColor
                             }
                         },
                         visualMap: {
@@ -244,10 +366,11 @@ HTML_TEMPLATE = """
 
                     chart.on('mouseover', function(params) {
                         if (params.componentType === 'xAxis' || params.componentType === 'yAxis') {
-                            hoveredNode = data.nodes.find(n => n.id === params.value);
+                            let rawVal = String(params.value || '').replace(/^[★⏳]\\s*/, '');
+                            hoveredNode = data.nodes.find(n => n.id === rawVal);
                             if (hoveredNode) {
-                                axisTooltip.innerHTML = `<b style="color:#38bdf8;">${hoveredNode.id} (${hoveredNode.status})</b><br>` +
-                                    `<b>Family:</b> ${hoveredNode.family}<br>` +
+                                axisTooltip.innerHTML = `<b style="color:#38bdf8;">${hoveredNode.id}</b> ${statusBadgeHtml(hoveredNode)}<br>` +
+                                    `<b>Role / Puzzle:</b> ${hoveredNode.family}<br>` +
                                     `<b>Organism:</b> ${hoveredNode.organism}<br>` +
                                     `<b>Name:</b> ${hoveredNode.name}<br>` +
                                     `<b>Length:</b> ${hoveredNode.length} aa`;
@@ -4911,21 +5034,62 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             </div>
         </section>
 
-        <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds; 4/4 Resolved graduate to / ) -->
+        <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds + Daisy-Chained M5/M6/M7 Composite Super-Pipelines + Interactive Routing Graph) -->
         <section class="breakthrough-panel" id="puzzles-section" aria-label="Open Bioprocess Puzzle Board and 4-Phase Embedded Validation Gates">
             <div class="puzzles-board-header" id="puzzles-board-caption">
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <span class="puzzles-board-title">🧩 Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">7</span> Active · Out-of-Order Phase Lock)</span>
-                    <a href="/discovery?limit=all" class="pz-pending-pill" id="pz-total-frontier-pill" title="Active Pending Edge Connections in orphan_discoveries (status = 'Pending') that are scouting the target extremophile genera and locked hubs of these 7 open puzzles">🛰️ ~495.9K / 1.37M Pending Edges (36.1% of Frontier) Scouting Open Puzzles</a>
+                    <span class="puzzles-board-title">🧩 Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">12</span> Active · Out-of-Order Phase Lock &amp; M5/M6/M7 Composite Graph)</span>
+                    <a href="/discovery?limit=puzzle-pending" class="pz-pending-pill" id="pz-total-frontier-pill" title="Inspect enqueued Pending next-bait candidates (status = 'Pending') and Locked Hubs across all Open Puzzles in the Swarm Discovery Grid">🛰️ ~495.9K / 1.37M Pending Edges (36.1% of Frontier) Scouting Open Puzzles</a>
                 </div>
                 <div class="puzzles-filter-group">
-                    <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All (<span id="pz-cnt-all">7</span>)</button>
+                    <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All Open (<span id="pz-cnt-all">12</span>)</button>
                     <button type="button" class="bt-preset-btn" id="pz-btn-3" onclick="setPuzzleBoardFilter('3')">⏳ 3/4 Near-Lock (<span id="pz-cnt-3">3</span>)</button>
-                    <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Seeds (<span id="pz-cnt-2">4</span>)</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Seeds (<span id="pz-cnt-2">9</span>)</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-comp" style="border-color:#c084fc;color:#e9d5ff;" onclick="setPuzzleBoardFilter('composite')">🔗 Composite M5·M6·M7 Chains (<span id="pz-cnt-comp">4</span>)</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-graph" style="border-color:#10b981;color:#34d399;background:rgba(16,185,129,0.14);" onclick="setPuzzleBoardFilter('graph')">🕸️ Interactive Routing Graph</button>
                     <a href="/" class="tel-metric-link" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;margin-left:4px;">⚡ 10 Compiled &rarr;</a>
                 </div>
             </div>
+
+            <!-- Interactive Bipartite Metabolic & Module Routing Hypergraph (ECharts Force + Inspector Sidebar) -->
+            <div id="puzzle-routing-graph-wrap" style="background:#060b16;border:1px solid #1e293b;border-radius:10px;padding:12px;margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e293b;">
+                    <div>
+                        <span style="font-size:0.86rem;font-weight:800;color:#34d399;">🕸️ Interactive Bioprocess Metabolic &amp; Module Routing Hypergraph (<span id="pg-nodes-cnt">0</span> Nodes · <span id="pg-edges-cnt">0</span> Directed Edges)</span>
+                        <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">
+                            Non-sequential directed reaction &amp; cofactor graph: <b>Shared Keystone Hubs</b> (e.g. <code>A0A1N7D179</code> Ferredoxin, <code>L9VS02</code> SAM Shield, <code>M0GR98</code> S-Layer Anchor, <code>V5TNY2</code> Clamp) bridge multiple pipelines while <b>Dashed Amber Edges (<code>⏳</code>)</b> mark open out-of-order phase slots actively hunted by the swarm.
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:0.69rem;font-weight:700;">
+                        <span style="color:#38bdf8;">◆ Metabolite / Handoff Pool</span>
+                        <span style="color:#34d399;">● M1 Anchor</span>
+                        <span style="color:#60a5fa;">● M2 Scissor</span>
+                        <span style="color:#a78bfa;">● M3 Sink</span>
+                        <span style="color:#f472b6;">● M4 Beacon</span>
+                        <span style="color:#fbbf24;">▲ M5·M6·M7 Post-Process</span>
+                        <span style="color:#f59e0b;border-bottom:2px dashed #f59e0b;">- - ⏳ Open Slot Gap</span>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:stretch;">
+                    <div id="chart-puzzle-routing-graph" style="width:100%;height:460px;background:radial-gradient(circle at 50% 50%, #0b1528 0%, #050912 100%);border-radius:8px;border:1px solid #1e293b;"></div>
+                    <aside id="puzzle-graph-inspector" style="background:#0b1324;border:1px solid #1e293b;border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;font-size:0.75rem;">
+                        <div id="pg-insp-content">
+                            <div style="color:#38bdf8;font-weight:800;font-size:0.82rem;margin-bottom:4px;">🔭 Graph Node &amp; Edge Inspector</div>
+                            <div style="color:#94a3b8;line-height:1.45;">Click any <b>Protein Module</b>, <b>Shared Metabolite Pool</b>, <b>Keystone Hub</b>, or <b>⏳ Open Slot Node</b> in the graph to inspect its 3D pocket gates, cross-pipeline connections, and live Pending frontier coverage.</div>
+                        </div>
+                        <div id="pg-keystone-list" style="border-top:1px solid #1e293b;padding-top:8px;"></div>
+                    </aside>
+                </div>
+            </div>
+
             <div tabindex="0" role="region" aria-labelledby="puzzles-board-caption" class="puzzles-cards-grid" id="puzzles-board-tbody"></div>
+            <div id="composite-chains-wrap" style="margin-top:12px;border-top:1px solid #1e293b;padding-top:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                    <span style="font-size:0.84rem;font-weight:800;color:#e9d5ff;">🔗 Daisy-Chained Composite Super-Pipelines (<code style="color:#38bdf8;">Pipeline A Product &rarr; Pipeline B Feedstock</code>) &amp; Post-Processing Infrastructure (<code style="color:#34d399;">M5 Exporter</code> · <code style="color:#fbbf24;">M6 Cofactor Bus</code> · <code style="color:#c084fc;">M7 Chassis Armor</code>)</span>
+                    <span style="font-size:0.72rem;color:#94a3b8;font-family:ui-monospace,monospace;">Verified via 8/8 RangeFinder GiST Containment + PAINS Filter + Coupled 96h RK4</span>
+                </div>
+                <div class="puzzles-cards-grid" id="composite-chains-tbody"></div>
+            </div>
         </section>
 
         <!-- 10 Compiled 4-Module Bio-Pipelines & Live RangeFinder 8-Column GiST Reverse Target Fishing Matrix -->
@@ -5042,12 +5206,14 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         var chCalib = echarts.init(document.getElementById('chart-calibration'));
         var chRegimes = echarts.init(document.getElementById('chart-regimes'));
         var chLive = echarts.init(document.getElementById('chart-live-waves'));
+        var chPuzzleGraph = echarts.init(document.getElementById('chart-puzzle-routing-graph'));
 
         window.addEventListener('resize', () => {
             chTimeline.resize();
             chCalib.resize();
             chRegimes.resize();
             chLive.resize();
+            if (chPuzzleGraph) chPuzzleGraph.resize();
         });
 
         function fmtNum(n) {
@@ -5058,16 +5224,386 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
         var ACTIVE_BT_SINCE = (new URLSearchParams(window.location.search).get('since') || '24h').trim() || '24h';
         var ACTIVE_PZ_FILTER = 'all';
         var LAST_OPEN_PUZZLES = [];
+        var LAST_COMPOSITE_CHAINS = [];
 
         function setPuzzleBoardFilter(mode) {
             ACTIVE_PZ_FILTER = mode || 'all';
             const bAll = document.getElementById('pz-btn-all');
             const b3 = document.getElementById('pz-btn-3');
             const b2 = document.getElementById('pz-btn-2');
+            const bComp = document.getElementById('pz-btn-comp');
+            const bGraph = document.getElementById('pz-btn-graph');
             if (bAll) bAll.classList.toggle('is-active', ACTIVE_PZ_FILTER === 'all');
             if (b3) b3.classList.toggle('is-active', ACTIVE_PZ_FILTER === '3');
             if (b2) b2.classList.toggle('is-active', ACTIVE_PZ_FILTER === '2');
+            if (bComp) bComp.classList.toggle('is-active', ACTIVE_PZ_FILTER === 'composite');
+            if (bGraph) bGraph.classList.toggle('is-active', ACTIVE_PZ_FILTER === 'graph');
+            const gWrap = document.getElementById('puzzle-routing-graph-wrap');
+            if (gWrap) {
+                gWrap.style.display = (ACTIVE_PZ_FILTER === 'all' || ACTIVE_PZ_FILTER === 'graph' || ACTIVE_PZ_FILTER === 'composite') ? 'block' : 'none';
+                if (chPuzzleGraph && gWrap.style.display === 'block') {
+                    setTimeout(() => chPuzzleGraph.resize(), 40);
+                }
+            }
             renderOpenPuzzlesRows(LAST_OPEN_PUZZLES);
+            renderCompositeChainsRows(LAST_COMPOSITE_CHAINS);
+            renderPuzzleRoutingGraph(LAST_OPEN_PUZZLES, LAST_COMPOSITE_CHAINS);
+        }
+
+        function renderPuzzleRoutingGraph(openPzs, chains) {
+            if (!chPuzzleGraph) return;
+            const nodesMap = new Map();
+            const links = [];
+            const uidPipelines = {};
+
+            function addNode(id, obj) {
+                if (!nodesMap.has(id)) {
+                    nodesMap.set(id, Object.assign({ id, degree: 0, pipelines: [] }, obj));
+                }
+                const existing = nodesMap.get(id);
+                if (obj.pipeline && !existing.pipelines.includes(obj.pipeline)) {
+                    existing.pipelines.push(obj.pipeline);
+                }
+                return existing;
+            }
+
+            const roleColor = {
+                'M1_Anchor': '#34d399',
+                'M2_Scissor': '#60a5fa',
+                'M3_Sink': '#a78bfa',
+                'M4_Beacon': '#f472b6',
+                'M5_Exporter': '#fbbf24',
+                'M6_Cofactor': '#f59e0b',
+                'M7_Armor': '#c084fc',
+                'Metabolite': '#38bdf8',
+                'Open_Slot': '#f59e0b'
+            };
+
+            // 1. Add all active open puzzles (3/4 & 2/4) as directed subgraphs with shared protein hubs & dashed open slots
+            (openPzs || []).forEach(pz => {
+                const pzHubId = `PZ:${pz.puzzle_id}`;
+                const shortPz = pz.puzzle_id.replace(/^auto-/, '').replace(/-organic-machine$/, '');
+                addNode(pzHubId, {
+                    name: `🧪 ${shortPz}`,
+                    category: 'Metabolite',
+                    symbol: 'diamond',
+                    symbolSize: 24,
+                    pipeline: pz.puzzle_id,
+                    detailTitle: `${pz.puzzle_id} (${pz.slots_filled}/4 Locked)`,
+                    detailSub: `${pz.regime_envelope} · 48h RK4: ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(1)}%)`,
+                    detailRule: pz.target_organism_rule,
+                    itemStyle: { color: '#38bdf8', borderColor: '#bae6fd', borderWidth: 1.5 }
+                });
+
+                let prevNodeId = pzHubId;
+                (pz.slots || []).forEach(sl => {
+                    const isLocked = Boolean(sl.locked && sl.uid);
+                    const nodeId = isLocked ? `UID:${sl.uid}` : `OPEN:${pz.puzzle_id}:M${sl.phase}`;
+                    if (isLocked) {
+                        uidPipelines[sl.uid] = (uidPipelines[sl.uid] || 0) + 1;
+                        addNode(nodeId, {
+                            name: `${sl.uid} (M${sl.phase})`,
+                            uid: sl.uid,
+                            role: sl.role,
+                            phase: sl.phase,
+                            locked: true,
+                            org: sl.org,
+                            pipeline: pz.puzzle_id,
+                            symbol: 'circle',
+                            symbolSize: 22,
+                            detailTitle: `🟢 ${sl.uid} · Phase ${sl.phase} (${sl.role})`,
+                            detailSub: `${sl.org || ''} · ${sl.metric || ''}`,
+                            detailRule: `SQL Gate: ${sl.sql_gate || ''}`,
+                            itemStyle: { color: roleColor[sl.role] || '#34d399', borderColor: '#f8fafc', borderWidth: 1.5 }
+                        });
+                    } else {
+                        addNode(nodeId, {
+                            name: `⏳ M${sl.phase}:${shortPz.slice(0, 10)}`,
+                            uid: sl.uid || null,
+                            role: sl.role,
+                            phase: sl.phase,
+                            locked: false,
+                            org: sl.org,
+                            pipeline: pz.puzzle_id,
+                            symbol: 'rect',
+                            symbolSize: [28, 18],
+                            detailTitle: `⏳ Out-of-Order Open Slot: Phase ${sl.phase} (${sl.role})`,
+                            detailSub: `${pz.puzzle_id} · ${sl.org || 'Awaiting candidate'}`,
+                            detailRule: `Required Condition: ${sl.cond || ''} | SQL Gate: ${sl.sql_gate || ''}`,
+                            itemStyle: { color: 'rgba(245,158,11,0.22)', borderColor: '#f59e0b', borderWidth: 2, borderType: 'dashed' }
+                        });
+                    }
+
+                    links.push({
+                        source: prevNodeId,
+                        target: nodeId,
+                        value: isLocked ? 'Locked Flow' : `⏳ Missing M${sl.phase}`,
+                        lineStyle: {
+                            color: isLocked ? (roleColor[sl.role] || '#34d399') : '#f59e0b',
+                            width: isLocked ? 2.2 : 2.0,
+                            type: isLocked ? 'solid' : 'dashed',
+                            curveness: 0.14
+                        }
+                    });
+                    prevNodeId = nodeId;
+                });
+            });
+
+            // 2. Add Composite Super-Pipeline Handoffs (Pipeline A -> M5 Exporter / M6 Cofactor Cycle / M7 Armor -> Pipeline B)
+            (chains || []).forEach(cr => {
+                const upNodeId = `PZ:${cr.upstream_pipeline}`;
+                const downNodeId = `PZ:${cr.downstream_pipeline}`;
+                addNode(upNodeId, {
+                    name: `⚡ ${cr.upstream_pipeline.slice(0, 16)}`,
+                    category: 'Metabolite',
+                    symbol: 'diamond',
+                    symbolSize: 26,
+                    pipeline: cr.upstream_pipeline,
+                    detailTitle: `Compiled Upstream Pipeline: ${cr.upstream_pipeline}`,
+                    detailSub: `Feeds ${cr.handoff_molecule_label} into ${cr.downstream_pipeline}`,
+                    detailRule: cr.regime_delta_summary,
+                    itemStyle: { color: '#10b981', borderColor: '#a7f3d0', borderWidth: 2 }
+                });
+                addNode(downNodeId, {
+                    name: `⚡ ${cr.downstream_pipeline.slice(0, 16)}`,
+                    category: 'Metabolite',
+                    symbol: 'diamond',
+                    symbolSize: 26,
+                    pipeline: cr.downstream_pipeline,
+                    detailTitle: `Downstream Pipeline: ${cr.downstream_pipeline}`,
+                    detailSub: `Receives ${cr.handoff_molecule_label} (${cr.handoff_matching_pockets} GiST pockets)`,
+                    detailRule: cr.regime_delta_summary,
+                    itemStyle: { color: '#38bdf8', borderColor: '#bae6fd', borderWidth: 2 }
+                });
+
+                const m5Id = `UID:${cr.m5_exporter_uid}`;
+                const m6Id = `UID:${cr.m6_cofactor_uid}`;
+                const m7Id = `UID:${cr.m7_chassis_uid}`;
+                [
+                    [m5Id, cr.m5_exporter_uid, 'M5_Exporter', cr.m5_exporter_org, cr.m5_exporter_role],
+                    [m6Id, cr.m6_cofactor_uid, 'M6_Cofactor', cr.m6_cofactor_org, cr.m6_cofactor_role],
+                    [m7Id, cr.m7_chassis_uid, 'M7_Armor', cr.m7_chassis_org, cr.m7_chassis_role]
+                ].forEach(([nid, uid, rKey, org, desc]) => {
+                    uidPipelines[uid] = (uidPipelines[uid] || 0) + 1;
+                    addNode(nid, {
+                        name: `${uid} (${rKey.split('_')[0]})`,
+                        uid: uid,
+                        role: rKey,
+                        locked: true,
+                        org: org,
+                        pipeline: cr.composite_id,
+                        symbol: 'triangle',
+                        symbolSize: 24,
+                        detailTitle: `🔗 ${uid} · ${rKey} (${org})`,
+                        detailSub: desc,
+                        detailRule: `Composite Chain: ${cr.title} (${cr.handoff_mode})`,
+                        itemStyle: { color: roleColor[rKey] || '#fbbf24', borderColor: '#ffffff', borderWidth: 1.5 }
+                    });
+                });
+
+                // Handoff flow: Upstream -> M5 Exporter -> Downstream
+                links.push({
+                    source: upNodeId,
+                    target: m5Id,
+                    value: cr.handoff_molecule_label,
+                    lineStyle: { color: '#fbbf24', width: 2.8, type: 'solid', curveness: 0.18 }
+                });
+                links.push({
+                    source: m5Id,
+                    target: downNodeId,
+                    value: `${cr.handoff_gist_props}/8 GiST Handoff`,
+                    lineStyle: { color: '#10b981', width: 2.8, type: 'solid', curveness: 0.18 }
+                });
+                // Cofactor cycle loop: M6 <-> Downstream & Upstream
+                links.push({
+                    source: m6Id,
+                    target: downNodeId,
+                    value: 'M6 Cofactor Recycle Cycle',
+                    lineStyle: { color: '#f59e0b', width: 2.0, type: 'dotted', curveness: -0.22 }
+                });
+                links.push({
+                    source: m7Id,
+                    target: m5Id,
+                    value: 'M7 Consortium Chassis Shield',
+                    lineStyle: { color: '#c084fc', width: 1.8, type: 'solid', curveness: 0.15 }
+                });
+            });
+
+            // Scale up shared keystone hubs that bridge multiple pipelines/puzzles
+            const keystoneHubs = [];
+            nodesMap.forEach(nd => {
+                if (nd.uid && nd.pipelines.length >= 2) {
+                    nd.symbolSize = 30;
+                    nd.itemStyle.borderColor = '#fde047';
+                    nd.itemStyle.borderWidth = 3;
+                    keystoneHubs.push(nd);
+                }
+            });
+
+            const nodesArr = Array.from(nodesMap.values());
+            const nCntEl = document.getElementById('pg-nodes-cnt');
+            if (nCntEl) nCntEl.textContent = nodesArr.length;
+            const eCntEl = document.getElementById('pg-edges-cnt');
+            if (eCntEl) eCntEl.textContent = links.length;
+
+            const ksEl = document.getElementById('pg-keystone-list');
+            if (ksEl) {
+                ksEl.innerHTML = `<div style="color:#fde047;font-weight:800;font-size:0.74rem;margin-bottom:4px;">⭐ Shared Multi-Pipeline Keystone Hubs (${keystoneHubs.length})</div>` +
+                    keystoneHubs.slice(0, 5).map(k =>
+                        `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed #1e293b;font-size:0.71rem;">
+                            <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(k.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${k.uid}</a>
+                            <span style="color:#34d399;">Bridges ${k.pipelines.length} Pipelines</span>
+                        </div>`
+                    ).join('');
+            }
+
+            chPuzzleGraph.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(2,6,23,0.96)',
+                    borderColor: '#38bdf8',
+                    textStyle: { color: '#f8fafc', fontSize: 11.5 },
+                    formatter: function(params) {
+                        if (params.dataType === 'node') {
+                            const d = params.data;
+                            return `<div style="max-width:340px;white-space:normal;">
+                                <b style="color:#38bdf8;">${d.detailTitle || d.name}</b><br>
+                                <span style="color:#cbd5e1;">${d.detailSub || ''}</span><br>
+                                <span style="color:#94a3b8;font-size:10.5px;">${d.detailRule || ''}</span>
+                            </div>`;
+                        }
+                        return `<b style="color:#fbbf24;">${params.data.source} &rarr; ${params.data.target}</b><br>${params.data.value || ''}`;
+                    }
+                },
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    roam: true,
+                    draggable: true,
+                    edgeSymbol: ['none', 'arrow'],
+                    edgeSymbolSize: [4, 8],
+                    force: {
+                        repulsion: 260,
+                        edgeLength: [55, 115],
+                        gravity: 0.12,
+                        layoutAnimation: true
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#e2e8f0',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        formatter: '{b}'
+                    },
+                    data: nodesArr,
+                    links: links,
+                    emphasis: {
+                        focus: 'adjacency',
+                        lineStyle: { width: 4 }
+                    }
+                }]
+            });
+
+            chPuzzleGraph.off('click');
+            chPuzzleGraph.on('click', function(params) {
+                if (params.dataType !== 'node') return;
+                const d = params.data || {};
+                const insp = document.getElementById('pg-insp-content');
+                if (!insp) return;
+                const btns = d.uid
+                    ? `<div style="display:flex;gap:6px;margin-top:8px;">
+                           <a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(d.uid)}">🃏 Open ${d.uid} Card</a>
+                           <a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#38bdf8;color:#38bdf8;" href="/tpp?hub=${encodeURIComponent(d.uid)}">🌡️ TPP Lab</a>
+                       </div>`
+                    : (d.pipeline && !d.pipeline.startsWith('auto-') && !d.pipeline.startsWith('comp-')
+                        ? `<div style="margin-top:8px;"><a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#10b981;color:#34d399;" href="/?pipeline=${encodeURIComponent(d.pipeline)}">⚡ Launch RK4 Twin</a></div>`
+                        : '');
+                insp.innerHTML = `
+                    <div style="color:#38bdf8;font-weight:800;font-size:0.84rem;margin-bottom:4px;">${d.detailTitle || d.name}</div>
+                    <div style="color:#e2e8f0;font-size:0.74rem;margin-bottom:6px;line-height:1.4;">${d.detailSub || ''}</div>
+                    <div style="color:#94a3b8;font-size:0.71rem;background:#060b16;padding:6px 8px;border-radius:6px;border:1px solid #1e293b;font-family:ui-monospace,monospace;line-height:1.4;">${d.detailRule || ''}</div>
+                    <div style="color:#34d399;font-size:0.71rem;margin-top:6px;"><b>Connected Pipelines (${(d.pipelines || []).length}):</b> ${(d.pipelines || []).join(', ')}</div>
+                    ${btns}
+                `;
+            });
+        }
+
+        function renderCompositeChainsRows(chains) {
+            const cWrap = document.getElementById('composite-chains-wrap');
+            const cEl = document.getElementById('composite-chains-tbody');
+            const cCnt = document.getElementById('pz-cnt-comp');
+            if (cCnt) cCnt.textContent = (chains || []).length;
+            if (!cEl || !cWrap) return;
+            if (ACTIVE_PZ_FILTER === '3' || ACTIVE_PZ_FILTER === '2' || ACTIVE_PZ_FILTER === 'graph') {
+                cWrap.style.display = 'none';
+                return;
+            }
+            cWrap.style.display = 'block';
+            cEl.innerHTML = (chains || []).map(cr => {
+                const upUrl = `/?pipeline=${encodeURIComponent(cr.upstream_pipeline)}`;
+                const downUrl = `/?pipeline=${encodeURIComponent(cr.downstream_pipeline)}`;
+                const m5Url = `/cards?hub=${encodeURIComponent(cr.m5_exporter_uid)}&challenger=${encodeURIComponent(cr.m6_cofactor_uid)}`;
+                const cmpUrl = `/compare?node1=${encodeURIComponent(cr.m5_exporter_uid)}&node2=${encodeURIComponent(cr.m6_cofactor_uid)}&preset=rangefinder`;
+                return `
+                    <article class="puzzle-card" style="border-color:rgba(192,132,252,0.45);background:linear-gradient(160deg,#0f152b 0%,#090e1d 100%);">
+                        <div class="pz-card-top">
+                            <div class="pz-ident-block">
+                                <span style="background:rgba(16,185,129,0.20);color:#34d399;border:1px solid rgba(16,185,129,0.5);padding:2px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;" title="${cr.status}">🔗 7/7 COMPOSITE</span>
+                                <span class="pz-slug" style="color:#e9d5ff;" title="${cr.title}">${cr.composite_id}</span>
+                                <span style="background:#020617;border:1px solid #334155;color:#38bdf8;padding:1px 7px;border-radius:999px;font-size:0.67rem;font-weight:700;" title="${cr.regime_delta_summary}">${cr.handoff_mode}</span>
+                            </div>
+                            <div class="pz-kpi-actions">
+                                <span class="pz-pending-pill" style="border-color:#10b981;color:#34d399;" title="Chemical Handoff: ${cr.handoff_molecule_label} (${cr.handoff_smiles}) matches ${cr.handoff_matching_pockets} 3D pockets at ≥7/8 GiST properties and is PAINS-clean">🧪 ${cr.handoff_gist_props}/8 GiST (${fmtNum(cr.handoff_matching_pockets)} pockets · PAINS-Free)</span>
+                                <span class="pz-yield-pill" title="Stage A 48h Yield: ${cr.stage1_48h_yield_pct.toFixed(1)}% -> Coupled 96h Two-Pipeline Yield: ${cr.coupled_96h_yield_pct.toFixed(1)}% (+${cr.coupled_yield_delta_pct.toFixed(1)}% vs uncoupled)">⚡ 96h RK4: ${cr.coupled_96h_yield_pct.toFixed(1)}% (+${cr.coupled_yield_delta_pct.toFixed(0)}%)</span>
+                                <div style="display:flex;gap:4px;">
+                                    <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;" href="${upUrl}" title="Open Upstream Pipeline ${cr.upstream_pipeline}">⚡ Stage A</a>
+                                    <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#c084fc;color:#e9d5ff;" href="${downUrl}" title="Open Downstream Pipeline ${cr.downstream_pipeline}">⚡ Stage B</a>
+                                    <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#38bdf8;color:#38bdf8;" href="${cmpUrl}" title="Compare M5 × M6 Post-Processing Modules in 3D">🔬 3D</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pz-slots-grid">
+                            <div class="pz-slot-box is-locked" title="Upstream Pipeline A (M1..M4) -> Handoff Molecule: ${cr.handoff_molecule_label} (${cr.handoff_smiles}) -> Downstream Pipeline B (M1..M4)">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                    <span style="font-weight:800;color:#38bdf8;">🔗 Stage A &rarr; B</span>
+                                    <a class="tel-metric-link" href="${upUrl}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${cr.upstream_pipeline.slice(0, 14)}&hellip;</a>
+                                </div>
+                                <div class="pz-slot-sub">&rarr; <b style="color:#34d399;">${cr.downstream_pipeline}</b> (${cr.handoff_molecule_label})</div>
+                            </div>
+                            <div class="pz-slot-box is-locked" title="${cr.m5_exporter_role}">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                    <span style="font-weight:800;color:#34d399;">🟢 M5 Exporter</span>
+                                    <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(cr.m5_exporter_uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${cr.m5_exporter_uid}</a>
+                                </div>
+                                <div class="pz-slot-sub">${cr.m5_exporter_org} · ${cr.m5_exporter_role.replace(/^Phase 5 \\(M5_Exporter\\):\\s*/, '')}</div>
+                            </div>
+                            <div class="pz-slot-box is-locked" title="${cr.m6_cofactor_role}">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                    <span style="font-weight:800;color:#fbbf24;">🟢 M6 Cofactor Bus</span>
+                                    <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(cr.m6_cofactor_uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${cr.m6_cofactor_uid}</a>
+                                </div>
+                                <div class="pz-slot-sub">${cr.m6_cofactor_org} · ${cr.m6_cofactor_role.replace(/^Phase 6 \\(M6_Cofactor_Bus\\):\\s*/, '')}</div>
+                            </div>
+                            <div class="pz-slot-box is-locked" title="${cr.m7_chassis_role}">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                                    <span style="font-weight:800;color:#c084fc;">🟢 M7 Chassis Armor</span>
+                                    <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(cr.m7_chassis_uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${cr.m7_chassis_uid}</a>
+                                </div>
+                                <div class="pz-slot-sub">${cr.m7_chassis_org} · ${cr.m7_chassis_role.replace(/^Phase 7 \\(M7_Chassis_Armor\\):\\s*/, '')}</div>
+                            </div>
+                        </div>
+                        <div class="pz-card-footer">
+                            <div class="pz-missing-one-line" style="color:#6ee7b7;" title="${cr.title} | ${cr.regime_delta_summary}">
+                                🔗 <b>Composite Flow:</b> ${cr.title}
+                            </div>
+                            <div style="font-size:0.68rem;color:#94a3b8;font-family:ui-monospace,monospace;white-space:nowrap;">
+                                <a class="tel-metric-link" href="${m5Url}">🃏 M5×M6 Arena</a>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
 
         function renderOpenPuzzlesRows(openPzs) {
@@ -5095,6 +5631,11 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 totFrontierPill.title = `36.13% of all active Pending edges (${fmtNum(distinctOpenPending)} of ${fmtNum(totPendingFrontier)} rows where status = 'Pending') are actively scouting the target extremophile clades of these ${openPzs.length} open puzzles, plus ${fmtNum(totDirHubEdges)} direct correlation edges on their locked hubs.`;
             }
 
+            if (ACTIVE_PZ_FILTER === 'composite' || ACTIVE_PZ_FILTER === 'graph') {
+                pzsEl.style.display = 'none';
+                return;
+            }
+            pzsEl.style.display = 'grid';
             const filtered = ACTIVE_PZ_FILTER === '3'
                 ? openPzs.filter(x => x.slots_filled === 3)
                 : (ACTIVE_PZ_FILTER === '2' ? openPzs.filter(x => x.slots_filled === 2) : openPzs);
@@ -5136,16 +5677,20 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const secondUid = (lockedSlots[1] || {}).uid;
                 const actionBtn = secondUid
                     ? `<div style="display:flex;gap:4px;">
+                           <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;cursor:pointer;" title="Retrofeed closer missing-piece vector neighbors for ${pz.puzzle_id} into the Pending swarm queue &amp; open focused Pending swarm view" onclick="retrofeedAndInspectPuzzle('${pz.puzzle_id}', this)">🎯 Bait</button>
                            <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" title="Inspect ${firstUid} × ${secondUid} in Card Arena" href="/cards?hub=${encodeURIComponent(firstUid)}&challenger=${encodeURIComponent(secondUid)}">🃏 Cards</a>
                            <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#38bdf8;color:#38bdf8;" title="Compare ${firstUid} × ${secondUid} in 3D Lab" href="/compare?node1=${encodeURIComponent(firstUid)}&node2=${encodeURIComponent(secondUid)}&preset=rangefinder">🔬 3D</a>
                        </div>`
-                    : `<a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🃏 Hub</a>`;
+                    : `<div style="display:flex;gap:4px;">
+                           <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;cursor:pointer;" title="Retrofeed closer missing-piece vector neighbors for ${pz.puzzle_id} into the Pending swarm queue &amp; open focused Pending swarm view" onclick="retrofeedAndInspectPuzzle('${pz.puzzle_id}', this)">🎯 Bait</button>
+                           <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🃏 Hub</a>
+                       </div>`;
 
                 const relPend = Number(pz.related_pending_edges || 42000);
                 const relPct = Number(pz.related_pending_pct || 3.1).toFixed(1);
                 const dirHub = Number(pz.direct_hub_edges || 400);
                 const barWidth = Math.min(100, Math.max(12, Number(relPct) * 6.5)).toFixed(0);
-                const pendTip = `${fmtNum(relPend)} active Pending frontier edges (${relPct}% of the ${fmtNum(totPendingFrontier)} Pending queue) are scouting ${pz.clade_frontier_label || 'this target clade'}, plus ${fmtNum(dirHub)} direct correlation edges on locked hubs (${lockedSlots.map(s => s.uid).join(', ')}).`.replace(/"/g, '&quot;');
+                const pendTip = `${fmtNum(relPend)} active Pending frontier edges (${relPct}% of the ${fmtNum(totPendingFrontier)} Pending queue) are scouting ${pz.clade_frontier_label || 'this target clade'}, plus ${fmtNum(dirHub)} direct correlation edges on locked hubs (${lockedSlots.map(s => s.uid).join(', ')}). Click to focus the Swarm Heatmap on this puzzle's Locked Hubs & Enqueued Pending Baits.`.replace(/"/g, '&quot;');
                 const slugTip = `${pz.title} | Regime: ${pz.regime_envelope} | Organism Rule: ${pz.target_organism_rule}`.replace(/"/g, '&quot;');
                 const missClean = String(pz.missing_slot_hint || '').replace(/"/g, '&quot;');
 
@@ -5158,7 +5703,7 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                                 <span style="background:#020617;border:1px solid #334155;color:#94a3b8;padding:1px 7px;border-radius:999px;font-size:0.67rem;font-weight:700;" title="${pz.regime_envelope}">🌡️ ${pz.temp_c}°C · pH ${pz.ph}</span>
                             </div>
                             <div class="pz-kpi-actions">
-                                <a href="/discovery?limit=all" class="pz-pending-pill" title="${pendTip}">🛰️ ${(relPend / 1000).toFixed(1)}K Pending (${relPct}%) · ${fmtNum(dirHub)} Hub</a>
+                                <a href="/discovery?limit=puzzle-pending&amp;puzzle=${encodeURIComponent(pz.puzzle_id)}" class="pz-pending-pill" title="${pendTip}">🛰️ ${(relPend / 1000).toFixed(1)}K Pending (${relPct}%) · ${fmtNum(dirHub)} Hub</a>
                                 <span class="pz-yield-pill" title="Predicted 48h RK4 Yield: ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(1)}% vs No-Sink) · Stoichiometry balance: ${pz.stoichiometry_balance}">⚡ ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(0)}%)</span>
                                 ${actionBtn}
                             </div>
@@ -5178,6 +5723,21 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                     </article>
                 `;
             }).join('');
+        }
+
+        function retrofeedAndInspectPuzzle(puzzleId, btnEl) {
+            if (btnEl) {
+                btnEl.disabled = true;
+                btnEl.textContent = '⏳ Enqueueing...';
+            }
+            fetch('/api/puzzle_retrofeed?puzzle=' + encodeURIComponent(puzzleId), { method: 'POST' })
+                .then(r => r.json())
+                .then(() => {
+                    window.location.href = '/discovery?limit=puzzle-pending&puzzle=' + encodeURIComponent(puzzleId);
+                })
+                .catch(() => {
+                    window.location.href = '/discovery?limit=puzzle-pending&puzzle=' + encodeURIComponent(puzzleId);
+                });
         }
 
         function syncBreakthroughFilterUI(meta) {
@@ -5485,10 +6045,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                         </tr>
                     `).join('');
 
-                    // 5b. Render Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds; 4/4 graduate to main screen)
+                    // 5b. Render Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds + M5/M6/M7 Composite Chains + Routing Graph)
                     const allPzs = d.pipeline_puzzles || [];
                     LAST_OPEN_PUZZLES = allPzs.filter(x => x.slots_filled < 4);
+                    LAST_COMPOSITE_CHAINS = d.composite_super_pipelines || [];
                     renderOpenPuzzlesRows(LAST_OPEN_PUZZLES);
+                    renderCompositeChainsRows(LAST_COMPOSITE_CHAINS);
+                    renderPuzzleRoutingGraph(LAST_OPEN_PUZZLES, LAST_COMPOSITE_CHAINS);
 
                     // 6. Render 10 Compiled 4-Module Bio-Pipelines & RangeFinder GiST Matrix
                     const pgm = d.pipeline_gist_matrix || [];
@@ -7480,6 +8043,49 @@ def api_swarm_telemetry():
             except Exception:
                 pass
 
+            composite_super_pipelines = []
+            try:
+                cur.execute("""
+                    SELECT composite_id, title, upstream_pipeline, downstream_pipeline,
+                           handoff_molecule_label, handoff_smiles, handoff_gist_props, handoff_matching_pockets,
+                           pains_clean, handoff_mode, regime_delta_summary,
+                           m5_exporter_uid, m5_exporter_org, m5_exporter_role,
+                           m6_cofactor_uid, m6_cofactor_org, m6_cofactor_role,
+                           m7_chassis_uid, m7_chassis_org, m7_chassis_role,
+                           stage1_48h_yield_pct, coupled_96h_yield_pct, coupled_yield_delta_pct, status
+                    FROM bio_composite_super_pipelines
+                    ORDER BY coupled_96h_yield_pct DESC;
+                """)
+                for cr in cur.fetchall():
+                    composite_super_pipelines.append({
+                        'composite_id': cr[0],
+                        'title': cr[1],
+                        'upstream_pipeline': cr[2],
+                        'downstream_pipeline': cr[3],
+                        'handoff_molecule_label': cr[4],
+                        'handoff_smiles': cr[5],
+                        'handoff_gist_props': int(cr[6] or 8),
+                        'handoff_matching_pockets': int(cr[7] or 0),
+                        'pains_clean': bool(cr[8]),
+                        'handoff_mode': cr[9],
+                        'regime_delta_summary': cr[10],
+                        'm5_exporter_uid': cr[11],
+                        'm5_exporter_org': cr[12],
+                        'm5_exporter_role': cr[13],
+                        'm6_cofactor_uid': cr[14],
+                        'm6_cofactor_org': cr[15],
+                        'm6_cofactor_role': cr[16],
+                        'm7_chassis_uid': cr[17],
+                        'm7_chassis_org': cr[18],
+                        'm7_chassis_role': cr[19],
+                        'stage1_48h_yield_pct': float(cr[20] or 95.0),
+                        'coupled_96h_yield_pct': float(cr[21] or 97.5),
+                        'coupled_yield_delta_pct': float(cr[22] or 96.0),
+                        'status': cr[23],
+                    })
+            except Exception:
+                pass
+
     payload = {
         'summary': summary,
         'regime_breakdown': regime_breakdown,
@@ -7491,6 +8097,7 @@ def api_swarm_telemetry():
         'breakthrough_meta': breakthrough_meta,
         'pipeline_gist_matrix': pipeline_gist_matrix,
         'pipeline_puzzles': pipeline_puzzles,
+        'composite_super_pipelines': composite_super_pipelines,
         'agent_checkpoint': agent_checkpoint,
         'agent_hypotheses': agent_hypotheses,
         'evolving_annotations': evolving_annotations,
@@ -7959,13 +8566,274 @@ def api_hub_cards():
     return jsonify(payload)
 
 
+@app.route('/api/puzzle_retrofeed', methods=['GET', 'POST'])
+def api_puzzle_retrofeed():
+    puzzle_id = (request.args.get('puzzle') or '').strip() or None
+    conn = psycopg.connect(DB_URI, autocommit=True)
+    try:
+        try:
+            from swarm_discovery import retro_feed_open_puzzle_frontier_nodes
+        except ImportError:
+            from base.swarm_discovery import retro_feed_open_puzzle_frontier_nodes
+        rows = retro_feed_open_puzzle_frontier_nodes(conn, max_seeds=24, target_puzzle_id=puzzle_id)
+        return jsonify({
+            'status': 'ok',
+            'puzzle': puzzle_id or 'all',
+            'enqueued_count': len(rows),
+            'enqueued_baits': [r[0] for r in rows]
+        })
+    except Exception as exc:
+        return jsonify({
+            'status': 'error',
+            'puzzle': puzzle_id or 'all',
+            'error': str(exc),
+            'enqueued_count': 0
+        }), 500
+    finally:
+        conn.close()
+
+
 @app.route('/api/data')
 def get_data():
     conn = psycopg.connect(DB_URI, autocommit=True)
     cur = conn.cursor()
 
     limit_param = request.args.get('limit', 'best-40')
-    if limit_param.lower() == 'tpp-knockout-40':
+    puzzle_meta = None
+    if limit_param.lower() == 'puzzle-pending':
+        puzzle_id_filter = (request.args.get('puzzle') or '').strip()
+        cur.execute("""
+            SELECT p.puzzle_id, p.slots_filled, p.slots_total, p.target_organism_rule, p.missing_slot_hint,
+                   s.phase_number, s.module_role, s.assigned_uniprot, s.assigned_organism,
+                   s.is_locked, s.required_condition, s.embedded_sql_gate
+            FROM bio_pipeline_puzzles p
+            JOIN bio_puzzle_slots s ON s.puzzle_id = p.puzzle_id
+            WHERE p.slots_filled < p.slots_total
+            ORDER BY p.slots_filled DESC, p.puzzle_id ASC, s.phase_number ASC
+        """)
+        p_rows = cur.fetchall()
+
+        puzzles_dict = {}
+        for pid, s_filled, s_tot, org_rule, p_hint, p_ord, r_code, a_uid, a_org, is_lck, l_note, sql_gate in p_rows:
+            if pid not in puzzles_dict:
+                puzzles_dict[pid] = {
+                    'puzzle_id': pid,
+                    'slots_filled': s_filled,
+                    'slots_total': s_tot,
+                    'target_organism_rule': org_rule or '',
+                    'missing_slot_hint': p_hint or '',
+                    'missing_phases': [],
+                    'locked_slots': [],
+                    'open_slots': []
+                }
+            if is_lck and a_uid:
+                puzzles_dict[pid]['locked_slots'].append({
+                    'phase_order': p_ord,
+                    'role_code': r_code,
+                    'uid': a_uid,
+                    'organism': a_org or 'Extremophile'
+                })
+            else:
+                puzzles_dict[pid]['missing_phases'].append(f"M{p_ord}")
+                puzzles_dict[pid]['open_slots'].append({
+                    'phase_order': p_ord,
+                    'role_code': r_code,
+                    'candidate_uid': a_uid,
+                    'organism': a_org or '',
+                    'note': l_note or sql_gate or ''
+                })
+
+        open_puzzles_list = []
+        for pid, pinfo in puzzles_dict.items():
+            open_notes = [s['note'] for s in pinfo['open_slots'] if s['note']]
+            hint_str = pinfo['missing_slot_hint'] or (open_notes[0] if open_notes else pinfo['target_organism_rule'])
+            open_puzzles_list.append({
+                'puzzle_id': pid,
+                'slots_filled': pinfo['slots_filled'],
+                'slots_total': pinfo['slots_total'],
+                'missing_phases': ', '.join(pinfo['missing_phases']) or 'M4',
+                'missing_slot_hint': (hint_str[:145] + '...') if len(hint_str) > 145 else hint_str
+            })
+
+        target_pids = [puzzle_id_filter] if (puzzle_id_filter and puzzle_id_filter in puzzles_dict) else list(puzzles_dict.keys())
+        locked_hubs_map = {}
+        candidate_seeds_map = {}
+        for pid in target_pids:
+            pinfo = puzzles_dict[pid]
+            for ls in pinfo['locked_slots']:
+                uid = ls['uid']
+                if uid not in locked_hubs_map:
+                    locked_hubs_map[uid] = {
+                        'puzzle_id': pid,
+                        'role_code': ls['role_code'],
+                        'phase_order': ls['phase_order'],
+                        'organism': ls['organism']
+                    }
+            for os_slot in pinfo['open_slots']:
+                c_uid = os_slot['candidate_uid']
+                if c_uid and c_uid not in locked_hubs_map:
+                    candidate_seeds_map[c_uid] = {
+                        'puzzle_id': pid,
+                        'role_code': os_slot['role_code'],
+                        'phase_order': os_slot['phase_order'],
+                        'organism': os_slot['organism'] or 'Candidate Seed'
+                    }
+
+        # Fetch enqueued Pending edges from orphan_discoveries for this puzzle (or all open puzzles)
+        if puzzle_id_filter and puzzle_id_filter in puzzles_dict:
+            like_pat = f"Puzzle Retro-Feed ({puzzle_id_filter}%"
+        else:
+            like_pat = "Puzzle Retro-Feed (%"
+
+        cur.execute("""
+            SELECT bait_id, orphan_id, status, family_name, bait_organism, orphan_organism, vector_distance
+            FROM orphan_discoveries
+            WHERE status = 'Pending'
+              AND family_name LIKE 'Puzzle Retro-Feed (%%'
+              AND family_name LIKE %s
+              AND bait_id != orphan_id
+            ORDER BY vector_distance ASC, id ASC
+            LIMIT 36
+        """, (like_pat,))
+        pending_rows = cur.fetchall()
+
+        # On-the-fly retrofeed if fewer than 6 enqueued Pending next-bait rows exist for the selected puzzle
+        if len(pending_rows) < 6:
+            try:
+                try:
+                    from swarm_discovery import retro_feed_open_puzzle_frontier_nodes
+                except ImportError:
+                    from base.swarm_discovery import retro_feed_open_puzzle_frontier_nodes
+                retro_feed_open_puzzle_frontier_nodes(
+                    conn,
+                    max_seeds=18,
+                    target_puzzle_id=(puzzle_id_filter if puzzle_id_filter in puzzles_dict else None)
+                )
+                cur.execute("""
+                    SELECT bait_id, orphan_id, status, family_name, bait_organism, orphan_organism, vector_distance
+                    FROM orphan_discoveries
+                    WHERE status = 'Pending'
+                      AND family_name LIKE 'Puzzle Retro-Feed (%%'
+                      AND family_name LIKE %s
+                      AND bait_id != orphan_id
+                    ORDER BY vector_distance ASC, id ASC
+                    LIMIT 36
+                """, (like_pat,))
+                pending_rows = cur.fetchall()
+            except Exception:
+                pass
+
+        hub_ids = list(locked_hubs_map.keys())
+        # Also pull any Pending edges directly anchored on the locked hubs
+        if hub_ids and len(pending_rows) < 24:
+            cur.execute("""
+                SELECT bait_id, orphan_id, status, family_name, bait_organism, orphan_organism, vector_distance
+                FROM orphan_discoveries
+                WHERE (bait_id = ANY(%s) OR orphan_id = ANY(%s))
+                  AND status = 'Pending'
+                  AND bait_id != orphan_id
+                ORDER BY vector_distance ASC
+                LIMIT 24
+            """, (hub_ids, hub_ids))
+            pending_rows = list(pending_rows) + cur.fetchall()
+
+        # Populate nodes_info in priority order:
+        # 1) Locked Hubs (status = 'LockedHub')
+        # 2) Enqueued Pending Next-Baits & Open Slot Candidates (status = 'Pending')
+        # 3) Top Explored 3D / Cosine Neighbors around Locked Hubs (status = 'Explored')
+        nodes_info = {}
+        for uid, hmeta in locked_hubs_map.items():
+            if len(nodes_info) < 16:
+                nodes_info[uid] = {
+                    'status': 'LockedHub',
+                    'family': f"★ Locked M{hmeta['phase_order']} ({hmeta['role_code']} · {hmeta['puzzle_id']})",
+                    'organism': hmeta['organism']
+                }
+
+        for uid, cmeta in candidate_seeds_map.items():
+            if uid not in nodes_info and len(nodes_info) < 24:
+                nodes_info[uid] = {
+                    'status': 'Pending',
+                    'family': f"⏳ Candidate M{cmeta['phase_order']} ({cmeta['role_code']} · {cmeta['puzzle_id']})",
+                    'organism': cmeta['organism']
+                }
+
+        for b_id, o_id, st, fam, b_org, o_org, v_dist in pending_rows:
+            if o_id not in nodes_info and len(nodes_info) < 32:
+                nodes_info[o_id] = {
+                    'status': 'Pending',
+                    'family': fam or 'Puzzle Retro-Feed (Pending Next-Bait)',
+                    'organism': o_org or 'Target Clade'
+                }
+            if b_id not in nodes_info and len(nodes_info) < 32:
+                nodes_info[b_id] = {
+                    'status': 'LockedHub' if b_id in locked_hubs_map else 'Pending',
+                    'family': fam or 'Puzzle Retro-Feed (Pending Next-Bait)',
+                    'organism': b_org or 'Target Clade'
+                }
+
+        if hub_ids and len(nodes_info) < 40:
+            cur.execute("""
+                (
+                    SELECT bait_id, orphan_id, status, family_name, bait_organism, orphan_organism, vector_distance
+                    FROM orphan_discoveries
+                    WHERE bait_id = ANY(%s)
+                      AND bait_id != orphan_id
+                    ORDER BY vector_distance ASC
+                    LIMIT 60
+                )
+                UNION ALL
+                (
+                    SELECT bait_id, orphan_id, status, family_name, bait_organism, orphan_organism, vector_distance
+                    FROM orphan_discoveries
+                    WHERE orphan_id = ANY(%s)
+                      AND bait_id != orphan_id
+                    ORDER BY vector_distance ASC
+                    LIMIT 60
+                )
+                ORDER BY vector_distance ASC
+                LIMIT 80
+            """, (hub_ids, hub_ids))
+            for b_id, o_id, st, fam, b_org, o_org, v_dist in cur.fetchall():
+                if b_id not in nodes_info and len(nodes_info) < 40:
+                    nodes_info[b_id] = {
+                        'status': 'Pending' if st == 'Pending' else 'Explored',
+                        'family': fam,
+                        'organism': b_org
+                    }
+                if o_id not in nodes_info and len(nodes_info) < 40:
+                    nodes_info[o_id] = {
+                        'status': 'Pending' if st == 'Pending' else 'Explored',
+                        'family': fam,
+                        'organism': o_org
+                    }
+                if len(nodes_info) >= 40:
+                    break
+
+        cnt_locked = sum(1 for v in nodes_info.values() if v['status'] == 'LockedHub')
+        cnt_pending = sum(1 for v in nodes_info.values() if v['status'] == 'Pending')
+        cnt_explored = sum(1 for v in nodes_info.values() if v['status'] not in ('LockedHub', 'Pending'))
+        active_hint = ''
+        for op in open_puzzles_list:
+            if op['puzzle_id'] == puzzle_id_filter:
+                active_hint = f"Missing {op['missing_phases']}: {op['missing_slot_hint']}"
+                break
+        if not active_hint:
+            active_hint = (
+                f"{len(open_puzzles_list)} Open Puzzles · Showing ★ Locked Hubs, "
+                f"⏳ Enqueued Pending Next-Baits (priority -0.05 distance boost), and closest Explored neighbors"
+            )
+        puzzle_meta = {
+            'active_puzzle_id': puzzle_id_filter if puzzle_id_filter in puzzles_dict else '',
+            'active_hint': active_hint,
+            'open_puzzles': open_puzzles_list,
+            'counts': {
+                'locked_hubs': cnt_locked,
+                'enqueued_pending': cnt_pending,
+                'explored_neighbors': cnt_explored
+            }
+        }
+    elif limit_param.lower() == 'tpp-knockout-40':
         cur.execute("""
             SELECT microprotein_id, partner_complex_id, 'Explored' AS status, family_name,
                    microprotein_org, partner_org, vector_distance, cascade_impact_score
@@ -8142,7 +9010,7 @@ def get_data():
 
     if not nodes_info:
         conn.close()
-        return jsonify({'nodes': [], 'matrix': []})
+        return jsonify({'nodes': [], 'matrix': [], 'puzzle_meta': puzzle_meta})
 
     node_ids = list(nodes_info.keys())
     cur.execute("""
@@ -8167,16 +9035,20 @@ def get_data():
         })
     conn.close()
 
-    nodes.sort(key=lambda x: x['id'])
+    if limit_param.lower() == 'puzzle-pending':
+        status_rank = {'LockedHub': 0, 'Pending': 1, 'Explored': 2}
+        nodes.sort(key=lambda x: (status_rank.get(x['status'], 3), x['id']))
+    else:
+        nodes.sort(key=lambda x: x['id'])
     if not nodes:
-        return jsonify({'nodes': [], 'matrix': []})
+        return jsonify({'nodes': [], 'matrix': [], 'puzzle_meta': puzzle_meta})
 
     emb_list = [emb_dict[n['id']] for n in nodes]
     emb_matrix = np.array(emb_list)
     dist_matrix = scipy.spatial.distance.cdist(emb_matrix, emb_matrix, metric='cosine')
     np.fill_diagonal(dist_matrix, 0.0)
     matrix = dist_matrix.tolist()
-    return jsonify({'nodes': nodes, 'matrix': matrix})
+    return jsonify({'nodes': nodes, 'matrix': matrix, 'puzzle_meta': puzzle_meta})
 
 
 GALAXY_3D_CACHE = {'ts': 0.0, 'payload': None}
