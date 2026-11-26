@@ -14,6 +14,12 @@ except ImportError:
 
 app = Flask(__name__)
 DB_URI = os.getenv("PG_BIO_URL", "postgresql://jonatas@localhost:28818/bio_demo")
+# Unset or empty: structures/models in the repository. Made absolute so
+# every module agrees whatever the working directory.
+MODELS_DIR = os.path.abspath(os.path.expanduser(
+    os.getenv("BIO_PIPELINES_MODELS_DIR")
+    or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "structures", "models")
+))
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -2689,8 +2695,8 @@ AA1_TO_AA3 = {
     'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
 }
 
-UNIPROT_CACHE_PATH = "/Users/jonatas/code/ideia.me/assets/models/uniprot_meta_cache.json"
-ALIGNED_PDB_DIR = "/Users/jonatas/code/ideia.me/assets/models/aligned"
+UNIPROT_CACHE_PATH = MODELS_DIR + "/uniprot_meta_cache.json"
+ALIGNED_PDB_DIR = MODELS_DIR + "/aligned"
 os.makedirs(ALIGNED_PDB_DIR, exist_ok=True)
 
 try:
@@ -2724,7 +2730,7 @@ def ensure_comparison_cache_table():
 ensure_comparison_cache_table()
 
 def fetch_pdb_string(uniprot_id):
-    path = f"/Users/jonatas/code/ideia.me/assets/models/AF-{uniprot_id}-F1-model_v4.pdb"
+    path = f"{MODELS_DIR}/AF-{uniprot_id}-F1-model_v4.pdb"
     if os.path.exists(path):
         with open(path, 'r') as f:
             content = f.read()
@@ -3630,7 +3636,7 @@ def compare_proteins(id1, id2):
     }
 
     # Save aligned PDB to disk and persist comparison metrics in PostgreSQL swarm_comparison_cache
-    pdb1_path = f"/Users/jonatas/code/ideia.me/assets/models/AF-{id1}-F1-model_v4.pdb"
+    pdb1_path = f"{MODELS_DIR}/AF-{id1}-F1-model_v4.pdb"
     pdb2_al_path = os.path.join(ALIGNED_PDB_DIR, f"AF-{id1}_vs_{id2}_aligned.pdb")
     try:
         with open(pdb2_al_path, 'w') as af:
@@ -11380,7 +11386,7 @@ def api_compound_3d(hub_id):
                     'seq_len': seq_len,
                 }
 
-    models_dir = '/Users/jonatas/code/ideia.me/assets/models'
+    models_dir = MODELS_DIR
     aligned_dir = os.path.join(models_dir, 'aligned')
 
     hub_pdb_path = os.path.join(models_dir, f'AF-{hub_id}-F1-model_v4.pdb')

@@ -12,7 +12,12 @@ except ImportError:
 
 DB_URI = os.getenv("PG_BIO_URL", "postgresql://localhost:28818/bio_demo")
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-MODELS_DIR = "/Users/jonatas/code/ideia.me/assets/models"
+# Unset or empty: structures/models in the repository. Made absolute so
+# every module agrees whatever the working directory.
+MODELS_DIR = os.path.abspath(os.path.expanduser(
+    os.getenv("BIO_PIPELINES_MODELS_DIR")
+    or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "structures", "models")
+))
 STRUCTURES_DIR = os.path.join(REPO_ROOT, "structures")
 
 PIPELINE_PRESETS = {

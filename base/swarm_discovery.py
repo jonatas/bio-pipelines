@@ -10,6 +10,12 @@ import psycopg
 import numpy as np
 
 DB_URI = os.getenv("PG_BIO_URL", "postgresql://jonatas@localhost:28818/bio_demo")
+# Unset or empty: structures/models in the repository. Made absolute so
+# every module agrees whatever the working directory.
+MODELS_DIR = os.path.abspath(os.path.expanduser(
+    os.getenv("BIO_PIPELINES_MODELS_DIR")
+    or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "structures", "models")
+))
 
 # Hardware-calibrated concurrency benchmark results on Apple Silicon (with Dense Closest-First Batch Frontier + HNSW ef=64)
 CALIBRATED_BENCHMARKS = [
@@ -588,7 +594,7 @@ def _ensure_3d_pocket_indexed(cur, uid: str) -> int:
     if cur.fetchone():
         return 0
 
-    pdb_path = f"/Users/jonatas/code/ideia.me/assets/models/AF-{uid}-F1-model_v4.pdb"
+    pdb_path = f"{MODELS_DIR}/AF-{uid}-F1-model_v4.pdb"
     pdb_str = None
     if os.path.exists(pdb_path):
         try:
