@@ -7,8 +7,11 @@ CREATE EXTENSION IF NOT EXISTS pg_bio CASCADE;
 CREATE TABLE IF NOT EXISTS proteins (
     uniprot_id VARCHAR(20) PRIMARY KEY,
     name TEXT,
-    sequence TEXT
+    sequence TEXT,
+    embedding vector(1280)
 );
+-- A table from an older seed has no embedding column; add it in place.
+ALTER TABLE proteins ADD COLUMN IF NOT EXISTS embedding vector(1280);
 
 CREATE TABLE IF NOT EXISTS orphan_discoveries (
     id SERIAL PRIMARY KEY,
@@ -2512,3 +2515,13 @@ INSERT INTO swarm_telemetry_log (recorded_at, power_mode, active_workers, hid_id
 INSERT INTO swarm_telemetry_log (recorded_at, power_mode, active_workers, hid_idle_sec, load_avg_1m, steps_completed, edges_discovered, pockets_3d_indexed, rf_pairs_scored, avg_step_ms, p95_step_ms, steps_per_sec, edges_per_sec, total_graph_edges, total_3d_rf_edges, tpp_cascades_mapped, total_tpp_cascades) VALUES ('2026-11-23 11:18:45.883922-03'::timestamptz, 'IDLE_HYPER_16W', 16, 333.3, 11.01, 48, 576, 0, 0, 437.43, 617.28, 21.28, 255.31, 108312752, 5504, 32, 1937667);
 INSERT INTO swarm_telemetry_log (recorded_at, power_mode, active_workers, hid_idle_sec, load_avg_1m, steps_completed, edges_discovered, pockets_3d_indexed, rf_pairs_scored, avg_step_ms, p95_step_ms, steps_per_sec, edges_per_sec, total_graph_edges, total_3d_rf_edges, tpp_cascades_mapped, total_tpp_cascades) VALUES ('2026-11-23 11:18:48.77462-03'::timestamptz, 'IDLE_HYPER_16W', 16, 335.6, 11.01, 48, 576, 0, 0, 481.72, 639.16, 16.85, 202.21, 108313328, 5504, 33, 1937700);
 INSERT INTO swarm_telemetry_log (recorded_at, power_mode, active_workers, hid_idle_sec, load_avg_1m, steps_completed, edges_discovered, pockets_3d_indexed, rf_pairs_scored, avg_step_ms, p95_step_ms, steps_per_sec, edges_per_sec, total_graph_edges, total_3d_rf_edges, tpp_cascades_mapped, total_tpp_cascades) VALUES ('2026-11-23 11:18:51.972621-03'::timestamptz, 'IDLE_HYPER_16W', 16, 338.5, 10.61, 48, 576, 0, 0, 668.1, 1015.82, 15.21, 182.51, 108313904, 5504, 34, 1937734);
+
+-- The column the code reads is of no use empty: p1.embedding <=> p2.embedding
+-- is NULL, and the HNSW neighbour searches in swarm_discovery.py return
+-- nothing, so the swarm never finds a frontier node to expand.
+-- get_esm_embedding is immutable and parallel safe, so the seed can fill it
+-- here: 1412 rows in about 65 ms.
+UPDATE proteins
+   SET embedding = get_esm_embedding(sequence)::vector
+ WHERE embedding IS NULL
+   AND sequence IS NOT NULL;
