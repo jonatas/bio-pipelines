@@ -3771,6 +3771,28 @@ def _classify_element_type(organism, family_name, pi_val, gravy_val):
 
 IDEIAME_BLOG_POSTS = [
     {
+        'date': '2026-11-26',
+        'slug': 'dual-slim-disordered-microprotein-tethers-enzref-backpressure-pg-bio',
+        'url': 'https://ideia.me/dual-slim-disordered-microprotein-tethers-enzref-backpressure-pg-bio',
+        'title': 'Dual-SLiM Disordered Microprotein Tethers & EnzRef Kinetic Backpressure: How Twin-Plug Ribbon Cables Supercharge 48-Hour RK4 Metabolon Cascades in pg_bio',
+        'pair': ['L0JP89', 'A0A897MT85'],
+        'pipeline': 'desalination-brine-upcycling',
+        'arena_url': '/tpp?hub=L0JP89',
+        'compare_url': '/compare?node1=L0JP89&node2=D3SWG7&preset=tpp',
+        'cards_url': '/cards?hub=D3SWG7&challenger=L0JP89',
+    },
+    {
+        'date': '2026-11-26',
+        'slug': 'pocketvina-posebusters-enzref-pslim-tethers-pg-bio',
+        'url': 'https://ideia.me/pocketvina-posebusters-enzref-pslim-tethers-pg-bio',
+        'title': 'Multi-Pocket PoseBusters, SIMD EnzRef Role-Contrast & Disordered Microprotein pSLiM Tethers in pg_bio',
+        'pair': ['D3SWG7', 'A0ABD5UZ94'],
+        'pipeline': 'desalination-brine-upcycling',
+        'arena_url': '/compare?node1=A0ABD5UZ94&node2=D3SWG7&preset=rangefinder',
+        'compare_url': '/compare?node1=A0ABD5UZ94&node2=D3SWG7&preset=rangefinder',
+        'cards_url': '/cards?hub=A0ABD5UZ94&challenger=D3SWG7',
+    },
+    {
         'date': '2026-11-24',
         'slug': 'bio-pipelines-intro',
         'url': 'https://ideia.me/bio-pipelines-intro',
@@ -3985,20 +4007,22 @@ IDEIAME_PROTEIN_BLOG_MAP = {}
 for _bp in reversed(IDEIAME_BLOG_POSTS):
     for _pid in _bp['pair']:
         IDEIAME_PROTEIN_BLOG_MAP[_pid] = _bp
-IDEIAME_PROTEIN_BLOG_MAP['A0AAE3FRF8'] = IDEIAME_BLOG_POSTS[0]
-IDEIAME_PROTEIN_BLOG_MAP['M0AEU6'] = IDEIAME_BLOG_POSTS[0]
 IDEIAME_PROTEIN_BLOG_MAP['A0A897MT85'] = IDEIAME_BLOG_POSTS[0]
-IDEIAME_PROTEIN_BLOG_MAP['L0AC28'] = IDEIAME_BLOG_POSTS[1]
-IDEIAME_PROTEIN_BLOG_MAP['A0ABD5PUN8'] = IDEIAME_BLOG_POSTS[1]
-IDEIAME_PROTEIN_BLOG_MAP['A0A1I3C945'] = IDEIAME_BLOG_POSTS[1]
-IDEIAME_PROTEIN_BLOG_MAP['A0A1I4ES58'] = IDEIAME_BLOG_POSTS[1]
-IDEIAME_PROTEIN_BLOG_MAP['P80042'] = IDEIAME_BLOG_POSTS[3]
-IDEIAME_PROTEIN_BLOG_MAP['W0JQR7'] = IDEIAME_BLOG_POSTS[7]
-IDEIAME_PROTEIN_BLOG_MAP['A0A3N6LPR6'] = IDEIAME_BLOG_POSTS[7]
-IDEIAME_PROTEIN_BLOG_MAP['A0A4D8RYL5'] = IDEIAME_BLOG_POSTS[7]
-IDEIAME_PROTEIN_BLOG_MAP['A0A2U9IE16'] = IDEIAME_BLOG_POSTS[7]
-IDEIAME_PROTEIN_BLOG_MAP['M0GR98'] = IDEIAME_BLOG_POSTS[6]
-IDEIAME_PROTEIN_BLOG_MAP['A0ABD6CIW8'] = IDEIAME_BLOG_POSTS[6]
+IDEIAME_PROTEIN_BLOG_MAP['L0JP89'] = IDEIAME_BLOG_POSTS[0]
+IDEIAME_PROTEIN_BLOG_MAP['A0A2G1WGQ6'] = IDEIAME_BLOG_POSTS[0]
+IDEIAME_PROTEIN_BLOG_MAP['A0AAE3FRF8'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['M0AEU6'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['L0AC28'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['A0ABD5PUN8'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['A0A1I3C945'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['A0A1I4ES58'] = IDEIAME_BLOG_POSTS[2]
+IDEIAME_PROTEIN_BLOG_MAP['P80042'] = IDEIAME_BLOG_POSTS[5]
+IDEIAME_PROTEIN_BLOG_MAP['W0JQR7'] = IDEIAME_BLOG_POSTS[9]
+IDEIAME_PROTEIN_BLOG_MAP['A0A3N6LPR6'] = IDEIAME_BLOG_POSTS[9]
+IDEIAME_PROTEIN_BLOG_MAP['A0A4D8RYL5'] = IDEIAME_BLOG_POSTS[9]
+IDEIAME_PROTEIN_BLOG_MAP['A0A2U9IE16'] = IDEIAME_BLOG_POSTS[9]
+IDEIAME_PROTEIN_BLOG_MAP['M0GR98'] = IDEIAME_BLOG_POSTS[8]
+IDEIAME_PROTEIN_BLOG_MAP['A0ABD6CIW8'] = IDEIAME_BLOG_POSTS[8]
 
 
 def _build_poke_card_profile(uid, meta_row, family_name, organism_override=None):
@@ -4898,6 +4922,63 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             border-color: #38bdf8;
             color: #38bdf8;
         }
+        /* Widget Help Button & Collapsible Metric Glossary Drawers */
+        .widget-help-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            border-radius: 999px;
+            padding: 2px 9px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .widget-help-btn:hover, .widget-help-btn.is-open {
+            background: rgba(56, 189, 248, 0.2);
+            color: #f8fafc;
+            border-color: #38bdf8;
+        }
+        .widget-help-drawer {
+            display: none;
+            background: linear-gradient(160deg, #071022 0%, #050a15 100%);
+            border: 1px solid rgba(56, 189, 248, 0.38);
+            border-left: 4px solid #38bdf8;
+            border-radius: 9px;
+            padding: 11px 14px;
+            margin: 6px 0 10px 0;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        .widget-help-drawer.is-open {
+            display: block;
+        }
+        .help-grid-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .help-item-box {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid #1e293b;
+            border-radius: 7px;
+            padding: 8px 10px;
+        }
+        .help-item-box b {
+            color: #38bdf8;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.76rem;
+        }
+        .puzzle-card.is-focused-highlight {
+            border-color: #fde047 !important;
+            box-shadow: 0 0 0 2px rgba(253, 224, 71, 0.45), 0 12px 28px rgba(0, 0, 0, 0.65) !important;
+        }
     </style>
 </head>
 <body>
@@ -4919,6 +5000,31 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
 
     <main class="tel-container">
         <!-- 4-Stage Closed-Loop Pipeline System Architecture Bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:-6px;">
+            <span style="font-size:0.74rem;color:#94a3b8;font-weight:700;">4-Stage Closed-Loop Swarm &amp; Bioprocess Telemetry Overview</span>
+            <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-kpis', this)">❓ Explain Top KPIs &amp; Stages</button>
+        </div>
+        <div id="help-tel-kpis" class="widget-help-drawer">
+            <div style="font-weight:800;color:#38bdf8;margin-bottom:4px;">💡 How to Read the Top 4-Stage Pipeline &amp; 5 Telemetry KPI Cards</div>
+            <div class="help-grid-cols">
+                <div class="help-item-box">
+                    <b>🛰️ Total Correlation Graph &amp; Pending Frontier</b>
+                    <b>Explored Nodes</b> are proteins whose 320-D ESM-2 HNSW neighborhood has already been expanded. <b>Pending Frontier</b> rows (<code>status = 'Pending'</code>) are queued candidate edges waiting for the 16-worker swarm to compute Smith-Waterman, 3D Kabsch TM-score, RangeFinder pocket IoU, and TPP stability.
+                </div>
+                <div class="help-item-box">
+                    <b>⚡ Active Governor Regime (16W → 4W)</b>
+                    Reads macOS HID idle seconds &amp; CPU load every wave: <code>IDLE_HYPER_16W</code> (16 workers when user idle &ge;120s), <code>IDLE_TURBO_12W</code>, <code>ACTIVE_BOOST_8W</code>, or <code>ACTIVE_FLOOR_4W</code> so discovery runs at ~165+ edges/s without slowing interactive work.
+                </div>
+                <div class="help-item-box">
+                    <b>🎯 3D RangeFinder 10Å Pockets &amp; Elite Scores</b>
+                    Carves a 10Å catalytic bounding box around each AlphaFold active site and indexes 8 physicochemical <code>numrange</code> intervals in a PostgreSQL GiST index. <b>Elite RF (&ge;0.85)</b> means &ge;85% 3D pocket IoU overlap; <b>Elite Twilight</b> means high 3D/vector homology despite &lt;35% sequence identity.
+                </div>
+                <div class="help-item-box">
+                    <b>🌡️ TPP Cascade Ingest &amp; Spillover</b>
+                    In-silico Thermal Proteome Profiling (CETSA/TPP): measures how knocking out a small microprotein staple (&le;150 aa) lowers a partner complex's melting temperature (<b>&Delta;Tm</b>), shifts its <b>Ideal Operating Temp (T_opt)</b>, and triggers downstream <b>Spillover Enzymes</b>.
+                </div>
+            </div>
+        </div>
         <section class="pipeline-stage-bar" style="grid-template-columns: repeat(4, minmax(180px, 1fr));" aria-label="4-Stage Closed-Loop Bio-Pipeline Architecture">
             <a class="stage-step" style="border-left-color:#38bdf8;" href="/discovery" title="Stage 1: Open Multi-Worker Protein Correlation Swarm Heatmap">
                 <span class="st-num">Stage 1 · Continuous Discovery</span>
@@ -4935,10 +5041,10 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <span class="st-title">🧬 Evolving DUF Annotations</span>
                 <span class="st-meta" id="st3-meta">59 Orphans Fold-Gated (TM ≥ 0.50)</span>
             </a>
-            <a class="stage-step" style="border-left-color:#10b981;" href="#puzzles-section" title="Stage 4: Inspect the 3 Active Open Puzzles (Auto-Compiled 4/4 Pipelines are live on the main 🧬 Pipelines screen)">
+            <a class="stage-step" style="border-left-color:#10b981;" href="#puzzles-section" title="Stage 4: Inspect the Active Open Puzzles (Auto-Compiled 4/4 Pipelines are live on the main 🧬 Pipelines screen)">
                 <span class="st-num">Stage 4 · Open Puzzle Board</span>
-                <span class="st-title">🧩 3 Open Puzzles (10 Compiled on /)</span>
-                <span class="st-meta" id="st5-meta">3 Active Puzzles Awaiting 4th Module</span>
+                <span class="st-title">🧩 12 Open Puzzles (10 Compiled on /)</span>
+                <span class="st-meta" id="st5-meta">3 Near-Lock (3/4) · 9 Seeds (2/4)</span>
             </a>
         </section>
 
@@ -5004,7 +5110,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <div class="chart-panel" id="timeline-section">
                 <div class="chart-header">
                     <h2>1. Overnight Cumulative Graph Expansion &amp; Discovery Velocity</h2>
-                    <span>15-Minute Telemetry Buckets (390K → 103.6M+ Edges)</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span>15-Minute Telemetry Buckets (390K → 146.8M+ Edges)</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-c1', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tel-c1" class="widget-help-drawer">
+                    <b>Cumulative Graph Edges (M)</b> shows total protein-protein homology &amp; 3D pocket edges persisted in <code>swarm_edges</code> over time. <b>Discovery Rate (edges/s)</b> (gold bars) tracks sustained scoring speed per 15-minute bucket alongside <b>Active Workers</b> (dashed purple line).
                 </div>
                 <div id="chart-timeline" class="echart-box"></div>
             </div>
@@ -5012,7 +5124,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <div class="chart-panel" id="calibration-section">
                 <div class="chart-header">
                     <h2>2. Apple Silicon (8P+2E) Concurrency Calibration Curve</h2>
-                    <span>Throughput (Edges/s) vs Step Latency (ms) &amp; Scaling Efficiency (%)</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span>Throughput (Edges/s) vs Step Latency (ms) &amp; Scaling Efficiency (%)</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-c2', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tel-c2" class="widget-help-drawer">
+                    Benchmarks parallel worker pools (<code>2W</code> to <code>16W</code>) against PostgreSQL 18 shared buffers &amp; Rust SIMD kernels. <b>Scaling Efficiency (%)</b> compares multi-worker throughput against linear single-worker scaling, showing why <code>12W–16W</code> saturates all 8 Performance + 2 Efficiency cores cleanly.
                 </div>
                 <div id="chart-calibration" class="echart-box"></div>
             </div>
@@ -5020,7 +5138,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <div class="chart-panel" id="regimes-section">
                 <div class="chart-header">
                     <h2>3. Power Regime Breakdown (`IDLE_HYPER_16W` · `IDLE_TURBO_12W` · `ACTIVE_BOOST_8W` · `ACTIVE_FLOOR_4W`)</h2>
-                    <span>Edges Discovered, Nodes Explored &amp; Mean Throughput per Mode</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span>Edges Discovered, Nodes Explored &amp; Mean Throughput per Mode</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-c3', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tel-c3" class="widget-help-drawer">
+                    Aggregates total edges discovered, frontier nodes expanded, and mean throughput (<code>edges/s</code>) contributed by each adaptive governor regime. Over 85% of total discovery volume is mined automatically during <code>IDLE_HYPER_16W</code> bursts.
                 </div>
                 <div id="chart-regimes" class="echart-box"></div>
             </div>
@@ -5028,54 +5152,94 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             <div class="chart-panel" id="live-waves-section">
                 <div class="chart-header">
                     <h2>4. Live Rolling Wave Stream (Last 60 Waves · Auto-Refreshes Every 5s)</h2>
-                    <span>Real-Time Edges/s, Steps/s, TPP KOs/wave &amp; Mean Step Latency (ms)</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span>Real-Time Edges/s, Steps/s, TPP KOs/wave &amp; Mean Step Latency (ms)</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-c4', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tel-c4" class="widget-help-drawer">
+                    Each <b>Wave</b> is a batch of frontier nodes popped from <code>swarm_frontier</code>. <b>Edges/sec</b> is total verified homology/pocket links written per second; <b>TPP KOs/wave</b> (rose bars) is the number of microprotein thermal knockout cascades mined in that wave; <b>Avg Latency (ms)</b> is per-node SQL+3D step time.
                 </div>
                 <div id="chart-live-waves" class="echart-box"></div>
             </div>
         </section>
 
-        <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds + Daisy-Chained M5/M6/M7 Composite Super-Pipelines + Interactive Routing Graph) -->
+        <!-- Any-Order Open Bioprocess Puzzle Board (3/4 Near-Lock + 2/4 Combinatorial Seeds + Daisy-Chained M5/M6/M7 Composite Super-Pipelines + Static Routing Graph) -->
         <section class="breakthrough-panel" id="puzzles-section" aria-label="Open Bioprocess Puzzle Board and 4-Phase Embedded Validation Gates">
             <div class="puzzles-board-header" id="puzzles-board-caption">
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                     <span class="puzzles-board-title">🧩 Open Bioprocess Puzzle Board (<span id="open-puzzles-cnt-lbl">12</span> Active · Out-of-Order Phase Lock &amp; M5/M6/M7 Composite Graph)</span>
                     <a href="/discovery?limit=puzzle-pending" class="pz-pending-pill" id="pz-total-frontier-pill" title="Inspect enqueued Pending next-bait candidates (status = 'Pending') and Locked Hubs across all Open Puzzles in the Swarm Discovery Grid">🛰️ ~495.9K / 1.37M Pending Edges (36.1% of Frontier) Scouting Open Puzzles</a>
+                    <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-puzzles', this)">❓ Explain Puzzle Roles &amp; Graph</button>
                 </div>
                 <div class="puzzles-filter-group">
                     <button type="button" class="bt-preset-btn is-active" id="pz-btn-all" onclick="setPuzzleBoardFilter('all')">All Open (<span id="pz-cnt-all">12</span>)</button>
                     <button type="button" class="bt-preset-btn" id="pz-btn-3" onclick="setPuzzleBoardFilter('3')">⏳ 3/4 Near-Lock (<span id="pz-cnt-3">3</span>)</button>
                     <button type="button" class="bt-preset-btn" id="pz-btn-2" onclick="setPuzzleBoardFilter('2')">🧩 2/4 Seeds (<span id="pz-cnt-2">9</span>)</button>
                     <button type="button" class="bt-preset-btn" id="pz-btn-comp" style="border-color:#c084fc;color:#e9d5ff;" onclick="setPuzzleBoardFilter('composite')">🔗 Composite M5·M6·M7 Chains (<span id="pz-cnt-comp">4</span>)</button>
-                    <button type="button" class="bt-preset-btn" id="pz-btn-graph" style="border-color:#10b981;color:#34d399;background:rgba(16,185,129,0.14);" onclick="setPuzzleBoardFilter('graph')">🕸️ Interactive Routing Graph</button>
+                    <button type="button" class="bt-preset-btn" id="pz-btn-graph" style="border-color:#10b981;color:#34d399;background:rgba(16,185,129,0.14);" onclick="setPuzzleBoardFilter('graph')">🕸️ Static Routing Graph</button>
                     <a href="/" class="tel-metric-link" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;margin-left:4px;">⚡ 10 Compiled &rarr;</a>
                 </div>
             </div>
 
-            <!-- Interactive Bipartite Metabolic & Module Routing Hypergraph (ECharts Force + Inspector Sidebar) -->
+            <div id="help-tel-puzzles" class="widget-help-drawer">
+                <div style="font-weight:800;color:#34d399;margin-bottom:4px;">💡 How the Out-of-Order Bioprocess Puzzle Board &amp; Static Routing Hypergraph Work</div>
+                <div class="help-grid-cols">
+                    <div class="help-item-box">
+                        <b>🧬 Core 4-Phase Modules (M1 → M2 → M3 → M4 in Any Order)</b>
+                        <b>M1 Anchor</b> (Emerald): Captures or imports raw feedstock at surfaces/membranes.<br>
+                        <b>M2 Scissor</b> (Blue): Primary catalytic bond-cleaving enzyme.<br>
+                        <b>M3 Sink</b> (Purple): Downstream thermodynamic sink or cofactor recycler that prevents product inhibition.<br>
+                        <b>M4 Beacon</b> (Pink): Allosteric regulator, riboswitch, or selective export gate.
+                    </div>
+                    <div class="help-item-box">
+                        <b>⏳ 3/4 Near-Lock &amp; 🧩 2/4 Combinatorial Seeds</b>
+                        Puzzles do <i>not</i> need to be discovered in 1→2→3→4 order. A puzzle can lock <code>M2+M3+M4</code> first while missing <code>M1</code> (or any 2-phase combination like <code>M1+M4</code>). Every 5th wave, <code>retro_feed_open_puzzle_frontier_nodes()</code> injects candidate proteins from that organism clade into the <b>Pending Frontier</b> to hunt the missing slots. Once 4/4 lock, the puzzle graduates to the main <b>🧬 Pipelines</b> screen.
+                    </div>
+                    <div class="help-item-box">
+                        <b>🔗 Post-Processing Bridges (M5 · M6 · M7 Composite Chains)</b>
+                        Plugs the output of <b>Upstream Pipeline A</b> into <b>Downstream Pipeline B</b>:<br>
+                        <b>M5 Exporter</b>: Periplasmic/ABC transporter or vesicle handoff.<br>
+                        <b>M6 Cofactor Bus</b>: Shared NAD(P)H, ATP, SAM, or Ferredoxin regeneration loop.<br>
+                        <b>M7 Chassis Armor</b>: Halocin/ectoine/S-layer shield enabling co-culture survival.
+                    </div>
+                    <div class="help-item-box">
+                        <b>⭐ Shared Keystone Hubs &amp; Click-to-Focus Subgraph</b>
+                        In the static graph below, <b>Left Swimlanes</b> show Open Puzzles, the <b>Center Spine (⭐)</b> highlights <b>Keystone Proteins</b> shared across &ge;2 pipelines, and <b>Right Swimlanes</b> show 7/7 Composite Chains. Click any <b>Pipeline Pill</b>, <b>◆ Hub</b>, or <b>🕸️ Focus Graph</b> button on a card to isolate its focused subgraph and jump directly to the pipeline!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Static Deterministic Bipartite Metabolic & Module Routing Hypergraph (Swimlane Layout + Pipeline Subgraph Focus + Inspector Sidebar) -->
             <div id="puzzle-routing-graph-wrap" style="background:#060b16;border:1px solid #1e293b;border-radius:10px;padding:12px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e293b;">
                     <div>
-                        <span style="font-size:0.86rem;font-weight:800;color:#34d399;">🕸️ Interactive Bioprocess Metabolic &amp; Module Routing Hypergraph (<span id="pg-nodes-cnt">0</span> Nodes · <span id="pg-edges-cnt">0</span> Directed Edges)</span>
+                        <span style="font-size:0.86rem;font-weight:800;color:#34d399;">🕸️ Static Bioprocess Metabolic &amp; Module Routing Graph (<span id="pg-nodes-cnt">0</span> Nodes · <span id="pg-edges-cnt">0</span> Directed Edges · <span id="pg-mode-badge" style="color:#38bdf8;">🌐 All Swimlanes Overview</span>)</span>
                         <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">
-                            Non-sequential directed reaction &amp; cofactor graph: <b>Shared Keystone Hubs</b> (e.g. <code>A0A1N7D179</code> Ferredoxin, <code>L9VS02</code> SAM Shield, <code>M0GR98</code> S-Layer Anchor, <code>V5TNY2</code> Clamp) bridge multiple pipelines while <b>Dashed Amber Edges (<code>⏳</code>)</b> mark open out-of-order phase slots actively hunted by the swarm.
+                            Static deterministic swimlane architecture (zero motion): <b>Left Swimlanes</b> = Open Puzzles (<code>M1&rarr;M4</code>) · <b>Center Spine (⭐)</b> = Shared Multi-Pipeline Keystone Hubs · <b>Right Swimlanes</b> = Daisy-Chained 7-Phase Composite Super-Pipelines. Click any pipeline or node to focus its correlations.
                         </div>
                     </div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:0.69rem;font-weight:700;">
-                        <span style="color:#38bdf8;">◆ Metabolite / Handoff Pool</span>
+                        <span style="color:#38bdf8;">◆ Pipeline / Handoff Hub</span>
                         <span style="color:#34d399;">● M1 Anchor</span>
                         <span style="color:#60a5fa;">● M2 Scissor</span>
                         <span style="color:#a78bfa;">● M3 Sink</span>
                         <span style="color:#f472b6;">● M4 Beacon</span>
-                        <span style="color:#fbbf24;">▲ M5·M6·M7 Post-Process</span>
-                        <span style="color:#f59e0b;border-bottom:2px dashed #f59e0b;">- - ⏳ Open Slot Gap</span>
+                        <span style="color:#fbbf24;">▲ M5·M6·M7 Bridge</span>
+                        <span style="color:#fde047;">⭐ Shared Keystone</span>
+                        <span style="color:#f59e0b;border-bottom:2px dashed #f59e0b;">- - ⏳ Open Slot</span>
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:stretch;">
-                    <div id="chart-puzzle-routing-graph" style="width:100%;height:460px;background:radial-gradient(circle at 50% 50%, #0b1528 0%, #050912 100%);border-radius:8px;border:1px solid #1e293b;"></div>
+
+                <!-- Pipeline Subgraph Focus Bar -->
+                <div id="pg-focus-bar" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:8px;padding:6px 8px;background:#091020;border:1px solid #1e293b;border-radius:7px;"></div>
+
+                <div style="display:grid;grid-template-columns:1fr 350px;gap:12px;align-items:stretch;">
+                    <div id="chart-puzzle-routing-graph" style="width:100%;height:560px;background:radial-gradient(circle at 50% 50%, #0b1528 0%, #050912 100%);border-radius:8px;border:1px solid #1e293b;"></div>
                     <aside id="puzzle-graph-inspector" style="background:#0b1324;border:1px solid #1e293b;border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;font-size:0.75rem;">
                         <div id="pg-insp-content">
-                            <div style="color:#38bdf8;font-weight:800;font-size:0.82rem;margin-bottom:4px;">🔭 Graph Node &amp; Edge Inspector</div>
-                            <div style="color:#94a3b8;line-height:1.45;">Click any <b>Protein Module</b>, <b>Shared Metabolite Pool</b>, <b>Keystone Hub</b>, or <b>⏳ Open Slot Node</b> in the graph to inspect its 3D pocket gates, cross-pipeline connections, and live Pending frontier coverage.</div>
+                            <div style="color:#38bdf8;font-weight:800;font-size:0.82rem;margin-bottom:4px;">🔭 Graph Node &amp; Pipeline Focus Inspector</div>
+                            <div style="color:#94a3b8;line-height:1.45;">Click any <b>◆ Pipeline Hub</b>, <b>● Protein Module</b>, <b>⭐ Shared Keystone Hub</b>, or <b>⏳ Open Slot</b> in the static graph (or click a pipeline pill above) to focus its subgraph, inspect its SQL gates, and jump directly to the pipeline or puzzle card.</div>
                         </div>
                         <div id="pg-keystone-list" style="border-top:1px solid #1e293b;padding-top:8px;"></div>
                     </aside>
@@ -5098,8 +5262,14 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <table class="tel-table">
                     <caption id="pipelines-gist-caption" style="color:#34d399;">
                         <div class="caption-bar">
-                            <span>🧬 10 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span>🧬 10 Compiled 4-Module (M1&rarr;M2&rarr;M3&rarr;M4) Bio-Pipelines &amp; Live 8-Column RangeFinder GiST Reverse Target Fishing (`swarm_pocket_ranges`)</span>
+                                <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-gist', this)">❓ Explain GiST Metrics</button>
+                            </div>
                             <a href="/" class="tel-metric-link" style="font-size:0.76rem;color:#38bdf8;font-family:ui-monospace,monospace;">Open Interactive 48h RK4 Digital Twin &rarr;</a>
+                        </div>
+                        <div id="help-tel-gist" class="widget-help-drawer" style="font-weight:400;">
+                            <b>Reverse Target Fishing (`swarm_pocket_ranges`)</b>: Each row represents a complete 4/4 compiled bioprocess pipeline and its key reaction intermediate SMILES. Using PostgreSQL's 8-column GiST index over <code>(MW, LogP, TPSA, HBD, HBA, RotBonds, FormalCharge, Fsp3)</code> <code>numrange</code> envelopes, <b>8/8 GiST Pocket Matches</b> counts how many 10Å 3D AlphaFold pockets across the proteome geometrically and electrostatically contain all 8 properties of that substrate simultaneously (<b>&ge;6/8 Matches</b> allows up to 2 flexible peripheral properties).
                         </div>
                     </caption>
                     <thead>
@@ -5124,7 +5294,10 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <table class="tel-table">
                     <caption id="overnight-breakthroughs-caption">
                         <div class="caption-bar">
-                            <span id="bt-caption-text">🏆 Top Breakthrough Discoveries (<span id="bt-window-label" style="color:#38bdf8;">Last 24 Hours</span> · <span id="bt-edge-range-label" style="color:#34d399;font-family:ui-monospace,monospace;">Loading…</span>) — Click any Protein ID, Organism, or Metric Score</span>
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span id="bt-caption-text">🏆 Top Breakthrough Discoveries (<span id="bt-window-label" style="color:#38bdf8;">Last 24 Hours</span> · <span id="bt-edge-range-label" style="color:#34d399;font-family:ui-monospace,monospace;">Loading…</span>) — Click any Protein ID, Organism, or Metric Score</span>
+                                <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-bt', this)">❓ Explain Breakthrough Metrics</button>
+                            </div>
                             <search class="bt-filter-search" aria-label="Filter top breakthrough discoveries by since date">
                                 <form class="bt-filter-form" action="/telemetry" method="GET" id="bt-since-form" aria-labelledby="overnight-breakthroughs-caption" onsubmit="event.preventDefault(); applySinceDateFromInput();">
                                     <label class="bt-filter-label" for="bt-since-date">📅 Since:</label>
@@ -5135,6 +5308,22 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                                     <button type="button" class="bt-preset-btn" id="bt-btn-all" onclick="setBreakthroughWindowPreset('all')">All Overnight (&gt;390K)</button>
                                 </form>
                             </search>
+                        </div>
+                        <div id="help-tel-bt" class="widget-help-drawer" style="font-weight:400;">
+                            <div class="help-grid-cols">
+                                <div class="help-item-box">
+                                    <b>🌌 Twilight-Zone Score &amp; SW ID %</b>
+                                    <b>Smith-Waterman (SW ID %)</b> is exact local amino-acid sequence identity. In the <b>Twilight Zone (&lt;35% SW ID)</b>, traditional BLAST fails; a high <b>Twilight-Zone Score (&gt;0.80)</b> rewards pairs that diverge in sequence across extremophile genera while preserving 320-D ESM-2 vector proximity (low <code>d</code>).
+                                </div>
+                                <div class="help-item-box">
+                                    <b>🎯 RangeFinder 10Å IoU &amp; RF Score</b>
+                                    <b>IoU (Intersection-over-Union, 0..1)</b> measures the 8-dimensional overlap between two enzymes' 10Å active-site physicochemical bounding boxes. High IoU (&ge;0.85) indicates both active sites accommodate the same substrate/intermediate geometry.
+                                </div>
+                                <div class="help-item-box">
+                                    <b>📐 3D TM-Score &amp; RosettaChaperone</b>
+                                    <b>TM-Score (0..1)</b> from 3D Kabsch C&alpha; superposition: <code>TM &ge; 0.50</code> proves identical global 3D protein fold. <b>Chaperone Score</b> measures buried interfacial hydrogen-bond network quality and absence of Buried Unsatisfied Polar Atoms (BUNS).
+                                </div>
+                            </div>
                         </div>
                     </caption>
                     <thead>
@@ -5159,8 +5348,14 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 <table class="tel-table">
                     <caption id="agent-duf-caption" style="color:#38bdf8;">
                         <div class="caption-bar">
-                            <span>🧬 Evolving Dark-Proteome (`DUF` / Uncharacterized) Functional Annotations (`bio_annotation_evolution`) — Click any Orphan ID, Partner, or Metric to inspect in 3D</span>
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span>🧬 Evolving Dark-Proteome (`DUF` / Uncharacterized) Functional Annotations (`bio_annotation_evolution`) — Click any Orphan ID, Partner, or Metric to inspect in 3D</span>
+                                <button type="button" class="widget-help-btn" onclick="toggleWidgetHelp('help-tel-duf', this)">❓ Explain DUF Evolution</button>
+                            </div>
                             <span id="agent-chk-badge" style="font-size:0.74rem;color:#34d399;font-family:ui-monospace,monospace;">In-Process Swarm Hook (Every 25 Waves) + Cron (*/30m) Active</span>
+                        </div>
+                        <div id="help-tel-duf" class="widget-help-drawer" style="font-weight:400;">
+                            <b>Dark-Proteome (`DUF`) Functional Rescue</b>: Tracks proteins originally labeled <i>Uncharacterized protein</i> or <i>Domain of Unknown Function (DUF)</i>. When the autonomous agent finds convergent cross-genus homology edges supported by <b>3D Fold Gate (TM-Score &ge; 0.50)</b> and <b>10Å RangeFinder Pocket IoU (&ge; 85%)</b>, it evolves the functional annotation (<code>v1 &rarr; v2 &rarr; v3</code>). <b>Gated Synergy (%)</b> combines vector homology, 3D fold lock, length-ratio compatibility, and pocket overlap into a single confidence score.
                         </div>
                     </caption>
                     <thead>
@@ -5220,11 +5415,32 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             return Number(n || 0).toLocaleString();
         }
 
+        function toggleWidgetHelp(drawerId, btnEl) {
+            const el = document.getElementById(drawerId);
+            if (!el) return;
+            const isOpen = el.classList.toggle('is-open');
+            if (btnEl) btnEl.classList.toggle('is-open', isOpen);
+        }
+
         // Breakthrough Since-Date Filter State (Default: '24h' = Last 24 Hours)
         var ACTIVE_BT_SINCE = (new URLSearchParams(window.location.search).get('since') || '24h').trim() || '24h';
         var ACTIVE_PZ_FILTER = 'all';
+        var ACTIVE_GRAPH_FOCUS_PIPELINE = '';
+        var _LAST_GRAPH_SIGNATURE = '';
         var LAST_OPEN_PUZZLES = [];
         var LAST_COMPOSITE_CHAINS = [];
+        var COMPILED_PIPELINE_SLUGS = new Set([
+            'pet-plastic-depolymerization',
+            'pfas-forever-chemical-defluorination',
+            'cyanide-mine-tailings-detox',
+            'habanero-capsaicin-terpene-synth',
+            'smorf-hla-immunopeptidomics',
+            'soda-lake-acetyl-chitin-upcycling',
+            'ptfe-to-bioceramic',
+            'desalination-brine-mining',
+            'deep-sea-methane-seep-capture',
+            'acid-mine-drainage-bioleaching'
+        ]);
 
         function setPuzzleBoardFilter(mode) {
             ACTIVE_PZ_FILTER = mode || 'all';
@@ -5247,14 +5463,128 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
             }
             renderOpenPuzzlesRows(LAST_OPEN_PUZZLES);
             renderCompositeChainsRows(LAST_COMPOSITE_CHAINS);
-            renderPuzzleRoutingGraph(LAST_OPEN_PUZZLES, LAST_COMPOSITE_CHAINS);
+            renderPuzzleRoutingGraph(LAST_OPEN_PUZZLES, LAST_COMPOSITE_CHAINS, true);
         }
 
-        function renderPuzzleRoutingGraph(openPzs, chains) {
+        function focusPipelineInGraph(pipelineId, scrollGraphIntoView) {
+            ACTIVE_GRAPH_FOCUS_PIPELINE = pipelineId || '';
+            const gWrap = document.getElementById('puzzle-routing-graph-wrap');
+            if (gWrap && gWrap.style.display === 'none') {
+                gWrap.style.display = 'block';
+                setTimeout(() => { if (chPuzzleGraph) chPuzzleGraph.resize(); }, 30);
+            }
+            renderPuzzleRoutingGraph(LAST_OPEN_PUZZLES, LAST_COMPOSITE_CHAINS, true);
+            if (scrollGraphIntoView && gWrap) {
+                gWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            // Highlight matching card below if visible
+            document.querySelectorAll('.puzzle-card').forEach(card => {
+                card.classList.toggle('is-focused-highlight', Boolean(ACTIVE_GRAPH_FOCUS_PIPELINE && card.dataset.pipelineId === ACTIVE_GRAPH_FOCUS_PIPELINE));
+            });
+        }
+
+        function scrollToOrOpenPipeline(pipelineId) {
+            if (!pipelineId) return;
+            const cardEl = document.getElementById('pz-card-' + pipelineId);
+            if (cardEl && cardEl.offsetParent !== null) {
+                document.querySelectorAll('.puzzle-card').forEach(c => c.classList.remove('is-focused-highlight'));
+                cardEl.classList.add('is-focused-highlight');
+                cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            // If card is hidden because of filter='graph', switch filter to 'all' and scroll to it
+            if (cardEl && cardEl.offsetParent === null) {
+                setPuzzleBoardFilter('all');
+                setTimeout(() => {
+                    const c2 = document.getElementById('pz-card-' + pipelineId);
+                    if (c2) {
+                        c2.classList.add('is-focused-highlight');
+                        c2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 60);
+                return;
+            }
+            // Otherwise if it is a compiled 4/4 pipeline on main screen, navigate to /?pipeline=<slug>
+            window.location.href = '/?pipeline=' + encodeURIComponent(pipelineId);
+        }
+
+        function renderGraphInspectorForNode(d) {
+            const insp = document.getElementById('pg-insp-content');
+            if (!insp || !d) return;
+            const pipes = d.pipelines || (d.pipeline ? [d.pipeline] : []);
+            const pipeLinksHtml = pipes.map(pid => {
+                const isComp = pid.startsWith('comp-');
+                const isOpenPz = (LAST_OPEN_PUZZLES || []).some(p => p.puzzle_id === pid);
+                const focusBtn = `<button type="button" class="kpi-pill-link" style="cursor:pointer;border-color:#38bdf8;color:#38bdf8;" onclick="focusPipelineInGraph('${pid}', false)" title="Isolate and focus ${pid} in the static routing graph">🎯 Focus ${pid.replace(/^auto-/, '').replace(/-organic-machine$/, '').slice(0, 18)}</button>`;
+                const jumpBtn = (isOpenPz || isComp)
+                    ? `<button type="button" class="kpi-pill-link" style="cursor:pointer;border-color:#10b981;color:#34d399;" onclick="scrollToOrOpenPipeline('${pid}')" title="Scroll down and highlight the ${pid} card">📜 Go to Card &darr;</button>`
+                    : `<a class="kpi-pill-link" style="border-color:#10b981;color:#34d399;" href="/?pipeline=${encodeURIComponent(pid)}" title="Open ${pid} on the main 48h RK4 Digital Twin screen">🚀 Open Pipeline &rarr;</a>`;
+                return `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px;">${focusBtn}${jumpBtn}</div>`;
+            }).join('');
+
+            const uidBtns = d.uid
+                ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:6px;border-top:1px dashed #1e293b;">
+                       <a class="tel-btn" style="padding:4px 9px;font-size:0.71rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(d.uid)}">🃏 Open ${d.uid} Card</a>
+                       <a class="tel-btn" style="padding:4px 9px;font-size:0.71rem;border-color:#fb7185;color:#fb7185;" href="/tpp?hub=${encodeURIComponent(d.uid)}">🌡️ TPP Lab</a>
+                   </div>`
+                : '';
+
+            const resetFocusBtn = ACTIVE_GRAPH_FOCUS_PIPELINE
+                ? `<div style="margin-top:8px;"><button type="button" class="tel-btn" style="width:100%;padding:4px 9px;font-size:0.71rem;border-color:#94a3b8;color:#e2e8f0;" onclick="focusPipelineInGraph('', false)">🌐 Back to All Swimlanes Overview</button></div>`
+                : '';
+
+            insp.innerHTML = `
+                <div style="color:#38bdf8;font-weight:800;font-size:0.84rem;margin-bottom:4px;">${d.detailTitle || d.name}</div>
+                <div style="color:#e2e8f0;font-size:0.74rem;margin-bottom:6px;line-height:1.4;">${d.detailSub || ''}</div>
+                <div style="color:#94a3b8;font-size:0.71rem;background:#060b16;padding:6px 8px;border-radius:6px;border:1px solid #1e293b;font-family:ui-monospace,monospace;line-height:1.4;">${d.detailRule || ''}</div>
+                <div style="color:#34d399;font-size:0.71rem;margin-top:7px;"><b>Connected Pipelines (${pipes.length}) — Click to Focus or Open:</b></div>
+                ${pipeLinksHtml}
+                ${uidBtns}
+                ${resetFocusBtn}
+            `;
+        }
+
+        function renderPuzzleRoutingGraph(openPzs, chains, forceRedraw) {
             if (!chPuzzleGraph) return;
+            const sig = JSON.stringify({
+                p: (openPzs || []).map(x => [x.puzzle_id, x.slots_filled]),
+                c: (chains || []).map(x => x.composite_id),
+                f: ACTIVE_GRAPH_FOCUS_PIPELINE
+            });
+            if (!forceRedraw && sig === _LAST_GRAPH_SIGNATURE) {
+                return;
+            }
+            _LAST_GRAPH_SIGNATURE = sig;
+
+            // Update Focus Pill Bar
+            const focusBar = document.getElementById('pg-focus-bar');
+            if (focusBar) {
+                const allAct = !ACTIVE_GRAPH_FOCUS_PIPELINE ? 'background:rgba(56,189,248,0.22);border-color:#38bdf8;color:#38bdf8;' : '';
+                let fbHtml = `<span style="font-size:0.7rem;font-weight:800;color:#94a3b8;margin-right:2px;">🎯 Focus Pipeline Subgraph:</span>`;
+                fbHtml += `<button type="button" class="kpi-pill-link" style="cursor:pointer;${allAct}" onclick="focusPipelineInGraph('', false)">🌐 All Swimlanes (${(openPzs || []).length + (chains || []).length})</button>`;
+                (openPzs || []).forEach(pz => {
+                    const isAct = ACTIVE_GRAPH_FOCUS_PIPELINE === pz.puzzle_id ? 'background:rgba(16,185,129,0.25);border-color:#34d399;color:#34d399;' : '';
+                    const shortName = pz.puzzle_id.replace(/^auto-/, '').replace(/-organic-machine$/, '');
+                    const icon = pz.slots_filled === 3 ? '⏳' : '🧩';
+                    fbHtml += `<button type="button" class="kpi-pill-link" style="cursor:pointer;${isAct}" onclick="focusPipelineInGraph('${pz.puzzle_id}', false)" title="${pz.title} (${pz.slots_filled}/4 Locked)">${icon} ${shortName}</button>`;
+                });
+                (chains || []).forEach(cr => {
+                    const isAct = ACTIVE_GRAPH_FOCUS_PIPELINE === cr.composite_id ? 'background:rgba(192,132,252,0.25);border-color:#c084fc;color:#e9d5ff;' : '';
+                    const shortComp = cr.composite_id.replace(/^comp-/, '');
+                    fbHtml += `<button type="button" class="kpi-pill-link" style="cursor:pointer;${isAct}" onclick="focusPipelineInGraph('${cr.composite_id}', false)" title="Composite 7-Phase Super-Pipeline: ${cr.title}">🔗 ${shortComp}</button>`;
+                });
+                focusBar.innerHTML = fbHtml;
+            }
+
+            const modeBadge = document.getElementById('pg-mode-badge');
+            if (modeBadge) {
+                modeBadge.textContent = ACTIVE_GRAPH_FOCUS_PIPELINE
+                    ? `🎯 Focused Subgraph: ${ACTIVE_GRAPH_FOCUS_PIPELINE}`
+                    : '🌐 All Swimlanes Overview';
+            }
+
             const nodesMap = new Map();
             const links = [];
-            const uidPipelines = {};
 
             function addNode(id, obj) {
                 if (!nodesMap.has(id)) {
@@ -5264,6 +5594,8 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 if (obj.pipeline && !existing.pipelines.includes(obj.pipeline)) {
                     existing.pipelines.push(obj.pipeline);
                 }
+                if (obj.x !== undefined && existing.x === undefined) existing.x = obj.x;
+                if (obj.y !== undefined && existing.y === undefined) existing.y = obj.y;
                 return existing;
             }
 
@@ -5279,100 +5611,190 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 'Open_Slot': '#f59e0b'
             };
 
-            // 1. Add all active open puzzles (3/4 & 2/4) as directed subgraphs with shared protein hubs & dashed open slots
+            // Pre-count how many pipelines each UID participates in across all open puzzles + composite chains
+            const uidPipeSet = {};
+            function trackUidPipe(uid, pid) {
+                if (!uid || !pid) return;
+                if (!uidPipeSet[uid]) uidPipeSet[uid] = new Set();
+                uidPipeSet[uid].add(pid);
+            }
             (openPzs || []).forEach(pz => {
+                (pz.slots || []).forEach(sl => {
+                    if (sl.locked && sl.uid) trackUidPipe(sl.uid, pz.puzzle_id);
+                });
+            });
+            (chains || []).forEach(cr => {
+                trackUidPipe(cr.m5_exporter_uid, cr.composite_id);
+                trackUidPipe(cr.m6_cofactor_uid, cr.composite_id);
+                trackUidPipe(cr.m7_chassis_uid, cr.composite_id);
+                trackUidPipe(cr.m5_exporter_uid, cr.upstream_pipeline);
+                trackUidPipe(cr.m5_exporter_uid, cr.downstream_pipeline);
+            });
+
+            // Determine which pipelines are in view (either all, or the focused pipeline + any pipeline sharing a keystone UID/handoff with it)
+            let activePzs = openPzs || [];
+            let activeChains = chains || [];
+            if (ACTIVE_GRAPH_FOCUS_PIPELINE) {
+                const focusUids = new Set();
+                const focusPipes = new Set([ACTIVE_GRAPH_FOCUS_PIPELINE]);
+                (openPzs || []).forEach(pz => {
+                    if (pz.puzzle_id === ACTIVE_GRAPH_FOCUS_PIPELINE) {
+                        (pz.slots || []).forEach(sl => { if (sl.locked && sl.uid) focusUids.add(sl.uid); });
+                    }
+                });
+                (chains || []).forEach(cr => {
+                    if (cr.composite_id === ACTIVE_GRAPH_FOCUS_PIPELINE || cr.upstream_pipeline === ACTIVE_GRAPH_FOCUS_PIPELINE || cr.downstream_pipeline === ACTIVE_GRAPH_FOCUS_PIPELINE) {
+                        focusPipes.add(cr.composite_id);
+                        focusPipes.add(cr.upstream_pipeline);
+                        focusPipes.add(cr.downstream_pipeline);
+                        [cr.m5_exporter_uid, cr.m6_cofactor_uid, cr.m7_chassis_uid].forEach(u => { if (u) focusUids.add(u); });
+                    }
+                });
+                // Also include any neighbor pipeline that shares a Keystone UID with the focused pipeline
+                (openPzs || []).forEach(pz => {
+                    if ((pz.slots || []).some(sl => sl.locked && sl.uid && focusUids.has(sl.uid))) {
+                        focusPipes.add(pz.puzzle_id);
+                    }
+                });
+                (chains || []).forEach(cr => {
+                    if ([cr.m5_exporter_uid, cr.m6_cofactor_uid, cr.m7_chassis_uid].some(u => focusUids.has(u))) {
+                        focusPipes.add(cr.composite_id);
+                    }
+                });
+                activePzs = (openPzs || []).filter(pz => focusPipes.has(pz.puzzle_id));
+                activeChains = (chains || []).filter(cr => focusPipes.has(cr.composite_id));
+            }
+
+            // Deterministic Swimlane Coordinates (Canvas coordinate space: X in [40..1000], Y in [35..525])
+            // Left Swimlanes: Open Puzzles (X = 75 for Hub, X = 195, 295, 395, 495 for M1..M4)
+            // Center Vertical Spine (X = 615): Shared Multi-Pipeline Keystone Proteins (degree >= 2)
+            // Right Swimlanes (X = 740..960): Composite 7-Phase Super-Pipelines
+            const pzCount = Math.max(1, activePzs.length);
+            const pzStepY = pzCount === 1 ? 0 : Math.min(85, Math.floor(475 / Math.max(1, pzCount - 1)));
+            const pzStartY = pzCount === 1 ? 260 : Math.max(36, Math.floor(280 - ((pzCount - 1) * pzStepY) / 2));
+
+            activePzs.forEach((pz, rowIdx) => {
+                const isPrimaryFocus = ACTIVE_GRAPH_FOCUS_PIPELINE === pz.puzzle_id;
+                const rowY = pzStartY + rowIdx * pzStepY;
                 const pzHubId = `PZ:${pz.puzzle_id}`;
                 const shortPz = pz.puzzle_id.replace(/^auto-/, '').replace(/-organic-machine$/, '');
                 addNode(pzHubId, {
-                    name: `🧪 ${shortPz}`,
+                    name: `${pz.slots_filled === 3 ? '⏳' : '🧩'} ${shortPz.slice(0, 18)}`,
+                    x: 70,
+                    y: rowY,
                     category: 'Metabolite',
                     symbol: 'diamond',
-                    symbolSize: 24,
+                    symbolSize: isPrimaryFocus ? 28 : 20,
                     pipeline: pz.puzzle_id,
                     detailTitle: `${pz.puzzle_id} (${pz.slots_filled}/4 Locked)`,
                     detailSub: `${pz.regime_envelope} · 48h RK4: ${pz.rk4_48h_yield_pct.toFixed(1)}% (+${pz.rk4_yield_delta_pct.toFixed(1)}%)`,
                     detailRule: pz.target_organism_rule,
-                    itemStyle: { color: '#38bdf8', borderColor: '#bae6fd', borderWidth: 1.5 }
+                    label: { position: 'right', distance: 6, color: isPrimaryFocus ? '#fde047' : '#38bdf8', fontWeight: 800, fontSize: isPrimaryFocus ? 11.5 : 9.8 },
+                    itemStyle: { color: isPrimaryFocus ? '#fde047' : '#38bdf8', borderColor: '#f8fafc', borderWidth: isPrimaryFocus ? 2.5 : 1.5 }
                 });
 
                 let prevNodeId = pzHubId;
-                (pz.slots || []).forEach(sl => {
+                const sortedSlots = (pz.slots || []).slice().sort((a, b) => Number(a.phase) - Number(b.phase));
+                sortedSlots.forEach(sl => {
+                    const ph = Number(sl.phase || 1);
+                    const slotX = 140 + ph * 92; // M1=232, M2=324, M3=416, M4=508
                     const isLocked = Boolean(sl.locked && sl.uid);
-                    const nodeId = isLocked ? `UID:${sl.uid}` : `OPEN:${pz.puzzle_id}:M${sl.phase}`;
+                    const isKeystone = isLocked && uidPipeSet[sl.uid] && uidPipeSet[sl.uid].size >= 2;
+                    const nodeId = isLocked ? `UID:${sl.uid}` : `OPEN:${pz.puzzle_id}:M${ph}`;
+
                     if (isLocked) {
-                        uidPipelines[sl.uid] = (uidPipelines[sl.uid] || 0) + 1;
                         addNode(nodeId, {
-                            name: `${sl.uid} (M${sl.phase})`,
+                            name: isKeystone ? `⭐ ${sl.uid}` : `${sl.uid} (M${ph})`,
+                            x: isKeystone ? 615 : slotX,
+                            y: rowY,
                             uid: sl.uid,
                             role: sl.role,
-                            phase: sl.phase,
+                            phase: ph,
                             locked: true,
+                            isKeystone: isKeystone,
                             org: sl.org,
                             pipeline: pz.puzzle_id,
                             symbol: 'circle',
-                            symbolSize: 22,
-                            detailTitle: `🟢 ${sl.uid} · Phase ${sl.phase} (${sl.role})`,
+                            symbolSize: isKeystone ? 25 : (isPrimaryFocus ? 21 : 17),
+                            detailTitle: `${isKeystone ? '⭐ Keystone Hub' : '🟢 Locked Module'} ${sl.uid} · Phase ${ph} (${sl.role})`,
                             detailSub: `${sl.org || ''} · ${sl.metric || ''}`,
                             detailRule: `SQL Gate: ${sl.sql_gate || ''}`,
-                            itemStyle: { color: roleColor[sl.role] || '#34d399', borderColor: '#f8fafc', borderWidth: 1.5 }
+                            label: { position: 'top', distance: 4, color: isKeystone ? '#fde047' : '#e2e8f0', fontSize: isKeystone ? 10.5 : 9.2 },
+                            itemStyle: { color: roleColor[sl.role] || '#34d399', borderColor: isKeystone ? '#fde047' : '#f8fafc', borderWidth: isKeystone ? 2.8 : 1.4 }
                         });
                     } else {
                         addNode(nodeId, {
-                            name: `⏳ M${sl.phase}:${shortPz.slice(0, 10)}`,
-                            uid: sl.uid || null,
+                            name: `⏳ M${ph} Open`,
+                            x: slotX,
+                            y: rowY,
+                            uid: null,
                             role: sl.role,
-                            phase: sl.phase,
+                            phase: ph,
                             locked: false,
                             org: sl.org,
                             pipeline: pz.puzzle_id,
                             symbol: 'rect',
-                            symbolSize: [28, 18],
-                            detailTitle: `⏳ Out-of-Order Open Slot: Phase ${sl.phase} (${sl.role})`,
+                            symbolSize: [24, 15],
+                            detailTitle: `⏳ Out-of-Order Open Slot: Phase ${ph} (${sl.role})`,
                             detailSub: `${pz.puzzle_id} · ${sl.org || 'Awaiting candidate'}`,
                             detailRule: `Required Condition: ${sl.cond || ''} | SQL Gate: ${sl.sql_gate || ''}`,
-                            itemStyle: { color: 'rgba(245,158,11,0.22)', borderColor: '#f59e0b', borderWidth: 2, borderType: 'dashed' }
+                            label: { position: 'top', distance: 3, color: '#fbbf24', fontSize: 8.8 },
+                            itemStyle: { color: 'rgba(245,158,11,0.20)', borderColor: '#f59e0b', borderWidth: 1.8, borderType: 'dashed' }
                         });
                     }
 
                     links.push({
                         source: prevNodeId,
                         target: nodeId,
-                        value: isLocked ? 'Locked Flow' : `⏳ Missing M${sl.phase}`,
+                        value: isLocked ? `M${ph} (${sl.role})` : `⏳ Missing M${ph}`,
                         lineStyle: {
                             color: isLocked ? (roleColor[sl.role] || '#34d399') : '#f59e0b',
-                            width: isLocked ? 2.2 : 2.0,
+                            width: isPrimaryFocus ? 2.6 : 1.8,
                             type: isLocked ? 'solid' : 'dashed',
-                            curveness: 0.14
+                            curveness: isKeystone ? 0.12 : 0.0
                         }
                     });
                     prevNodeId = nodeId;
                 });
             });
 
-            // 2. Add Composite Super-Pipeline Handoffs (Pipeline A -> M5 Exporter / M6 Cofactor Cycle / M7 Armor -> Pipeline B)
-            (chains || []).forEach(cr => {
+            // 2. Right Swimlanes: Composite Super-Pipelines (X = 735 Upstream -> X = 845 M5/M6/M7 -> X = 955 Downstream)
+            const compCount = Math.max(1, activeChains.length);
+            const compStepY = compCount === 1 ? 0 : Math.min(125, Math.floor(430 / Math.max(1, compCount - 1)));
+            const compStartY = compCount === 1 ? 260 : Math.max(65, Math.floor(280 - ((compCount - 1) * compStepY) / 2));
+
+            activeChains.forEach((cr, cIdx) => {
+                const isCompFocus = ACTIVE_GRAPH_FOCUS_PIPELINE === cr.composite_id;
+                const cy = compStartY + cIdx * compStepY;
                 const upNodeId = `PZ:${cr.upstream_pipeline}`;
                 const downNodeId = `PZ:${cr.downstream_pipeline}`;
+
                 addNode(upNodeId, {
-                    name: `⚡ ${cr.upstream_pipeline.slice(0, 16)}`,
+                    name: `⚡ ${cr.upstream_pipeline.slice(0, 15)}`,
+                    x: 735,
+                    y: cy - 12,
                     category: 'Metabolite',
                     symbol: 'diamond',
-                    symbolSize: 26,
+                    symbolSize: isCompFocus ? 26 : 21,
                     pipeline: cr.upstream_pipeline,
                     detailTitle: `Compiled Upstream Pipeline: ${cr.upstream_pipeline}`,
                     detailSub: `Feeds ${cr.handoff_molecule_label} into ${cr.downstream_pipeline}`,
                     detailRule: cr.regime_delta_summary,
+                    label: { position: 'top', distance: 4, color: '#34d399', fontSize: 9.5 },
                     itemStyle: { color: '#10b981', borderColor: '#a7f3d0', borderWidth: 2 }
                 });
                 addNode(downNodeId, {
-                    name: `⚡ ${cr.downstream_pipeline.slice(0, 16)}`,
+                    name: `⚡ ${cr.downstream_pipeline.slice(0, 15)}`,
+                    x: 955,
+                    y: cy - 12,
                     category: 'Metabolite',
                     symbol: 'diamond',
-                    symbolSize: 26,
+                    symbolSize: isCompFocus ? 26 : 21,
                     pipeline: cr.downstream_pipeline,
                     detailTitle: `Downstream Pipeline: ${cr.downstream_pipeline}`,
                     detailSub: `Receives ${cr.handoff_molecule_label} (${cr.handoff_matching_pockets} GiST pockets)`,
                     detailRule: cr.regime_delta_summary,
+                    label: { position: 'top', distance: 4, color: '#38bdf8', fontSize: 9.5 },
                     itemStyle: { color: '#38bdf8', borderColor: '#bae6fd', borderWidth: 2 }
                 });
 
@@ -5380,65 +5802,76 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const m6Id = `UID:${cr.m6_cofactor_uid}`;
                 const m7Id = `UID:${cr.m7_chassis_uid}`;
                 [
-                    [m5Id, cr.m5_exporter_uid, 'M5_Exporter', cr.m5_exporter_org, cr.m5_exporter_role],
-                    [m6Id, cr.m6_cofactor_uid, 'M6_Cofactor', cr.m6_cofactor_org, cr.m6_cofactor_role],
-                    [m7Id, cr.m7_chassis_uid, 'M7_Armor', cr.m7_chassis_org, cr.m7_chassis_role]
-                ].forEach(([nid, uid, rKey, org, desc]) => {
-                    uidPipelines[uid] = (uidPipelines[uid] || 0) + 1;
+                    [m5Id, cr.m5_exporter_uid, 'M5_Exporter', cr.m5_exporter_org, cr.m5_exporter_role, 845, cy - 22],
+                    [m6Id, cr.m6_cofactor_uid, 'M6_Cofactor', cr.m6_cofactor_org, cr.m6_cofactor_role, 845, cy + 8],
+                    [m7Id, cr.m7_chassis_uid, 'M7_Armor', cr.m7_chassis_org, cr.m7_chassis_role, 845, cy + 36]
+                ].forEach(([nid, uid, rKey, org, desc, nx, ny]) => {
+                    const isKs = uidPipeSet[uid] && uidPipeSet[uid].size >= 2;
                     addNode(nid, {
-                        name: `${uid} (${rKey.split('_')[0]})`,
+                        name: `${isKs ? '⭐ ' : ''}${uid} (${rKey.split('_')[0]})`,
+                        x: isKs ? 615 : nx,
+                        y: ny,
                         uid: uid,
                         role: rKey,
                         locked: true,
+                        isKeystone: isKs,
                         org: org,
                         pipeline: cr.composite_id,
                         symbol: 'triangle',
-                        symbolSize: 24,
+                        symbolSize: isKs ? 24 : 19,
                         detailTitle: `🔗 ${uid} · ${rKey} (${org})`,
                         detailSub: desc,
                         detailRule: `Composite Chain: ${cr.title} (${cr.handoff_mode})`,
-                        itemStyle: { color: roleColor[rKey] || '#fbbf24', borderColor: '#ffffff', borderWidth: 1.5 }
+                        label: { position: 'top', distance: 3, color: isKs ? '#fde047' : '#cbd5e1', fontSize: 9.0 },
+                        itemStyle: { color: roleColor[rKey] || '#fbbf24', borderColor: isKs ? '#fde047' : '#ffffff', borderWidth: isKs ? 2.5 : 1.4 }
                     });
                 });
 
-                // Handoff flow: Upstream -> M5 Exporter -> Downstream
                 links.push({
                     source: upNodeId,
                     target: m5Id,
                     value: cr.handoff_molecule_label,
-                    lineStyle: { color: '#fbbf24', width: 2.8, type: 'solid', curveness: 0.18 }
+                    lineStyle: { color: '#fbbf24', width: 2.2, type: 'solid', curveness: 0.08 }
                 });
                 links.push({
                     source: m5Id,
                     target: downNodeId,
                     value: `${cr.handoff_gist_props}/8 GiST Handoff`,
-                    lineStyle: { color: '#10b981', width: 2.8, type: 'solid', curveness: 0.18 }
+                    lineStyle: { color: '#10b981', width: 2.2, type: 'solid', curveness: 0.08 }
                 });
-                // Cofactor cycle loop: M6 <-> Downstream & Upstream
                 links.push({
                     source: m6Id,
                     target: downNodeId,
-                    value: 'M6 Cofactor Recycle Cycle',
-                    lineStyle: { color: '#f59e0b', width: 2.0, type: 'dotted', curveness: -0.22 }
+                    value: 'M6 Cofactor Recycle Bus',
+                    lineStyle: { color: '#f59e0b', width: 1.7, type: 'dotted', curveness: 0.12 }
                 });
                 links.push({
                     source: m7Id,
                     target: m5Id,
                     value: 'M7 Consortium Chassis Shield',
-                    lineStyle: { color: '#c084fc', width: 1.8, type: 'solid', curveness: 0.15 }
+                    lineStyle: { color: '#c084fc', width: 1.6, type: 'solid', curveness: 0.08 }
                 });
             });
 
-            // Scale up shared keystone hubs that bridge multiple pipelines/puzzles
+            // 3. Evenly distribute all Shared Keystone Hubs along the Center Keystone Spine (X = 615) so they never overlap
             const keystoneHubs = [];
             nodesMap.forEach(nd => {
-                if (nd.uid && nd.pipelines.length >= 2) {
-                    nd.symbolSize = 30;
+                if (nd.uid && ((uidPipeSet[nd.uid] && uidPipeSet[nd.uid].size >= 2) || nd.pipelines.length >= 2)) {
+                    nd.isKeystone = true;
+                    nd.symbolSize = 26;
                     nd.itemStyle.borderColor = '#fde047';
-                    nd.itemStyle.borderWidth = 3;
+                    nd.itemStyle.borderWidth = 2.8;
                     keystoneHubs.push(nd);
                 }
             });
+            if (keystoneHubs.length > 0) {
+                const ksStepY = keystoneHubs.length === 1 ? 0 : Math.min(62, Math.floor(460 / Math.max(1, keystoneHubs.length - 1)));
+                const ksStartY = keystoneHubs.length === 1 ? 260 : Math.max(45, Math.floor(280 - ((keystoneHubs.length - 1) * ksStepY) / 2));
+                keystoneHubs.forEach((kNode, kIdx) => {
+                    kNode.x = 615;
+                    kNode.y = ksStartY + kIdx * ksStepY;
+                });
+            }
 
             const nodesArr = Array.from(nodesMap.values());
             const nCntEl = document.getElementById('pg-nodes-cnt');
@@ -5448,16 +5881,24 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
 
             const ksEl = document.getElementById('pg-keystone-list');
             if (ksEl) {
-                ksEl.innerHTML = `<div style="color:#fde047;font-weight:800;font-size:0.74rem;margin-bottom:4px;">⭐ Shared Multi-Pipeline Keystone Hubs (${keystoneHubs.length})</div>` +
-                    keystoneHubs.slice(0, 5).map(k =>
-                        `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed #1e293b;font-size:0.71rem;">
-                            <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(k.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">${k.uid}</a>
-                            <span style="color:#34d399;">Bridges ${k.pipelines.length} Pipelines</span>
-                        </div>`
-                    ).join('');
+                ksEl.innerHTML = `<div style="color:#fde047;font-weight:800;font-size:0.74rem;margin-bottom:4px;">⭐ Shared Multi-Pipeline Keystone Hubs (${keystoneHubs.length}) — Click to Focus</div>` +
+                    keystoneHubs.slice(0, 8).map(k => {
+                        const firstPipe = k.pipelines[0] || '';
+                        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed #1e293b;font-size:0.71rem;">
+                            <a class="tel-metric-link" href="/cards?hub=${encodeURIComponent(k.uid)}" style="color:#f8fafc;font-weight:800;font-family:ui-monospace,monospace;">⭐ ${k.uid}</a>
+                            <button type="button" class="kpi-pill-link" style="cursor:pointer;padding:1px 7px;font-size:0.66rem;border-color:#fde047;color:#fde047;" onclick="focusPipelineInGraph('${firstPipe}', false)" title="Pipelines bridged: ${k.pipelines.join(', ')}">🎯 Bridges ${k.pipelines.length} Pipelines</button>
+                        </div>`;
+                    }).join('');
+            }
+
+            // Auto-populate inspector if a specific pipeline is focused
+            if (ACTIVE_GRAPH_FOCUS_PIPELINE) {
+                const hubNode = nodesMap.get(`PZ:${ACTIVE_GRAPH_FOCUS_PIPELINE}`) || nodesArr.find(n => (n.pipelines || []).includes(ACTIVE_GRAPH_FOCUS_PIPELINE));
+                if (hubNode) renderGraphInspectorForNode(hubNode);
             }
 
             chPuzzleGraph.setOption({
+                animation: false,
                 tooltip: {
                     trigger: 'item',
                     backgroundColor: 'rgba(2,6,23,0.96)',
@@ -5466,10 +5907,11 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                     formatter: function(params) {
                         if (params.dataType === 'node') {
                             const d = params.data;
-                            return `<div style="max-width:340px;white-space:normal;">
+                            return `<div style="max-width:350px;white-space:normal;">
                                 <b style="color:#38bdf8;">${d.detailTitle || d.name}</b><br>
                                 <span style="color:#cbd5e1;">${d.detailSub || ''}</span><br>
-                                <span style="color:#94a3b8;font-size:10.5px;">${d.detailRule || ''}</span>
+                                <span style="color:#94a3b8;font-size:10.5px;">${d.detailRule || ''}</span><br>
+                                <span style="color:#34d399;font-size:10.5px;">Click node to inspect &amp; focus pipeline</span>
                             </div>`;
                         }
                         return `<b style="color:#fbbf24;">${params.data.source} &rarr; ${params.data.target}</b><br>${params.data.value || ''}`;
@@ -5477,55 +5919,44 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 },
                 series: [{
                     type: 'graph',
-                    layout: 'force',
+                    layout: 'none',
+                    animation: false,
                     roam: true,
-                    draggable: true,
+                    zoom: ACTIVE_GRAPH_FOCUS_PIPELINE ? 1.06 : 0.96,
+                    draggable: false,
                     edgeSymbol: ['none', 'arrow'],
                     edgeSymbolSize: [4, 8],
-                    force: {
-                        repulsion: 260,
-                        edgeLength: [55, 115],
-                        gravity: 0.12,
-                        layoutAnimation: true
-                    },
                     label: {
                         show: true,
-                        position: 'right',
+                        position: 'top',
                         color: '#e2e8f0',
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: 700,
                         formatter: '{b}'
+                    },
+                    labelLayout: {
+                        hideOverlap: true
                     },
                     data: nodesArr,
                     links: links,
                     emphasis: {
                         focus: 'adjacency',
-                        lineStyle: { width: 4 }
+                        lineStyle: { width: 3.5 }
                     }
                 }]
-            });
+            }, true);
 
             chPuzzleGraph.off('click');
             chPuzzleGraph.on('click', function(params) {
                 if (params.dataType !== 'node') return;
                 const d = params.data || {};
-                const insp = document.getElementById('pg-insp-content');
-                if (!insp) return;
-                const btns = d.uid
-                    ? `<div style="display:flex;gap:6px;margin-top:8px;">
-                           <a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(d.uid)}">🃏 Open ${d.uid} Card</a>
-                           <a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#38bdf8;color:#38bdf8;" href="/tpp?hub=${encodeURIComponent(d.uid)}">🌡️ TPP Lab</a>
-                       </div>`
-                    : (d.pipeline && !d.pipeline.startsWith('auto-') && !d.pipeline.startsWith('comp-')
-                        ? `<div style="margin-top:8px;"><a class="tel-btn" style="padding:4px 9px;font-size:0.72rem;border-color:#10b981;color:#34d399;" href="/?pipeline=${encodeURIComponent(d.pipeline)}">⚡ Launch RK4 Twin</a></div>`
-                        : '');
-                insp.innerHTML = `
-                    <div style="color:#38bdf8;font-weight:800;font-size:0.84rem;margin-bottom:4px;">${d.detailTitle || d.name}</div>
-                    <div style="color:#e2e8f0;font-size:0.74rem;margin-bottom:6px;line-height:1.4;">${d.detailSub || ''}</div>
-                    <div style="color:#94a3b8;font-size:0.71rem;background:#060b16;padding:6px 8px;border-radius:6px;border:1px solid #1e293b;font-family:ui-monospace,monospace;line-height:1.4;">${d.detailRule || ''}</div>
-                    <div style="color:#34d399;font-size:0.71rem;margin-top:6px;"><b>Connected Pipelines (${(d.pipelines || []).length}):</b> ${(d.pipelines || []).join(', ')}</div>
-                    ${btns}
-                `;
+                renderGraphInspectorForNode(d);
+                // If user clicked a Pipeline Hub diamond node, toggle focus on that pipeline
+                if (d.id && String(d.id).startsWith('PZ:') && d.pipeline) {
+                    if (ACTIVE_GRAPH_FOCUS_PIPELINE !== d.pipeline) {
+                        focusPipelineInGraph(d.pipeline, false);
+                    }
+                }
             });
         }
 
@@ -5545,18 +5976,20 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const downUrl = `/?pipeline=${encodeURIComponent(cr.downstream_pipeline)}`;
                 const m5Url = `/cards?hub=${encodeURIComponent(cr.m5_exporter_uid)}&challenger=${encodeURIComponent(cr.m6_cofactor_uid)}`;
                 const cmpUrl = `/compare?node1=${encodeURIComponent(cr.m5_exporter_uid)}&node2=${encodeURIComponent(cr.m6_cofactor_uid)}&preset=rangefinder`;
+                const isFocused = ACTIVE_GRAPH_FOCUS_PIPELINE === cr.composite_id;
                 return `
-                    <article class="puzzle-card" style="border-color:rgba(192,132,252,0.45);background:linear-gradient(160deg,#0f152b 0%,#090e1d 100%);">
+                    <article id="pz-card-${cr.composite_id}" data-pipeline-id="${cr.composite_id}" class="puzzle-card ${isFocused ? 'is-focused-highlight' : ''}" style="border-color:rgba(192,132,252,0.45);background:linear-gradient(160deg,#0f152b 0%,#090e1d 100%);">
                         <div class="pz-card-top">
                             <div class="pz-ident-block">
                                 <span style="background:rgba(16,185,129,0.20);color:#34d399;border:1px solid rgba(16,185,129,0.5);padding:2px 7px;border-radius:999px;font-size:0.68rem;font-weight:800;" title="${cr.status}">🔗 7/7 COMPOSITE</span>
-                                <span class="pz-slug" style="color:#e9d5ff;" title="${cr.title}">${cr.composite_id}</span>
+                                <a href="#puzzle-routing-graph-wrap" onclick="event.preventDefault(); focusPipelineInGraph('${cr.composite_id}', true);" class="pz-slug tel-metric-link" style="color:#e9d5ff;" title="Click to focus ${cr.composite_id} in the Static Routing Graph">${cr.composite_id}</a>
                                 <span style="background:#020617;border:1px solid #334155;color:#38bdf8;padding:1px 7px;border-radius:999px;font-size:0.67rem;font-weight:700;" title="${cr.regime_delta_summary}">${cr.handoff_mode}</span>
                             </div>
                             <div class="pz-kpi-actions">
                                 <span class="pz-pending-pill" style="border-color:#10b981;color:#34d399;" title="Chemical Handoff: ${cr.handoff_molecule_label} (${cr.handoff_smiles}) matches ${cr.handoff_matching_pockets} 3D pockets at ≥7/8 GiST properties and is PAINS-clean">🧪 ${cr.handoff_gist_props}/8 GiST (${fmtNum(cr.handoff_matching_pockets)} pockets · PAINS-Free)</span>
                                 <span class="pz-yield-pill" title="Stage A 48h Yield: ${cr.stage1_48h_yield_pct.toFixed(1)}% -> Coupled 96h Two-Pipeline Yield: ${cr.coupled_96h_yield_pct.toFixed(1)}% (+${cr.coupled_yield_delta_pct.toFixed(1)}% vs uncoupled)">⚡ 96h RK4: ${cr.coupled_96h_yield_pct.toFixed(1)}% (+${cr.coupled_yield_delta_pct.toFixed(0)}%)</span>
                                 <div style="display:flex;gap:4px;">
+                                    <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#fde047;color:#fde047;cursor:pointer;" onclick="focusPipelineInGraph('${cr.composite_id}', true)" title="Focus ${cr.composite_id} in the Static Routing Graph">🕸️ Graph</button>
                                     <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;" href="${upUrl}" title="Open Upstream Pipeline ${cr.upstream_pipeline}">⚡ Stage A</a>
                                     <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#c084fc;color:#e9d5ff;" href="${downUrl}" title="Open Downstream Pipeline ${cr.downstream_pipeline}">⚡ Stage B</a>
                                     <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#38bdf8;color:#38bdf8;" href="${cmpUrl}" title="Compare M5 × M6 Post-Processing Modules in 3D">🔬 3D</a>
@@ -5677,11 +6110,13 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const secondUid = (lockedSlots[1] || {}).uid;
                 const actionBtn = secondUid
                     ? `<div style="display:flex;gap:4px;">
+                           <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#fde047;color:#fde047;cursor:pointer;" title="Focus ${pz.puzzle_id} in the Static Routing Graph above" onclick="focusPipelineInGraph('${pz.puzzle_id}', true)">🕸️ Graph</button>
                            <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;cursor:pointer;" title="Retrofeed closer missing-piece vector neighbors for ${pz.puzzle_id} into the Pending swarm queue &amp; open focused Pending swarm view" onclick="retrofeedAndInspectPuzzle('${pz.puzzle_id}', this)">🎯 Bait</button>
                            <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" title="Inspect ${firstUid} × ${secondUid} in Card Arena" href="/cards?hub=${encodeURIComponent(firstUid)}&challenger=${encodeURIComponent(secondUid)}">🃏 Cards</a>
                            <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#38bdf8;color:#38bdf8;" title="Compare ${firstUid} × ${secondUid} in 3D Lab" href="/compare?node1=${encodeURIComponent(firstUid)}&node2=${encodeURIComponent(secondUid)}&preset=rangefinder">🔬 3D</a>
                        </div>`
                     : `<div style="display:flex;gap:4px;">
+                           <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#fde047;color:#fde047;cursor:pointer;" title="Focus ${pz.puzzle_id} in the Static Routing Graph above" onclick="focusPipelineInGraph('${pz.puzzle_id}', true)">🕸️ Graph</button>
                            <button type="button" class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#10b981;color:#34d399;cursor:pointer;" title="Retrofeed closer missing-piece vector neighbors for ${pz.puzzle_id} into the Pending swarm queue &amp; open focused Pending swarm view" onclick="retrofeedAndInspectPuzzle('${pz.puzzle_id}', this)">🎯 Bait</button>
                            <a class="tel-btn" style="padding:3px 7px;font-size:0.69rem;border-color:#f59e0b;color:#fbbf24;" href="/cards?hub=${encodeURIComponent(firstUid)}">🃏 Hub</a>
                        </div>`;
@@ -5691,15 +6126,16 @@ TELEMETRY_DASHBOARD_HTML_TEMPLATE = """
                 const dirHub = Number(pz.direct_hub_edges || 400);
                 const barWidth = Math.min(100, Math.max(12, Number(relPct) * 6.5)).toFixed(0);
                 const pendTip = `${fmtNum(relPend)} active Pending frontier edges (${relPct}% of the ${fmtNum(totPendingFrontier)} Pending queue) are scouting ${pz.clade_frontier_label || 'this target clade'}, plus ${fmtNum(dirHub)} direct correlation edges on locked hubs (${lockedSlots.map(s => s.uid).join(', ')}). Click to focus the Swarm Heatmap on this puzzle's Locked Hubs & Enqueued Pending Baits.`.replace(/"/g, '&quot;');
-                const slugTip = `${pz.title} | Regime: ${pz.regime_envelope} | Organism Rule: ${pz.target_organism_rule}`.replace(/"/g, '&quot;');
+                const slugTip = `${pz.title} | Regime: ${pz.regime_envelope} | Organism Rule: ${pz.target_organism_rule} — Click to focus in the Static Routing Graph`.replace(/"/g, '&quot;');
                 const missClean = String(pz.missing_slot_hint || '').replace(/"/g, '&quot;');
+                const isFocused = ACTIVE_GRAPH_FOCUS_PIPELINE === pz.puzzle_id;
 
                 return `
-                    <article class="puzzle-card ${isThree ? '' : 'is-two-phase'}">
+                    <article id="pz-card-${pz.puzzle_id}" data-pipeline-id="${pz.puzzle_id}" class="puzzle-card ${isThree ? '' : 'is-two-phase'} ${isFocused ? 'is-focused-highlight' : ''}">
                         <div class="pz-card-top">
                             <div class="pz-ident-block">
                                 ${stBadge}
-                                <span class="pz-slug" title="${slugTip}">${pz.puzzle_id}</span>
+                                <a href="#puzzle-routing-graph-wrap" onclick="event.preventDefault(); focusPipelineInGraph('${pz.puzzle_id}', true);" class="pz-slug tel-metric-link" title="${slugTip}">${pz.puzzle_id}</a>
                                 <span style="background:#020617;border:1px solid #334155;color:#94a3b8;padding:1px 7px;border-radius:999px;font-size:0.67rem;font-weight:700;" title="${pz.regime_envelope}">🌡️ ${pz.temp_c}°C · pH ${pz.ph}</span>
                             </div>
                             <div class="pz-kpi-actions">
@@ -6539,6 +6975,58 @@ TPP_LAB_HTML_TEMPLATE = """
             color: #38bdf8;
             background: rgba(56, 189, 248, 0.14);
         }
+        .widget-help-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            border-radius: 999px;
+            padding: 2px 9px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .widget-help-btn:hover, .widget-help-btn.is-open {
+            background: rgba(56, 189, 248, 0.22);
+            color: #f8fafc;
+            border-color: #38bdf8;
+        }
+        .widget-help-drawer {
+            display: none;
+            background: linear-gradient(160deg, #081226 0%, #050a14 100%);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-left: 4px solid #fbbf24;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 4px 0 8px 0;
+            font-size: 0.76rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        .widget-help-drawer.is-open {
+            display: block;
+        }
+        .help-grid-cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .help-item-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 9px 11px;
+        }
+        .help-item-box b {
+            color: #fbbf24;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.78rem;
+        }
     </style>
 </head>
 <body>
@@ -6548,6 +7036,7 @@ TPP_LAB_HTML_TEMPLATE = """
             <div class="sub">Whole-Proteome 1-to-N Microprotein Staple Disruption Cascades · Eyring Catalytic Sweet-Spot (<code>k_cat(T) × f_soluble(T)</code>) · TPCA Complex Decoherence</div>
         </div>
         <div class="tel-nav">
+            <button type="button" class="widget-help-btn" style="border-color:#fbbf24;color:#fbbf24;padding:5px 11px;font-size:0.76rem;" onclick="toggleTppHelp('help-tpp-kpis', this)">❓ Explain Metrics &amp; Spillover</button>
             <a class="tel-btn" style="border-color:#10b981; color:#34d399;" href="/">🧬 Pipelines</a>
             <a class="tel-btn" style="border-color:#c084fc; color:#c084fc;" href="/telemetry">📊 Telemetry</a>
             <a class="tel-btn" style="border-color:#38bdf8; color:#7dd3fc;" href="/discovery?limit=tpp-knockout-40">🛰️ Swarm</a>
@@ -6559,37 +7048,86 @@ TPP_LAB_HTML_TEMPLATE = """
 
     <main class="tel-container">
         <section class="kpi-grid" aria-label="CETSA TPP Biophysical Summary">
-            <article class="kpi-card" style="border-color:rgba(244,63,94,0.45);">
-                <span class="kpi-label" style="color:#fb7185;">Proteome Cascades &amp; Staples</span>
+            <article class="kpi-card" style="border-color:rgba(244,63,94,0.45);cursor:pointer;" onclick="toggleTppHelp('help-tpp-kpis')" title="Click to toggle explanation of Proteome Cascades, Microprotein Staples, and Obligate Complex Collapses">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="kpi-label" style="color:#fb7185;">Proteome Cascades &amp; Staples</span>
+                    <span style="font-size:0.7rem;color:#fb7185;font-weight:800;">❓ Help</span>
+                </div>
                 <span class="kpi-value" id="tpp-kpi-cascades" style="color:#fb7185;">--</span>
                 <span class="kpi-delta" id="tpp-kpi-staples">--</span>
                 <span class="kpi-sub" id="tpp-kpi-collapses">--</span>
             </article>
-            <article class="kpi-card" style="border-color:rgba(192,132,252,0.45);">
-                <span class="kpi-label" style="color:#c084fc;">1st-Order Thermal Shift (ΔTm &amp; TPCA)</span>
+            <article class="kpi-card" style="border-color:rgba(192,132,252,0.45);cursor:pointer;" onclick="toggleTppHelp('help-tpp-kpis')" title="Click to toggle explanation of 1st-Order Thermal Shift (ΔTm) and TPCA Complex Decoherence">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="kpi-label" style="color:#c084fc;">1st-Order Thermal Shift (ΔTm &amp; TPCA)</span>
+                    <span style="font-size:0.7rem;color:#c084fc;font-weight:800;">❓ Help</span>
+                </div>
                 <span class="kpi-value" id="tpp-kpi-deltatm" style="color:#c084fc;">--</span>
                 <span class="kpi-delta" id="tpp-kpi-tpca">--</span>
                 <span class="kpi-sub">64-Bit Register Sigmoidal Curve Sketch (40°C..68°C)</span>
             </article>
-            <article class="kpi-card" style="border-color:rgba(16,185,129,0.45);">
-                <span class="kpi-label" style="color:#34d399;">Ideal Operating Temp (T_opt Sweet-Spot)</span>
+            <article class="kpi-card" style="border-color:rgba(16,185,129,0.45);cursor:pointer;" onclick="toggleTppHelp('help-tpp-kpis')" title="Click to toggle explanation of Ideal Operating Temp (T_opt Sweet-Spot) and Eyring Catalytic Output Boost">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="kpi-label" style="color:#34d399;">Ideal Operating Temp (T_opt Sweet-Spot)</span>
+                    <span style="font-size:0.7rem;color:#34d399;font-weight:800;">❓ Help</span>
+                </div>
                 <span class="kpi-value" id="tpp-kpi-topt" style="color:#34d399;">--</span>
                 <span class="kpi-delta" id="tpp-kpi-flux" style="color:#fbbf24;">--</span>
                 <span class="kpi-sub">Peak of Eyring Reaction Speed × Folded Soluble %</span>
             </article>
-            <article class="kpi-card" style="border-color:rgba(245,158,11,0.45);">
-                <span class="kpi-label" style="color:#fbbf24;">2nd &amp; 3rd-Order Whole-Proteome Ripple</span>
+            <article class="kpi-card" style="border-color:rgba(245,158,11,0.45);cursor:pointer;" onclick="toggleTppHelp('help-tpp-kpis')" title="Click to toggle explanation of 2nd-Order Spillover Enzymes and 3rd-Order HSP70/CCT Chaperone Sink Load">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="kpi-label" style="color:#fbbf24;">2nd &amp; 3rd-Order Whole-Proteome Ripple</span>
+                    <span style="font-size:0.7rem;color:#fbbf24;font-weight:800;">❓ What is Spillover?</span>
+                </div>
                 <span class="kpi-value" id="tpp-kpi-spillover" style="color:#fbbf24;">--</span>
                 <span class="kpi-delta" id="tpp-kpi-sink">--</span>
                 <span class="kpi-sub">2-Level Fastscan Pocket Spillover &amp; HSP70/CCT Sink</span>
             </article>
         </section>
 
+        <!-- Collapsible Metric Reference for Top 4 KPI Cards (Explains Spillover, ΔTm, TPCA, T_opt) -->
+        <div id="help-tpp-kpis" class="widget-help-drawer">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <span style="font-weight:800;color:#fbbf24;font-size:0.84rem;">💡 CETSA / TPP Biophysical Metric Glossary — What Each KPI Means</span>
+                <button type="button" class="widget-help-btn" onclick="toggleTppHelp('help-tpp-kpis')">✕ Close Guide</button>
+            </div>
+            <div class="help-grid-cols">
+                <div class="help-item-box">
+                    <b style="color:#fb7185;">1. Proteome Cascades &amp; Microprotein Staples (&le;150 aa)</b>
+                    A <b>Microprotein Staple</b> is a small protein (&le;150 aa, often a dark-proteome sMORF or DUF) that physically binds across the subunit interface of a large enzyme complex (via buried hydrogen bonds &amp; complementary isoelectric charge, <b>&Delta;pI</b>). An <b>Obligate Complex Collapse (&Delta;Tm &le; &minus;5.5°C)</b> means the partner complex cannot hold its quaternary fold at bioreactor temperatures without that staple.
+                </div>
+                <div class="help-item-box">
+                    <b style="color:#c084fc;">2. 1st-Order Thermal Shift (&Delta;Tm) &amp; TPCA Decoherence</b>
+                    <b>Tm (Melting Temp)</b> is the temperature where 50% of the enzyme stays soluble. <b>&Delta;Tm = Tm(KO) &minus; Tm(WT)</b> measures how many °C earlier the enzyme melts when the microprotein staple is knocked out (<code>KO</code>). <b>TPCA (Thermal Proximity Co-Aggregation) Decoherence (%)</b> measures how strongly the 8-temperature sigmoidal melting curves (<code>40°C..68°C</code>, stored in a 64-bit register sketch) pull apart across interacting subunits when unstapled.
+                </div>
+                <div class="help-item-box">
+                    <b style="color:#34d399;">3. Ideal Operating Temp (T_opt Sweet-Spot &amp; Catalytic Boost)</b>
+                    According to the <b>Eyring equation</b>, catalytic rate <code>k_cat(T)</code> rises exponentially with temperature—<i>until</i> the enzyme unfolds (<code>f_soluble(T) &rarr; 0</code>). Multiplying <code>k_cat(T) &times; f_soluble(T)</code> produces a bell curve whose peak is <b>T_opt</b> (the Ideal Bioreactor Operating Temperature). Keeping the microprotein staple locked shifts <b>T_opt</b> upward by <code>+5.26°C</code> on average, unlocking up to <b>2.61&times; higher peak catalytic productivity</b>.
+                </div>
+                <div class="help-item-box" style="border-color:rgba(245,158,11,0.55);background:rgba(245,158,11,0.07);">
+                    <b style="color:#fbbf24;">4. What Are "Spillover Enzymes" &amp; "HSP70/CCT Chaperone Sink Load"?</b>
+                    When a primary (1st-order) enzyme complex destabilizes after microprotein knockout, it triggers a 2-stage whole-proteome ripple:<br>
+                    &bull; <b>2nd-Order Allosteric Spillover Enzymes:</b> Unconsumed substrates, accumulated intermediates, and unrecycled cofactors from the collapsed 1st-order complex <i>spill over</i> into downstream and parallel enzymes whose 3D active pockets share high RangeFinder GiST / 128-bit Fastscan overlap (2-hop neighbors in <code>pg_bio</code>), altering their ligand-bound thermal stability (<b>Allosteric &Delta;Tm</b>).<br>
+                    &bull; <b>3rd-Order HSP70/CCT Chaperone Sink Load (0..25):</b> The unfolding 1st-order complex floods the cell's finite <code>HSP70 / DnaK / CCT</code> chaperone pool (<code>25.0</code> = maximum saturation), starving unrelated bystander enzymes of folding maintenance.
+                </div>
+            </div>
+        </div>
+
         <section class="charts-grid" aria-label="CETSA Melting Curve and 1-to-N Domino Map">
             <div class="chart-panel" id="tpp-charts-section" style="border-color: rgba(244, 63, 94, 0.45);">
                 <div class="chart-header">
                     <h2 style="color:#fb7185;">1. CETSA / TPP Melting Curve &amp; Ideal Operating Temperature Sweet-Spot (T_opt: 40°C → 68°C)</h2>
-                    <span id="tpp-curve-subtitle">Soluble Folded % vs Eyring Catalytic Output Bell Curve (<code>k_cat(T) × f_soluble(T)</code>)</span>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span id="tpp-curve-subtitle">Soluble Folded % vs Eyring Catalytic Output Bell Curve (<code>k_cat(T) × f_soluble(T)</code>)</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleTppHelp('help-tpp-c1', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tpp-c1" class="widget-help-drawer">
+                    <b>How to Read Chart 1:</b><br>
+                    &bull; <b>Blue Solid Line (`WT Folded %`):</b> Fraction of the enzyme complex remaining folded &amp; soluble from <code>40°C</code> to <code>68°C</code> when stapled by the microprotein (Wild-Type).<br>
+                    &bull; <b>Red Dashed Line (`KO Folded %`):</b> Sigmoidal melting curve when the microprotein staple is knocked out (melts earlier by <b>&Delta;Tm</b>).<br>
+                    &bull; <b>Emerald Bars (`WT Catalytic Output`) vs Amber Bars (`KO Catalytic Output`):</b> Effective reactor productivity <code>k_cat(T) &times; f_soluble(T)</code>. Notice how the emerald bars peak at a higher temperature (<b>WT T_opt</b>) and reach up to <b>1.7&times;–2.6&times;</b> higher output than the unstapled KO bars.
                 </div>
                 <div id="chart-tpp-melting" class="echart-box"></div>
             </div>
@@ -6597,14 +7135,34 @@ TPP_LAB_HTML_TEMPLATE = """
             <div class="chart-panel" id="tpp-landscape-section" style="border-color: rgba(245, 158, 11, 0.45);">
                 <div class="chart-header">
                     <h2 style="color:#fbbf24;">2. 1-to-N Whole-Proteome Domino Map (Single Microprotein KO → Multi-Complex &amp; Pathway Ripple)</h2>
-                    <span>Click any 1-to-N Microprotein Master Hub bar to filter its complete proteome domino cascade below</span>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span>Click any 1-to-N Microprotein Master Hub bar to filter its complete proteome domino cascade below</span>
+                        <button type="button" class="widget-help-btn" onclick="toggleTppHelp('help-tpp-c2', this)">❓ Help</button>
+                    </div>
+                </div>
+                <div id="help-tpp-c2" class="widget-help-drawer">
+                    <b>How to Read Chart 2 (The 1-to-N Pleiotropic Domino Map):</b><br>
+                    Each x-axis entry is a single <b>1-to-N Microprotein Master Hub</b> (e.g. <code>A0A6B9FC67 · 76aa</code>) that acts as a shared structural staple across multiple distinct enzyme complexes:<br>
+                    &bull; <b>Red Bars (Left Axis):</b> Number of <b>1st-Order Direct Partner Complexes</b> that thermally collapse when this single microprotein is knocked out.<br>
+                    &bull; <b>Purple Bars (Left Axis):</b> Number of <b>Distinct Metabolic Pathways</b> disrupted by those direct collapses.<br>
+                    &bull; <b>Emerald Line (Left Axis):</b> Maximum <b>Catalytic Output Gain (&times; at T_opt)</b> achieved across those complexes.<br>
+                    &bull; <b>Amber Dashed Line (`2nd-Order Spillover Enzymes`, Right Axis):</b> Total downstream/parallel enzymes in the proteome whose 3D pockets experience substrate/cofactor accumulation and chaperone-sink spillover when the 1st-order complexes collapse.
                 </div>
                 <div id="chart-tpp-landscape" class="echart-box"></div>
             </div>
         </section>
 
         <section class="breakthrough-panel" id="tpp-knockout-section" aria-label="Microprotein TPP Knockout Cascades">
-            <div id="tpp-hub-filter-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 2px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div id="tpp-hub-filter-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 2px;"></div>
+                <button type="button" class="widget-help-btn" onclick="toggleTppHelp('help-tpp-table', this)">❓ Explain Table Columns</button>
+            </div>
+            <div id="help-tpp-table" class="widget-help-drawer">
+                <b>Column Guide for In-Silico Thermal Proteome Profiling (TPP) Table:</b><br>
+                &bull; <b>Organism &amp; Physical Mechanism (`GRAVY` · `pI`):</b> <code>GRAVY</code> is grand average of hydropathy (negative = hydrophilic surface pin; positive = hydrophobic core/membrane staple). <code>pI A&rarr;B</code> shows electrostatic charge complementarity between the microprotein and target complex.<br>
+                &bull; <b>1st-Order Thermal Shift (`&Delta;Tm` &amp; 8-Temp Sparkline):</b> Mini bar sparkline shows soluble % at <code>40, 44, 48, 52, 56, 60, 64, 68°C</code> (blue &ge;60%, gold 25–59%, rose &lt;25%). Click any value to plot it in Chart 1.<br>
+                &bull; <b>Whole-Proteome Ripple (`Spillover Enzymes` · `TPCA` · `Sink`):</b> Number of 2nd-order pocket-neighbor spillover enzymes (+ligand-induced allosteric &Delta;Tm), <code>TPCA</code> subunit decoherence %, and 3rd-order <code>HSP70/CCT Chaperone Sink Load</code>.
+            </div>
             <div tabindex="0" role="region" aria-labelledby="tpp-knockout-caption" class="table-wrapper">
                 <table class="tel-table">
                     <caption id="tpp-knockout-caption" style="color:#fb7185;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -6643,6 +7201,13 @@ TPP_LAB_HTML_TEMPLATE = """
 
         function fmtNum(n) {
             return Number(n || 0).toLocaleString();
+        }
+
+        function toggleTppHelp(drawerId, btnEl) {
+            const el = document.getElementById(drawerId);
+            if (!el) return;
+            const isOpen = el.classList.toggle('is-open');
+            if (btnEl) btnEl.classList.toggle('is-open', isOpen);
         }
 
         function renderTppMeltingCurve(idx) {
@@ -6686,10 +7251,9 @@ TPP_LAB_HTML_TEMPLATE = """
                     ],
                     textStyle: { color: '#cbd5e1', fontSize: 10.5 }
                 },
-                grid: { top: 46, bottom: 28, left: 52, right: 52 },
+                grid: { top: 52, bottom: 32, left: 56, right: 64 },
                 xAxis: {
                     type: 'category',
-                    name: 'Temp',
                     data: temps,
                     axisLabel: { color: '#e2e8f0', fontWeight: 'bold' }
                 },
@@ -6697,6 +7261,7 @@ TPP_LAB_HTML_TEMPLATE = """
                     {
                         type: 'value',
                         name: 'Folded Soluble (%)',
+                        nameTextStyle: { color: '#38bdf8', padding: [0, 0, 0, 14] },
                         min: 0,
                         max: 105,
                         axisLabel: { color: '#38bdf8', formatter: '{value}%' },
@@ -6704,7 +7269,8 @@ TPP_LAB_HTML_TEMPLATE = """
                     },
                     {
                         type: 'value',
-                        name: 'Catalytic Output %',
+                        name: 'Catalytic Output (%)',
+                        nameTextStyle: { color: '#34d399', padding: [0, 18, 0, 0] },
                         min: 0,
                         max: 105,
                         axisLabel: { color: '#34d399', formatter: '{value}%' },
