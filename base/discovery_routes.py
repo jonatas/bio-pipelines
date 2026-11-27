@@ -3771,6 +3771,28 @@ def _classify_element_type(organism, family_name, pi_val, gravy_val):
 
 IDEIAME_BLOG_POSTS = [
     {
+        'date': '2026-11-27',
+        'slug': 'benein-boolean-attractor-kaist-colorectal-cancer-reversion-pg-bio',
+        'url': 'https://ideia.me/benein-boolean-attractor-kaist-colorectal-cancer-reversion-pg-bio',
+        'title': 'Layer 22 Bit-Sliced 64-Way BENEIN Boolean Attractor & Synergistic Cancer Reversion Control (KAIST MYB + HDAC2 + FOXA2) in pg_bio',
+        'pair': ['Q92769', 'P10242'],
+        'pipeline': 'kaist-colorectal-cancer-reversion',
+        'arena_url': '/?pipeline=kaist-colorectal-cancer-reversion',
+        'compare_url': '/compare?node1=Q92769&node2=P10242&preset=rangefinder',
+        'cards_url': '/cards?hub=Q92769&challenger=P10242',
+    },
+    {
+        'date': '2026-11-27',
+        'slug': 'ipsae-minipae-cofolding-gate-disordered-slim-tethers-pg-bio',
+        'url': 'https://ideia.me/ipsae-minipae-cofolding-gate-disordered-slim-tethers-pg-bio',
+        'title': "Why AlphaFold's ipTM Rejects Disordered Microprotein Tethers—And How Contact-Restricted ipSAE & 5x5 MiniPAE Fix It in pg_bio",
+        'pair': ['A0A7K4HP20', 'A0AA97FC58'],
+        'pipeline': 'biochar-water-remediation',
+        'arena_url': '/compare?node1=A0AA97FC58&node2=A0A7K4HP20&preset=rangefinder',
+        'compare_url': '/compare?node1=A0AA97FC58&node2=A0A7K4HP20&preset=rangefinder',
+        'cards_url': '/cards?hub=A0AA97FC58&challenger=A0A7K4HP20',
+    },
+    {
         'date': '2026-11-26',
         'slug': 'dual-slim-disordered-microprotein-tethers-enzref-backpressure-pg-bio',
         'url': 'https://ideia.me/dual-slim-disordered-microprotein-tethers-enzref-backpressure-pg-bio',
@@ -8466,7 +8488,8 @@ def api_swarm_telemetry():
                             ('cyanide-mine-tailings', 'Gold-Mine Cyanide & Sulfide -> MBL-Rhodanese Chameleon', 38.0, 9.8, 'Nitrile / Cyanide C≡N Triple Bond (891 kJ/mol)', 'N#CCc1ccccc1'),
                             ('desalination-brine-upcycling', 'Desalination Brine & Whey -> Soda-Lake GalE/Glf Sugars', 45.0, 9.5, 'Pyranose-to-Furanose Ring Contraction (285 kJ/mol)', 'OCC1OC(O)C(O)C(O)C1O'),
                             ('smorf-hla-immunopeptidomics', '🧩 Dark-Proteome smORF -> HLA-I Surface Antigen & CRISPR Screen', 37.0, 7.2, 'C-Terminal Hydrophobic P9 Anchor Peptide Bond', 'CC(C)C(NC(=O)C(Cc1cnc[nH]1)NC(=O)C(C(C)C)N)C(=O)O'),
-                            ('soda-lake-acetyl-chitin-upcycling', '🧩 Soda-Lake Crustacean Chitin -> Glucosamine via DUF5816 GNAT', 45.0, 9.8, 'β-1,4-N-Acetylglucosamine Glycosidic Bond', 'NC1C(O)OC(CO)C(O)C1O')
+                            ('soda-lake-acetyl-chitin-upcycling', '🧩 Soda-Lake Crustacean Chitin -> Glucosamine via DUF5816 GNAT', 45.0, 9.8, 'β-1,4-N-Acetylglucosamine Glycosidic Bond', 'NC1C(O)OC(CO)C(O)C1O'),
+                            ('kaist-colorectal-cancer-reversion', '🧬 KAIST BENEIN Colorectal Cancer Reversion (MYB + HDAC2 + FOXA2 -> Enterocyte)', 37.0, 7.4, 'HDAC2 Zn2+ Acetyl-Lysine Deacetylation & MYB-EP300 KIX LxxLL Tether', 'O=C(CCCCCCC(=O)Nc1ccccc1)NO')
                     ),
                     lig_props AS (
                         SELECT pm.*, r.mw, r.logp, r.hbd, r.hba, r.tpsa, r.rotatable_bonds, r.aromatic_rings, r.fsp3
@@ -8662,6 +8685,40 @@ def api_swarm_telemetry():
             except Exception:
                 pass
 
+            benein_reversion_runs = []
+            try:
+                cur.execute("""
+                    SELECT reversion_id, network_name, combo_rank, combo_size,
+                           knockdown_mask, knockdown_genes, normal_basin_pct, cancer_escape_pct,
+                           mean_hamming_to_normal, reversion_score, synergy_over_subsets,
+                           steps_to_converge, final_attractor_mask, reversion_verdict,
+                           hdac2_enzref_flux, myb_kix_slim_motif
+                    FROM bio_benein_reversion_runs
+                    ORDER BY combo_rank ASC
+                    LIMIT 12;
+                """)
+                for br in cur.fetchall():
+                    benein_reversion_runs.append({
+                        'reversion_id': br[0],
+                        'network_name': br[1],
+                        'combo_rank': int(br[2]),
+                        'combo_size': int(br[3]),
+                        'knockdown_mask': int(br[4]),
+                        'knockdown_genes': br[5],
+                        'normal_basin_pct': float(br[6]),
+                        'cancer_escape_pct': float(br[7]),
+                        'mean_hamming_to_normal': float(br[8]),
+                        'reversion_score': float(br[9]),
+                        'synergy_over_subsets': float(br[10]),
+                        'steps_to_converge': int(br[11]),
+                        'final_attractor_mask': int(br[12]),
+                        'reversion_verdict': br[13],
+                        'hdac2_enzref_flux': float(br[14]),
+                        'myb_kix_slim_motif': br[15],
+                    })
+            except Exception:
+                pass
+
     payload = {
         'summary': summary,
         'regime_breakdown': regime_breakdown,
@@ -8674,6 +8731,7 @@ def api_swarm_telemetry():
         'pipeline_gist_matrix': pipeline_gist_matrix,
         'pipeline_puzzles': pipeline_puzzles,
         'composite_super_pipelines': composite_super_pipelines,
+        'benein_reversion_runs': benein_reversion_runs,
         'agent_checkpoint': agent_checkpoint,
         'agent_hypotheses': agent_hypotheses,
         'evolving_annotations': evolving_annotations,
