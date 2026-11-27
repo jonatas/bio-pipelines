@@ -2,6 +2,8 @@ import os
 import re
 import sys
 import time
+import glob
+import importlib
 import datetime
 import subprocess
 import threading
@@ -10,6 +12,76 @@ import psycopg
 import numpy as np
 
 DB_URI = os.getenv("PG_BIO_URL", "postgresql://jonatas@localhost:28818/bio_demo")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class SwarmCodeChangeWatcher:
+    """
+    Observes file modification times (`mtime_ns`) and byte sizes across `base/*.py` and `base/*.sql`:
+      1. If `hypothesis_agent.py` or `schema.sql` changes, hot-reloads `hypothesis_agent` in-process via
+         `importlib.reload()` and immediately triggers `run_hypothesis_evolution_cycle()` so newly added
+         pipelines, puzzles, or Layer 22 BENEIN reversion scans are executed and persisted without wait.
+      2. If `swarm_discovery.py` itself changes on disk, saves the current swarm checkpoint, runs one
+         hot-reloaded hypothesis evolution cycle, and cleanly re-executes (`os.execv`) the swarm daemon
+         with the exact same CLI arguments after the current wave completes!
+    """
+
+    def __init__(self, watch_dir: str = BASE_DIR):
+        self.watch_dir = watch_dir
+        self.boot_ts = time.time()
+        self.reload_count = 0
+        self.last_changed_files: list[str] = []
+        self.last_reload_at: str | None = None
+        self.snapshot = self._scan_files()
+
+    def _scan_files(self) -> dict[str, tuple[int, int]]:
+        state: dict[str, tuple[int, int]] = {}
+        for ext in ("*.py", "*.sql"):
+            for path in glob.glob(os.path.join(self.watch_dir, ext)):
+                try:
+                    st = os.stat(path)
+                    state[os.path.basename(path)] = (st.st_mtime_ns, st.st_size)
+                except OSError:
+                    pass
+        return state
+
+    def check_changes(self) -> tuple[bool, list[str], bool]:
+        """Returns `(has_changes, changed_filenames, requires_process_reexec)`."""
+        curr = self._scan_files()
+        changed = [fname for fname, sig in curr.items() if self.snapshot.get(fname) != sig]
+        if not changed:
+            return False, [], False
+        self.snapshot = curr
+        self.reload_count += 1
+        self.last_changed_files = sorted(changed)
+        self.last_reload_at = datetime.datetime.now().isoformat(timespec="seconds")
+        needs_reexec = "swarm_discovery.py" in changed
+        return True, self.last_changed_files, needs_reexec
+
+
+CODE_WATCHER = SwarmCodeChangeWatcher()
+
+
+def trigger_hot_reloaded_hypothesis_cycle(reason: str = "Periodic Wave Hook") -> bool:
+    """
+    Dynamically reloads `hypothesis_agent` from disk and runs `run_hypothesis_evolution_cycle()`
+    so any code edits to `hypothesis_agent.py` or `schema.sql` take effect immediately.
+    """
+    try:
+        mod_name = "base.hypothesis_agent" if "base.hypothesis_agent" in sys.modules else "hypothesis_agent"
+        if mod_name in sys.modules:
+            mod = importlib.reload(sys.modules[mod_name])
+        else:
+            try:
+                import base.hypothesis_agent as mod
+            except ImportError:
+                import hypothesis_agent as mod
+        print(f"[Swarm Code Watcher] Running hot-reloaded hypothesis & BENEIN pipeline cycle ({reason})...")
+        mod.run_hypothesis_evolution_cycle()
+        return True
+    except Exception as he:
+        print(f"[Swarm Code Watcher] Warning during hypothesis cycle ({reason}): {he}")
+        return False
 
 # Hardware-calibrated concurrency benchmark results on Apple Silicon (with Dense Closest-First Batch Frontier + HNSW ef=64)
 CALIBRATED_BENCHMARKS = [
@@ -1619,18 +1691,41 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
                 f"Graph: {tot_graph:,} edges ({tot_rf:,} 3D RF, {tot_tpp:,} TPP KOs)"
             )
 
+            # Code Change Observation & Auto-Reload Mechanism (`SwarmCodeChangeWatcher`)
+            has_code_change, changed_files, needs_reexec = CODE_WATCHER.check_changes()
+            if has_code_change:
+                print(
+                    f"\n🔄 [Swarm Code Watcher] Detected code update #{CODE_WATCHER.reload_count} in "
+                    f"{', '.join(changed_files)} at {CODE_WATCHER.last_reload_at}!"
+                )
+                with admin_conn.cursor() as cur:
+                    save_swarm_checkpoint(cur)
+                trigger_hot_reloaded_hypothesis_cycle(
+                    reason=f"Auto-Reload on {', '.join(changed_files)}"
+                )
+                if needs_reexec and max_cycles == 0:
+                    print(
+                        "🚀 [Swarm Code Watcher] `swarm_discovery.py` modified -> "
+                        "Gracefully closing DB pool and re-executing swarm daemon (`os.execv`)..."
+                    )
+                    for c in worker_conns:
+                        try:
+                            c.close()
+                        except Exception:
+                            pass
+                    try:
+                        claim_conn.close()
+                        admin_conn.close()
+                    except Exception:
+                        pass
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+
             # In-process Pipeline Intelligence Hook (non-blocking background thread)
             if cycle % 25 == 0 and not getattr(run_adaptive_swarm, "_hyp_thread_busy", False):
                 def _bg_hyp():
                     run_adaptive_swarm._hyp_thread_busy = True
                     try:
-                        try:
-                            from base.hypothesis_agent import run_hypothesis_evolution_cycle
-                        except ImportError:
-                            from hypothesis_agent import run_hypothesis_evolution_cycle
-                        run_hypothesis_evolution_cycle()
-                    except Exception as he:
-                        print(f"[Pipeline Hypothesis Hook] Warning: {he}")
+                        trigger_hot_reloaded_hypothesis_cycle(reason=f"Wave #{cycle+1} Hook")
                     finally:
                         run_adaptive_swarm._hyp_thread_busy = False
                 threading.Thread(target=_bg_hyp, daemon=True).start()

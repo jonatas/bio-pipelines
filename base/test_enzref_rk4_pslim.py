@@ -12,6 +12,7 @@ from hypothesis_agent import (
     discover_disordered_dual_slim_tethers,
     evaluate_kaist_benein_cancer_reversion,
 )
+from swarm_discovery import SwarmCodeChangeWatcher, trigger_hot_reloaded_hypothesis_cycle
 
 
 def test_split_reaction_roles_and_enzref_antisymmetry():
@@ -150,4 +151,28 @@ def test_layer22_kaist_benein_cancer_reversion_pipeline():
             assert top1["reversion_verdict"] == "SYNERGISTIC_MASTER_REVERSION_SET"
             assert top1["hdac2_enzref_flux"] > 0.0
             assert top1["myb_kix_slim_motif"] == "ELELLLMS"
+
+
+def test_swarm_code_change_watcher_and_hot_reload():
+    """
+    Verifies `SwarmCodeChangeWatcher` tracks `base/*.py` and `base/*.sql`,
+    detects simulated timestamp updates, and triggers hot-reloaded hypothesis + BENEIN execution.
+    """
+    watcher = SwarmCodeChangeWatcher()
+    assert "hypothesis_agent.py" in watcher.snapshot
+    assert "swarm_discovery.py" in watcher.snapshot
+    has_change, changed, needs_reexec = watcher.check_changes()
+    assert has_change is False
+    assert changed == []
+    assert needs_reexec is False
+
+    # Simulate an mtime update on hypothesis_agent.py
+    old_mtime, old_size = watcher.snapshot["hypothesis_agent.py"]
+    watcher.snapshot["hypothesis_agent.py"] = (old_mtime - 1, old_size)
+    has_change, changed, needs_reexec = watcher.check_changes()
+    assert has_change is True
+    assert "hypothesis_agent.py" in changed
+    assert needs_reexec is False
+    assert watcher.reload_count == 1
+
 

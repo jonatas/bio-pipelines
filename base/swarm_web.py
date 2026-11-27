@@ -246,6 +246,29 @@ PIPELINE_PRESETS = {
         "sink_name": "Solved DUF5816 GNAT Acetyltransferase Sink (A0AAE3FRF8 × M0AEU6 · 95.5% Pocket IoU)",
         "beacon_name": "NagC GlcNAc Sensor → Halophilic Bacterioruberin CrtI Beacon (A0A0W1R8L8)",
     },
+    "kaist-colorectal-cancer-reversion": {
+        "title": "KAIST BENEIN Colorectal Cancer Reversion (MYB P10242 + HDAC2 Q92769 + FOXA2 Q9Y261 → EP300 / Enterocyte Attractor, 37°C, pH 7.4) [🧬 LAYER 22 AUTO-COMPILED 4/4]",
+        "temp_c": 37.0,
+        "ph": 7.4,
+        "smiles": "CC(=O)NCCCCC(N)C(=O)O",
+        "ref_smiles": "O=C(CCCCCCC(=O)Nc1ccccc1)NO",
+        "sub_label": "Malignant WNT/MYC Chromatin Pool (H3K9ac/H3K27ac Silenced, µM eq)",
+        "int_label": "De-Repressed CDX2 / HNF4A Enhancer Pool (µM eq)",
+        "prod_label": "Differentiated Normal Enterocyte Attractor (VIL1+ / KLF4+, µM eq)",
+        "kcat1": 27.5,
+        "km1": 330.0,
+        "kcat2": 56.5,
+        "km2": 23.5,
+        "ki": 18.0,
+        "boost": 9.8,
+        "f1": 0.45,
+        "f2": 0.35,
+        "f3": 0.20,
+        "target_bond": "HDAC2 Zn2+ ε-N-Acetyl-L-Lysine Deacetylation & MYB-EP300 KIX LxxLL Tether (340 kJ/mol)",
+        "linker_name": "MYB_TAD[261..304] Disordered Dual-SLiM Bridge (28 aa, GRAVY -1.16)",
+        "sink_name": "MYB LxxLL (297..304 ELELLLMS) Blockade → EP300 (Q09472) Redirection to CDX2/HNF4A",
+        "beacon_name": "Layer 22 Bit-Sliced 64-Way BENEIN Attractor Gate (Mask 7 → Mask 968 · 100.0% Reversion, Synergy +0.9413)",
+    },
 }
 
 
@@ -4079,8 +4102,57 @@ def resolve_deterministic_id(ident: str = ""):
     return redirect("/")
 
 
+@app.route("/api/code_reload_status", methods=["GET", "POST"])
+def api_code_reload_status():
+    """
+    Exposes live code-change watcher telemetry (`base/*.py`, `base/*.sql`) and supports
+    on-demand hot-reload (`POST /api/code_reload_status` or `?trigger=1`) of `hypothesis_agent`
+    (including Stage 7 Layer 22 BENEIN cancer reversion) without dropping active web requests.
+    """
+    try:
+        from base.swarm_discovery import CODE_WATCHER, trigger_hot_reloaded_hypothesis_cycle
+    except ImportError:
+        from swarm_discovery import CODE_WATCHER, trigger_hot_reloaded_hypothesis_cycle
+
+    has_change, changed_files, _needs_reexec = CODE_WATCHER.check_changes()
+    force_trigger = request.method == "POST" or request.args.get("trigger") in ("1", "true", "yes")
+    reloaded_now = False
+    if has_change or force_trigger:
+        reason = (
+            f"File change in {', '.join(changed_files)}"
+            if has_change
+            else "Manual /api/code_reload_status trigger"
+        )
+        reloaded_now = trigger_hot_reloaded_hypothesis_cycle(reason=reason)
+
+    return jsonify(
+        {
+            "status": "ok",
+            "reloaded_now": reloaded_now,
+            "reload_count": CODE_WATCHER.reload_count,
+            "last_changed_files": CODE_WATCHER.last_changed_files,
+            "last_reload_at": CODE_WATCHER.last_reload_at,
+            "watched_files": sorted(CODE_WATCHER.snapshot.keys()),
+            "active_pipelines": list(PIPELINE_PRESETS.keys()),
+        }
+    )
+
+
 if __name__ == "__main__":
+    import glob as _glob
     import sys
     host = os.getenv("SWARM_WEB_HOST", "0.0.0.0")
     port = int(sys.argv[1]) if len(sys.argv) > 1 else int(os.getenv("SWARM_WEB_PORT", "8090"))
-    app.run(host=host, port=port, debug=False)
+    use_reloader = os.getenv("SWARM_WEB_RELOAD", "1") not in ("0", "false", "False")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    extra_files = sorted(
+        _glob.glob(os.path.join(base_dir, "*.py"))
+        + _glob.glob(os.path.join(base_dir, "*.sql"))
+    )
+    app.run(
+        host=host,
+        port=port,
+        debug=False,
+        use_reloader=use_reloader,
+        extra_files=extra_files,
+    )
