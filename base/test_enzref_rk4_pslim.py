@@ -10,6 +10,7 @@ from hypothesis_agent import (
     DB_URL,
     evaluate_m3_sink_candidate_with_enzref_rk4,
     discover_disordered_dual_slim_tethers,
+    evaluate_kaist_benein_cancer_reversion,
 )
 
 
@@ -125,3 +126,28 @@ def test_pslim_window_pool_and_dual_slim_tether_junction_sanity():
             j_pass, j_mode = cur.fetchone()
             assert j_pass is False
             assert "Bicistronic_Operon_Required" in j_mode
+
+
+def test_layer22_kaist_benein_cancer_reversion_pipeline():
+    """
+    Verifies Stage 7 Layer 22 Bit-Sliced 64-Way BENEIN Boolean Attractor & KAIST Colorectal Reversion
+    integration in `bio-pipelines` (`evaluate_kaist_benein_cancer_reversion`):
+    - Ranks `MYB + HDAC2 + FOXA2` (mask = 7) as Rank #1 (`100.0%` normal enterocyte basin, `synergy = +0.9413`).
+    - Couples `HDAC2` (`Q92769`) positive EnzRef deacetylation flux and `MYB` (`P10242`) `ELELLLMS` KIX-tether SLiM.
+    """
+    with psycopg.connect(DB_URL) as conn:
+        with conn.cursor() as cur:
+            rows = evaluate_kaist_benein_cancer_reversion(cur)
+            conn.commit()
+            assert len(rows) >= 10
+            top1 = rows[0]
+            assert top1["combo_rank"] == 1
+            assert top1["combo_size"] == 3
+            assert top1["knockdown_mask"] == 7
+            assert top1["knockdown_genes"] == "MYB + HDAC2 + FOXA2"
+            assert top1["normal_basin_pct"] == 100.0
+            assert top1["synergy_over_subsets"] >= 0.90
+            assert top1["reversion_verdict"] == "SYNERGISTIC_MASTER_REVERSION_SET"
+            assert top1["hdac2_enzref_flux"] > 0.0
+            assert top1["myb_kix_slim_motif"] == "ELELLLMS"
+

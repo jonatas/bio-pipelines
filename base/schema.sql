@@ -236,3 +236,24 @@ INSERT INTO bio_agent_checkpoint (id, last_scanned_edge_id, total_cycles_run, to
 VALUES (1, 0, 0, 0, 0)
 ON CONFLICT (id) DO NOTHING;
 
+CREATE TABLE IF NOT EXISTS bio_benein_reversion_runs (
+    reversion_id TEXT PRIMARY KEY,
+    network_name TEXT NOT NULL,
+    combo_rank INT NOT NULL,
+    combo_size INT NOT NULL,
+    knockdown_mask BIGINT NOT NULL,
+    knockdown_genes TEXT NOT NULL,
+    normal_basin_pct DOUBLE PRECISION NOT NULL,
+    cancer_escape_pct DOUBLE PRECISION NOT NULL,
+    mean_hamming_to_normal DOUBLE PRECISION NOT NULL,
+    reversion_score DOUBLE PRECISION NOT NULL,
+    synergy_over_subsets DOUBLE PRECISION NOT NULL,
+    steps_to_converge INT NOT NULL,
+    final_attractor_mask BIGINT NOT NULL,
+    reversion_verdict TEXT NOT NULL,
+    hdac2_enzref_flux REAL NOT NULL DEFAULT 0.0,
+    myb_kix_slim_motif TEXT NOT NULL DEFAULT 'ELELLLMS',
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
