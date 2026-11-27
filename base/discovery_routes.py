@@ -11474,6 +11474,6 @@ def api_compound_3d(hub_id):
 
 
 if __name__ == '__main__':
-    host = os.getenv("SWARM_WEB_HOST", "0.0.0.0")
+    host = os.getenv("SWARM_WEB_HOST", "127.0.0.1")
     port = int(os.getenv("SWARM_WEB_PORT", "8080"))
     app.run(host=host, port=port, threaded=True)
