@@ -2566,31 +2566,54 @@ def evaluate_kaist_benein_cancer_reversion(cur) -> list[dict]:
         """
     )
 
-    cur.execute(
-        """
-        SELECT forward_flux_score
-        FROM bio_enzref_kinetics_smiles(
-            (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'Q92769'),
-            'CC(=O)NCCCCC([NH3+])C(=O)[O-].O>>CC(=O)[O-].[NH3+]CCCCC([NH3+])C(=O)[O-]'
-        );
-        """
-    )
-    erow = cur.fetchone()
-    hdac2_flux = float(erow[0]) if erow else 0.058743
+    # Q92769 is human HDAC2, which the seed dataset does not carry: the
+    # subquery yields NULL, pg_bio refuses it with "argument 0 must not be
+    # null", and the exception fires inside execute() before the fallback
+    # below can be reached. A savepoint keeps the failure local, so the
+    # cycle carries on with the fallback this already provides.
+    hdac2_flux = 0.058743
+    cur.execute("SAVEPOINT bio_enzref_probe")
+    try:
+        cur.execute(
+            """
+            SELECT forward_flux_score
+            FROM bio_enzref_kinetics_smiles(
+                (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'Q92769'),
+                'CC(=O)NCCCCC([NH3+])C(=O)[O-].O>>CC(=O)[O-].[NH3+]CCCCC([NH3+])C(=O)[O-]'
+            );
+            """
+        )
+        erow = cur.fetchone()
+        if erow and erow[0] is not None:
+            hdac2_flux = float(erow[0])
+    except psycopg.Error:
+        cur.execute("ROLLBACK TO SAVEPOINT bio_enzref_probe")
+    else:
+        cur.execute("RELEASE SAVEPOINT bio_enzref_probe")
 
-    cur.execute(
-        """
-        SELECT subseq_b
-        FROM bio_match_dual_slim_tether(
-            substring((SELECT sequence FROM proteins WHERE uniprot_id = 'P10242') from 241 for 85),
-            (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'Q09472'),
-            (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'P35222'),
-            8, 2, 6, NULL::bytea, NULL::text
-        );
-        """
-    )
-    mrow = cur.fetchone()
-    myb_motif = mrow[0] if mrow else "ELELLLMS"
+    # P10242 (MYB), Q09472 (EP300) and P35222 (CTNNB1) are human too, and
+    # absent for the same reason.
+    myb_motif = "ELELLLMS"
+    cur.execute("SAVEPOINT bio_slim_probe")
+    try:
+        cur.execute(
+            """
+            SELECT subseq_b
+            FROM bio_match_dual_slim_tether(
+                substring((SELECT sequence FROM proteins WHERE uniprot_id = 'P10242') from 241 for 85),
+                (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'Q09472'),
+                (SELECT embedding::real[] FROM proteins WHERE uniprot_id = 'P35222'),
+                8, 2, 6, NULL::bytea, NULL::text
+            );
+            """
+        )
+        mrow = cur.fetchone()
+        if mrow and mrow[0] is not None:
+            myb_motif = mrow[0]
+    except psycopg.Error:
+        cur.execute("ROLLBACK TO SAVEPOINT bio_slim_probe")
+    else:
+        cur.execute("RELEASE SAVEPOINT bio_slim_probe")
 
     gene_names = ["MYB", "HDAC2", "FOXA2", "EP300", "CTNB1", "MYC", "CDX2", "HNF4A", "KLF4", "VIL1"]
     cur.execute(
