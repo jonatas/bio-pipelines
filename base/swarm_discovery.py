@@ -1600,6 +1600,19 @@ def run_adaptive_swarm(max_cycles: int = 0, force_mode: str = ""):
                     nodes.extend(seeded)
 
             if not nodes:
+                # An exhausted frontier still costs a wave. Without this the
+                # cycle counter never advances, so --cycles=N never returns
+                # and a bounded run waits for a frontier that may never come:
+                # on a database whose proteins have no embeddings, both
+                # claim_dense_frontier_batch and
+                # seed_unexpanded_proteome_islands come back empty for ever.
+                cycle += 1
+                if max_cycles > 0 and cycle >= max_cycles:
+                    print(
+                        f"[Swarm Governor] Frontier empty for {cycle} cycle(s); "
+                        "nothing left to expand."
+                    )
+                    break
                 time.sleep(1.0)
                 continue
 
@@ -1759,6 +1772,11 @@ if __name__ == "__main__":
         elif arg.startswith("--cycles="):
             max_c = int(arg.split("=", 1)[1])
 
+    # A bounded run reports a failure instead of retrying it: `--cycles=N`
+    # is asked for by a caller that wants an exit code, and a missing
+    # relation or a bad credential is not something three seconds will
+    # mend. The daemon keeps its original behaviour.
+    attempts = 0
     while True:
         try:
             run_adaptive_swarm(max_cycles=max_c, force_mode=force_arg)
@@ -1766,4 +1784,12 @@ if __name__ == "__main__":
                 break
         except Exception as e:
             print(f"[Swarm Governor] Recovered from error: {e}")
+            if max_c > 0:
+                attempts += 1
+                if attempts >= 3:
+                    print(
+                        f"[Swarm Governor] {attempts} failed attempts on a "
+                        f"bounded run; giving up: {e}"
+                    )
+                    sys.exit(1)
             time.sleep(3)
